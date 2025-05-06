@@ -17,7 +17,7 @@ export const COLORS = {
     yellow:"#fdcc39",
     SECONDARY_COLOR: '#ffffff',
 
-    
+
     BLUE_COLOR: '#1F45AB',
     // LIGHT_COLOR: '#8A8A8D',
     LIGHT_COLOR: '#cccccc',
@@ -81,6 +81,7 @@ export const IconUri = {
     
     //New
     CalenderColor: require('../assets/Icons/CalenderColor.png'),
+    CalenderSearch: require('../assets/Icons/CalenderSearch.png'),
 }
 
 

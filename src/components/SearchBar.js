@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.BORDER_LIGHT_COLOR,
         borderRadius: 10,
         paddingHorizontal: 10,
-        height: 45,
+        height: 40,
         marginBottom: 10,
     },
     icon: {

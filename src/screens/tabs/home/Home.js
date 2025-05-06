@@ -6,12 +6,26 @@ import WelcomeContainer from './components/WelcomeContainer';
 import MyText from '../../../components/MyText';
 import { COLORS, IconUri } from '../../../constants';
 import { calculatefontSize } from '../../../helper/responsiveHelper';
+
+//PKGS
+import { CalendarList } from 'react-native-calendars';
 //Icons
 import Entypo from "react-native-vector-icons/Entypo";
 import SearchBar from '../../../components/SearchBar';
 
 const Home = () => {
   const [tabs, setTabs] = React.useState("Events");
+
+  const [selectedDate, setSelectedDate] = React.useState('2025-05-06');
+  const days = Array.from({ length: 7 }).map((_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() + i);
+    return {
+      date: date.toISOString().split('T')[0],
+      day: date.toDateString().slice(0, 3),
+      num: date.getDate(),
+    };
+  });
 
   return (
     <>
@@ -34,8 +48,8 @@ const Home = () => {
             ]}
             onPress={() => setTabs(item)}
           >
-           {tabs === item && <Entypo name={'check'} size={20} color={tabs === item ? "#fff" : "#000"} />}
-            <MyText style={{ color: tabs === item ? COLORS?.whiteColors :COLORS?.whiteColors, fontSize: calculatefontSize(2) }}>{item}</MyText>
+            {tabs === item && <Entypo name={'check'} size={20} color={tabs === item ? "#fff" : "#000"} />}
+            <MyText style={{ color: tabs === item ? COLORS?.whiteColors : COLORS?.whiteColors, fontSize: calculatefontSize(2) }}>{item}</MyText>
           </TouchableOpacity>
         ))}
       </View>
@@ -43,9 +57,47 @@ const Home = () => {
       {/* Tab Content */}
       {tabs === "Events" ? (
         <Wrapper>
-         <SearchBar />
-          <View style={{ backgroundColor: "yellow" }}>
-            <MyText>Calender</MyText>
+          <SearchBar placeholder='Search an event' />
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginVertical: 10 }}>
+            <MyText style={{ fontSize: calculatefontSize(2), color: COLORS?.PRIMARY_COLOR_LIGHT }}>Today</MyText>
+            <Image
+              source={IconUri?.CalenderSearch}
+              style={{ height: 20, width: 20, resizeMode: "contain" }}
+            />
+          </View>
+          <View style={{ backgroundColor: COLORS?.PRIMARY_COLOR, borderRadius: 10, paddingVertical: 20 }}>
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={days}
+              keyExtractor={(item) => item.date}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={{
+                    alignItems: 'center',
+                    // padding: 10,
+                    // marginHorizontal: 5,
+
+                    borderRadius: 10,
+                    width: 45,
+                  }}
+                  onPress={() => setSelectedDate(item.date)}
+                >
+                  <Text style={{ color: '#fff', fontSize: calculatefontSize(1.5), marginVertical: 10 }}>{item.day}</Text>
+                  <Text style={
+                    {
+                      color: selectedDate === item.date ? COLORS.PRIMARY_COLOR : COLORS.whiteColors,
+                      fontSize: calculatefontSize(1.5),
+                      height: 20,
+                      width: 20,
+                      textAlign: "center",
+                      borderRadius: 10,
+                      backgroundColor:
+                        selectedDate === item.date ? COLORS.whiteColors : COLORS.PRIMARY_COLOR,
+                    }}>{item.num}</Text>
+                </TouchableOpacity>
+              )}
+            />
           </View>
           <FlatList
             showsVerticalScrollIndicator={false}
@@ -106,9 +158,9 @@ const styles = StyleSheet.create({
   },
   tab: {
     flex: 1,
-    flexDirection:"row",
-    justifyContent:"center",
-  
+    flexDirection: "row",
+    justifyContent: "center",
+
     paddingVertical: 10,
     alignItems: 'center',
     borderRadius: 5,
