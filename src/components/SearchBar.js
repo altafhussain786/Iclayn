@@ -1,0 +1,62 @@
+import React from 'react';
+import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import { COLORS, fontFamily } from '../constants';
+import { calculatefontSize } from '../helper/responsiveHelper';
+
+
+const SearchBar = ({
+    value,
+    onChangeText,
+    placeholder = "Search...",
+    onClear,
+    style,
+    iconSize = 20,
+    iconColor = COLORS.LIGHT_COLOR,
+    inputStyle,
+    containerStyle
+}) => {
+    return (
+        <View style={[styles.container, containerStyle]}>
+            <AntDesign name="search1" size={iconSize} color={iconColor} style={styles.icon} />
+            <TextInput
+                value={value}
+                onChangeText={onChangeText}
+                placeholder={placeholder}
+                placeholderTextColor={COLORS.LIGHT_COLOR}
+                style={[styles.input, inputStyle]}
+            />
+            {value?.length > 0 && (
+                <TouchableOpacity onPress={onClear} style={styles.clearButton}>
+                    <AntDesign name="closecircle" size={iconSize} color={COLORS.LIGHT_COLOR} />
+                </TouchableOpacity>
+            )}
+        </View>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: COLORS.BORDER_LIGHT_COLOR,
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        height: 45,
+        marginBottom: 10,
+    },
+    icon: {
+        marginRight: 8,
+    },
+    input: {
+        flex: 1,
+        fontSize: calculatefontSize(1.8),
+        // fontFamily: fontFamily.regulaer,
+        color: COLORS.BLACK_COLOR,
+    },
+    clearButton: {
+        marginLeft: 8,
+    }
+});
+
+export default SearchBar;
