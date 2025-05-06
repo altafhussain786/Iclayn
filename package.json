@@ -23,6 +23,7 @@
     "react-native-calendars": "^1.1312.0",
     "react-native-gesture-handler": "^2.25.0",
     "react-native-loader-kit": "^2.0.8",
+    "react-native-otp-entry": "^1.8.4",
     "react-native-pager-view": "^6.7.1",
     "react-native-responsive-dimensions": "^3.1.1",
     "react-native-safe-area-context": "^5.4.0",

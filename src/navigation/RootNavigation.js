@@ -7,6 +7,7 @@ import Splash from '../screens/splash/Splash';
 import BottomTabNavigation from './BottomTabNavigation';
 import LoginByPassword from '../screens/auth/login/LoginByPassword';
 import ForgetPassword from '../screens/auth/forgetPassword/ForgetPassword';
+import Otp from '../screens/auth/otp/Otp';
 
 
 
@@ -26,6 +27,7 @@ const RootNavigation = () => {
         <Stack.Screen name="Splash" component={Splash} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="LoginByPassword" component={LoginByPassword} />
+        <Stack.Screen name="Otp" component={Otp} />
         <Stack.Screen name="ForgetPassword" component={ForgetPassword} />
         <Stack.Screen name="BottomTabNavigation" component={BottomTabNavigation} />
   

@@ -9,24 +9,20 @@ import * as Yup from 'yup'
 import { calculatefontSize } from '../../helper/responsiveHelper'
 
 const validationSchema = Yup.object().shape({
-    companyUrl: Yup.string().required('Company URL is required'),
+    
     email: Yup.string().email('Invalid email').required('Email is required'),
-    password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+   
 })
 
 const Login = ({ navigation }) => {
     const [loader, setLoader] = React.useState(false)
 
     const login = async (values) => {
-        if (!values?.email) {
-                   Alert.alert('Email is required')
-                   return
-                   
-               }
+      
                setLoader(true)
                setTimeout(() => {
                    setLoader(false)
-                   navigation.navigate('LoginByPassword')
+                   navigation.navigate('LoginByPassword',{email:values.email})
                }, 2000)
     }
 
@@ -36,14 +32,14 @@ const Login = ({ navigation }) => {
                 <Image tintColor={COLORS?.whiteColors} source={{ uri: "https://api.iclayn.com/assets/logo-DuQxixZj.png" }} style={{ width: 150, height: 50, resizeMode: "contain", }} />
             </View>
             <Formik
-                initialValues={{ companyUrl: '', email: '', password: '' }}
-                // validationSchema={validationSchema}
+                initialValues={{  email: '', }}
+                validationSchema={validationSchema}
                 onSubmit={login}
             >
                 {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
                     <View style={styles.loginContainer}>
                         <InputText iconName={'email'} value={values.email} onChangeText={handleChange('email')} extraStyle={{ marginTop: 30 }} placeholder={'Email'} />
-                      
+                        {touched.email && errors.email && <MyText style={{ color: 'red' }}>{errors.email}</MyText>}
                         <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 30 }}>
                             <TouchableOpacity onPress={() => navigation.navigate('ForgetPassword')}>
                                 <MyText style={{ color: COLORS?.whiteColors, textAlign: 'right', fontSize: calculatefontSize(1.9) }}>Forgot Password?</MyText>

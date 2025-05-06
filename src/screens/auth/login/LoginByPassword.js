@@ -18,7 +18,8 @@ const validationSchema = Yup.object().shape({
     password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
 })
 
-const LoginByPassword = ({ navigation }) => {
+const LoginByPassword = ({ navigation ,route}) => {
+    const email = route?.params?.email
     const [loader, setLoader] = React.useState(false)
 
     const LoginByPassword = async (values) => {
@@ -29,7 +30,7 @@ const LoginByPassword = ({ navigation }) => {
         setLoader(true)
         setTimeout(() => {
             setLoader(false)
-            navigation.navigate('BottomTabNavigation')
+            navigation.navigate('Otp',{userEmail:email})
         }, 2000)
     }
 
@@ -49,7 +50,7 @@ const LoginByPassword = ({ navigation }) => {
                         <View style={{ marginVertical: 20,flexDirection:'row',alignItems:"center",justifyContent:'space-between' }}>
                             <View style={{flexDirection:'row',alignItems:'center',gap:5}}>
                                 <Icon name={'email'} size={22} color={COLORS.LIGHT_COLOR} />
-                                <MyText style={{ color: COLORS?.whiteColors, fontSize: calculatefontSize(1.9) }}>irfan@yopmail.com</MyText>
+                                <MyText style={{ color: COLORS?.whiteColors, fontSize: calculatefontSize(1.9) }}>{email}</MyText>
 
                             </View>
                             <TouchableOpacity onPress={() => navigation.goBack()} >
