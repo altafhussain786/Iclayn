@@ -50,15 +50,15 @@ const BottomTabNavigation = () => {
               <Image
                 source={iconSource}
                 style={{
-                  width: 24,
-                  height: 24,
-                  tintColor: focused ? COLORS.PRIMARY_COLOR : '#a1a1a1',
+                  width: 20,
+                  height: 20,
+                  tintColor: focused ? COLORS.PRIMARY_COLOR_LIGHT : '#a1a1a1',
                 }}
                 resizeMode="contain"
               />
             );
           },
-          tabBarActiveTintColor: COLORS.PRIMARY_COLOR,
+          tabBarActiveTintColor: COLORS.PRIMARY_COLOR_LIGHT,
           tabBarInactiveTintColor: '#a1a1a1',
         })}
       >

@@ -4,6 +4,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import MyText from './MyText';
 import LogoText from './LogoText';
 import { COLORS } from '../constants';
+import { calculatefontSize } from '../helper/responsiveHelper';
 
 const ScreenHeader = ({
   isShowTitle = false,
@@ -12,7 +13,8 @@ const ScreenHeader = ({
   isGoBack = false
 }) => {
   return (
-    <View style={styles.container}>
+    <View style={styles.container1}>
+      <View style={styles.container}>
       <TouchableOpacity onPress={onPress} style={styles.iconWrapper}>
         <Feather name={isGoBack ? 'arrow-left' : 'settings'} size={20} color={COLORS?.whiteColors} />
       </TouchableOpacity>
@@ -29,6 +31,7 @@ const ScreenHeader = ({
       <TouchableOpacity onPress={onPress} style={styles.iconWrapper}>
         <Feather name={'bell'} size={20} color={COLORS?.whiteColors} />
       </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -36,15 +39,19 @@ const ScreenHeader = ({
 export default ScreenHeader;
 
 const styles = StyleSheet.create({
+  container1: {
+    backgroundColor: COLORS?. PRIMARY_COLOR_LIGHT,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+  },
   container: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    top:10,
     backgroundColor: COLORS?. PRIMARY_COLOR_LIGHT,
-    paddingHorizontal: 20,
-    paddingVertical: 30,
-
   },
+  
   iconWrapper: {
     width: 30, // Ensures symmetry for centered title/logo
     alignItems: 'center'
@@ -54,8 +61,8 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   titleText: {
-    fontSize: 20,
+    fontSize: calculatefontSize(2),
     color: COLORS?.whiteColors,
-    fontWeight: '600'
+    fontWeight: '400'
   }
 });
