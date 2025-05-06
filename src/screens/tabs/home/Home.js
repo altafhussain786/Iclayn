@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   timeColor: {
-    color: COLORS?.LIGHT_COLOR,
+    color: COLORS?.LIGHT_COLOR, 
     fontSize: calculatefontSize(1.5),
   },
   txtStyle: {
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   taskText: {
     fontSize: 18,
     color: COLORS.PRIMARY_COLOR,
-    textAlign: 'center',
+    // textAlign: 'center',
     marginTop: 20,
   },
 });

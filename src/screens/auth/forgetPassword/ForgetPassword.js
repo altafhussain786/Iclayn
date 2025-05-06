@@ -1,12 +1,14 @@
 import { Alert, Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
-import MyText from '../../components/MyText'
-import InputText from '../../components/InputText'
-import TouchableButton from '../../components/TouchableButton'
-import { COLORS, IconUri } from '../../constants'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
-import { calculatefontSize } from '../../helper/responsiveHelper'
+import MyText from '../../../components/MyText'
+import InputText from '../../../components/InputText'
+import TouchableButton from '../../../components/TouchableButton'
+import { COLORS, IconUri } from '../../../constants'
+import { calculatefontSize } from '../../../helper/responsiveHelper'
+
+
 
 const validationSchema = Yup.object().shape({
     companyUrl: Yup.string().required('Company URL is required'),
@@ -14,41 +16,41 @@ const validationSchema = Yup.object().shape({
     password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
 })
 
-const Login = ({ navigation }) => {
+const ForgetPassword = ({ navigation }) => {
     const [loader, setLoader] = React.useState(false)
 
-    const login = async (values) => {
+    const ForgetPassword = async (values) => {
         if (!values?.email) {
-                   Alert.alert('Email is required')
-                   return
-                   
-               }
-               setLoader(true)
-               setTimeout(() => {
-                   setLoader(false)
-                   navigation.navigate('LoginByPassword')
-               }, 2000)
+            Alert.alert('Email is required')
+            return
+
+        }
+        setLoader(true)
+        setTimeout(() => {
+            setLoader(false)
+            navigation.navigate('ForgetPasswordByPassword')
+        }, 2000)
     }
 
     return (
-        <ImageBackground blurRadius={2} source={require("../../assets/Images/bgimage.png")} style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
-            <View >
+        <ImageBackground blurRadius={2} source={require("../../../assets/Images/bgimage.png")} style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
+            <View style={{ marginBottom: 20 }}>
                 <Image tintColor={COLORS?.whiteColors} source={{ uri: "https://api.iclayn.com/assets/logo-DuQxixZj.png" }} style={{ width: 150, height: 50, resizeMode: "contain", }} />
             </View>
             <Formik
                 initialValues={{ companyUrl: '', email: '', password: '' }}
                 // validationSchema={validationSchema}
-                onSubmit={login}
+                onSubmit={ForgetPassword}
             >
                 {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
                     <View style={styles.loginContainer}>
-                        <InputText iconName={'email'} value={values.email} onChangeText={handleChange('email')} extraStyle={{ marginTop: 30 }} placeholder={'Email'} />
-                      
-                        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 30 }}>
-                            <TouchableOpacity onPress={() => navigation.navigate('ForgetPassword')}>
-                                <MyText style={{ color: COLORS?.whiteColors, textAlign: 'right', fontSize: calculatefontSize(1.9) }}>Forgot Password?</MyText>
-                            </TouchableOpacity>
-                        </View>
+                        <MyText style={{ color: COLORS?.whiteColors, fontSize: calculatefontSize(1.9), marginVertical: 10, fontWeight: 'bold' }}>Reset password </MyText>
+                        <MyText style={{ color: COLORS?.whiteColors, fontSize: calculatefontSize(1.5) }}>Please enter the email address used to sign in to your DIDWW account. Password reset instructions will be sent shortly.
+                        </MyText>
+
+                        <InputText iconName={'email'} value={values.email} onChangeText={handleChange('email')} extraStyle={{ marginVertical: 20 }} placeholder={'Email'} />
+
+
                         <TouchableButton style={{ borderRadius: 100 }} backgroundColor={COLORS?.PRIMARY_COLOR_LIGHT} isLoading={loader} onPress={handleSubmit} title='Login' />
                     </View>
                 )}
@@ -62,7 +64,7 @@ const Login = ({ navigation }) => {
     )
 }
 
-export default Login
+export default ForgetPassword
 
 const styles = StyleSheet.create({
     loginContainer: {

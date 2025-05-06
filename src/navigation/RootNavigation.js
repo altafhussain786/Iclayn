@@ -5,6 +5,8 @@ import Login from '../screens/auth/Login';
 import { COLORS } from '../constants';
 import Splash from '../screens/splash/Splash';
 import BottomTabNavigation from './BottomTabNavigation';
+import LoginByPassword from '../screens/auth/login/LoginByPassword';
+import ForgetPassword from '../screens/auth/forgetPassword/ForgetPassword';
 
 
 
@@ -18,10 +20,13 @@ const RootNavigation = () => {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
+          animation: 'slide_from_right', // 👈 Smooth left-to-right animation
         }}
         initialRouteName="Splash">
         <Stack.Screen name="Splash" component={Splash} />
         <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="LoginByPassword" component={LoginByPassword} />
+        <Stack.Screen name="ForgetPassword" component={ForgetPassword} />
         <Stack.Screen name="BottomTabNavigation" component={BottomTabNavigation} />
   
  

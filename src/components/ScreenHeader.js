@@ -2,7 +2,6 @@ import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import MyText from './MyText';
-import LogoText from './LogoText';
 import { COLORS } from '../constants';
 import { calculatefontSize } from '../helper/responsiveHelper';
 

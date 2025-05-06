@@ -1,12 +1,16 @@
 import { Alert, Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
-import MyText from '../../components/MyText'
-import InputText from '../../components/InputText'
-import TouchableButton from '../../components/TouchableButton'
-import { COLORS, IconUri } from '../../constants'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
-import { calculatefontSize } from '../../helper/responsiveHelper'
+import MyText from '../../../components/MyText'
+import { COLORS } from '../../../constants'
+import { calculatefontSize } from '../../../helper/responsiveHelper'
+import InputText from '../../../components/InputText'
+import TouchableButton from '../../../components/TouchableButton'
+import Icon from 'react-native-vector-icons/MaterialIcons'; // or any icon library you're using
+
+
+
 
 const validationSchema = Yup.object().shape({
     companyUrl: Yup.string().required('Company URL is required'),
@@ -14,36 +18,45 @@ const validationSchema = Yup.object().shape({
     password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
 })
 
-const Login = ({ navigation }) => {
+const LoginByPassword = ({ navigation }) => {
     const [loader, setLoader] = React.useState(false)
 
-    const login = async (values) => {
-        if (!values?.email) {
-                   Alert.alert('Email is required')
-                   return
-                   
-               }
-               setLoader(true)
-               setTimeout(() => {
-                   setLoader(false)
-                   navigation.navigate('LoginByPassword')
-               }, 2000)
+    const LoginByPassword = async (values) => {
+        if (!values?.password) {
+            Alert.alert('Password is required')
+            return
+        }
+        setLoader(true)
+        setTimeout(() => {
+            setLoader(false)
+            navigation.navigate('BottomTabNavigation')
+        }, 2000)
     }
 
     return (
-        <ImageBackground blurRadius={2} source={require("../../assets/Images/bgimage.png")} style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
+        <ImageBackground blurRadius={2} source={require("../../../assets/Images/bgimage.png")} style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
             <View >
                 <Image tintColor={COLORS?.whiteColors} source={{ uri: "https://api.iclayn.com/assets/logo-DuQxixZj.png" }} style={{ width: 150, height: 50, resizeMode: "contain", }} />
             </View>
             <Formik
                 initialValues={{ companyUrl: '', email: '', password: '' }}
                 // validationSchema={validationSchema}
-                onSubmit={login}
+                onSubmit={LoginByPassword}
             >
                 {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
                     <View style={styles.loginContainer}>
-                        <InputText iconName={'email'} value={values.email} onChangeText={handleChange('email')} extraStyle={{ marginTop: 30 }} placeholder={'Email'} />
-                      
+                       
+                        <View style={{ marginVertical: 20,flexDirection:'row',alignItems:"center",justifyContent:'space-between' }}>
+                            <View style={{flexDirection:'row',alignItems:'center',gap:5}}>
+                                <Icon name={'email'} size={22} color={COLORS.LIGHT_COLOR} />
+                                <MyText style={{ color: COLORS?.whiteColors, fontSize: calculatefontSize(1.9) }}>irfan@yopmail.com</MyText>
+
+                            </View>
+                            <TouchableOpacity onPress={() => navigation.goBack()} >
+                                <MyText  style={{ color: COLORS?.whiteColors, fontSize: calculatefontSize(1.9) }}>Change</MyText>
+                            </TouchableOpacity>
+                        </View>
+                        <InputText secureTextEntry={true} iconName={'key'} value={values.password} onChangeText={handleChange('password')} placeholder={'Password'} />
                         <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 30 }}>
                             <TouchableOpacity onPress={() => navigation.navigate('ForgetPassword')}>
                                 <MyText style={{ color: COLORS?.whiteColors, textAlign: 'right', fontSize: calculatefontSize(1.9) }}>Forgot Password?</MyText>
@@ -62,7 +75,7 @@ const Login = ({ navigation }) => {
     )
 }
 
-export default Login
+export default LoginByPassword
 
 const styles = StyleSheet.create({
     loginContainer: {

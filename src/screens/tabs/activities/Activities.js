@@ -66,7 +66,7 @@ const Activities = () => {
               >
                 <View style={{ gap: 5 }}>
                   <MyText style={styles.timeColor}>01-05-2025 - 01:30 PM</MyText>
-                  <MyText style={[styles.txtStyle,{fontWeight:"600"}]}>Phone consultation</MyText>
+                  <MyText style={[styles.txtStyle, { fontWeight: "600" }]}>Phone consultation</MyText>
                   <MyText style={styles.timeColor}>
                     Matter name here
                   </MyText>
@@ -84,13 +84,13 @@ const Activities = () => {
             );
           }}
         />
-       <FloatingButton
-        icon="plus"
-        navigateTo="CreateScreen"
-        backgroundColor={COLORS.PRIMARY_COLOR_LIGHT}
-        size={50}
-        iconSize={25}
-      />
+        <FloatingButton
+          icon="plus"
+          navigateTo="CreateScreen"
+          backgroundColor={COLORS.PRIMARY_COLOR_LIGHT}
+          size={50}
+          iconSize={25}
+        />
       </Wrapper>
     </>
   )
