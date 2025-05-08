@@ -5,7 +5,7 @@ import * as Yup from 'yup'
 import MyText from '../../../components/MyText'
 import InputText from '../../../components/InputText'
 import TouchableButton from '../../../components/TouchableButton'
-import { COLORS, IconUri } from '../../../constants'
+import { API_URL, BASE_URL, COLORS, IconUri } from '../../../constants'
 import { calculatefontSize } from '../../../helper/responsiveHelper'
 
 
@@ -35,7 +35,7 @@ const ForgetPassword = ({ navigation }) => {
     return (
         <ImageBackground blurRadius={2} source={require("../../../assets/Images/bgimage.png")} style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
             <View style={{ marginBottom: 20 }}>
-                <Image tintColor={COLORS?.whiteColors} source={{ uri: "https://api.iclayn.com/assets/logo-DuQxixZj.png" }} style={{ width: 150, height: 50, resizeMode: "contain", }} />
+                <Image tintColor={COLORS?.whiteColors} source={{ uri: `${BASE_URL}/assets/logo-DuQxixZj.png`}} style={{ width: 150, height: 50, resizeMode: "contain", }} />
             </View>
             <Formik
                 initialValues={{ companyUrl: '', email: '', password: '' }}

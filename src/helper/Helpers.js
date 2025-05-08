@@ -5,11 +5,11 @@ const TOKEN_KEY = 'access_token';
 const EXPIRATION_KEY = 'expires_in';
 
 
-export const saveToken = async (token = "", expiresIn, tenantId) => {
-    const expirationDate = new Date().getTime() + expiresIn * 1000; // expiresIn is in seconds
+export const saveToken = async (token = "", tenantId) => {
+    // const expirationDate = new Date().getTime() + expiresIn * 1000; // expiresIn is in seconds
     try {
         await AsyncStorage.setItem(TOKEN_KEY, token);
-        await AsyncStorage.setItem(EXPIRATION_KEY, expirationDate.toString());
+        // await AsyncStorage.setItem(EXPIRATION_KEY, expirationDate.toString());
         await AsyncStorage.setItem("tenantId", tenantId);
     } catch (e) {
         console.error('Failed to save the token to storage', e);

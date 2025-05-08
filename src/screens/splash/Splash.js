@@ -7,7 +7,7 @@ import {
   ImageBackground,
 } from 'react-native';
 import LoaderKit from 'react-native-loader-kit';
-import { COLORS } from '../../constants';
+import { API_URL, BASE_URL, COLORS } from '../../constants';
 
 const Splash = ({ navigation }) => {
   const logoOpacity = useRef(new Animated.Value(0)).current;
@@ -61,7 +61,7 @@ const Splash = ({ navigation }) => {
       >
         <Animated.Image
           tintColor={COLORS?.whiteColors}
-          source={{ uri: 'https://api.iclayn.com/assets/logo-DuQxixZj.png' }}
+          source={{ uri: `${BASE_URL}/assets/logo-DuQxixZj.png` }}
           style={[
             styles.logo,
             {

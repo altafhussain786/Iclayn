@@ -3,12 +3,13 @@ import React from 'react'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import MyText from '../../../components/MyText'
-import { COLORS } from '../../../constants'
+import { API_URL, BASE_URL, COLORS } from '../../../constants'
 import { calculatefontSize } from '../../../helper/responsiveHelper'
 import InputText from '../../../components/InputText'
 import TouchableButton from '../../../components/TouchableButton'
 import Icon from 'react-native-vector-icons/MaterialIcons'; // or any icon library you're using
 import { OtpInput } from "react-native-otp-entry";
+import httpRequest from '../../../api/apiHandler'
 
 
 
@@ -21,12 +22,26 @@ const Otp = ({ navigation, route }) => {
     const [loader, setLoader] = React.useState(false)
 
     const Otp = async (values) => {
-
         setLoader(true)
-        setTimeout(() => {
+        const { res, err } = await httpRequest({
+            method: "post",
+            path: `/ic/auth/submit-login/${values.otp}`,
+        })
+        if (res) {
             setLoader(false)
+            console.log(res, 'login res==========>');
             navigation.navigate('BottomTabNavigation')
-        }, 2000)
+        }
+        else {
+            setLoader(false)
+            console.log("err", err);
+        }
+
+        // setLoader(true)
+        // setTimeout(() => {
+        //     setLoader(false)
+        //     navigation.navigate('BottomTabNavigation')
+        // }, 2000)
     }
 
     function maskEmail(email) {
@@ -41,7 +56,7 @@ const Otp = ({ navigation, route }) => {
     return (
         <ImageBackground blurRadius={2} source={require("../../../assets/Images/bgimage.png")} style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
             <View >
-                <Image tintColor={COLORS?.whiteColors} source={{ uri: "https://api.iclayn.com/assets/logo-DuQxixZj.png" }} style={{ width: 150, height: 50, resizeMode: "contain", }} />
+                <Image tintColor={COLORS?.whiteColors} source={{ uri: `${BASE_URL}/assets/logo-DuQxixZj.png` }} style={{ width: 150, height: 50, resizeMode: "contain", }} />
             </View>
             <Formik
                 initialValues={{ otp: '' }}

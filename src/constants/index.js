@@ -6,8 +6,9 @@ import {
 } from "react-native-responsive-dimensions";
 //
 // export const API_URL = 'http://213.81.69.99:8001'; // debug
-export const API_URL = 'https://api.quickzeros.com:8443'; // Live
-export const BASE_URL = 'https://quickzeros.com';
+export const API_URL = 'https://api.iclayn.com:8443'; // Live
+export const BASE_URL = 'https://api.iclayn.com';
+export const X_TENANT_ID = "5024000001";
 
 
 

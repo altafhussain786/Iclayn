@@ -3,36 +3,55 @@ import React from 'react'
 import MyText from '../../components/MyText'
 import InputText from '../../components/InputText'
 import TouchableButton from '../../components/TouchableButton'
-import { COLORS, IconUri } from '../../constants'
+import { API_URL, BASE_URL, COLORS, IconUri, X_TENANT_ID } from '../../constants'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import { calculatefontSize } from '../../helper/responsiveHelper'
 
+import { HttpStatusCode } from 'axios'
+import httpRequest from '../../api/apiHandler'
+
 const validationSchema = Yup.object().shape({
-    
+
     email: Yup.string().email('Invalid email').required('Email is required'),
-   
+
 })
 
 const Login = ({ navigation }) => {
     const [loader, setLoader] = React.useState(false)
 
     const login = async (values) => {
-      
-               setLoader(true)
-               setTimeout(() => {
-                   setLoader(false)
-                   navigation.navigate('LoginByPassword',{email:values.email})
-               }, 2000)
+
+        setLoader(true)
+
+        const { res, status, err } = await httpRequest({
+            path: `/ic/un-auth/user/${values.email}`,
+            header: { "X_TENANT_ID": X_TENANT_ID }
+        });
+        if (status === HttpStatusCode.NoContent) {
+            console.log('No account associated with this email. Please try again or register.');
+            setLoader(false);
+            return;
+        }
+        if (res) {
+            console.log(res,"res data");
+            setLoader(false)
+            navigation.navigate('LoginByPassword', { email: values.email,emailData:res?.data })
+
+        } else {
+            console.log("err", err);
+
+        }
+        setLoader(false);
     }
 
     return (
         <ImageBackground blurRadius={2} source={require("../../assets/Images/bgimage.png")} style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
             <View >
-                <Image tintColor={COLORS?.whiteColors} source={{ uri: "https://api.iclayn.com/assets/logo-DuQxixZj.png" }} style={{ width: 150, height: 50, resizeMode: "contain", }} />
+                <Image tintColor={COLORS?.whiteColors} source={{ uri: `${BASE_URL}/assets/logo-DuQxixZj.png` }} style={{ width: 150, height: 50, resizeMode: "contain", }} />
             </View>
             <Formik
-                initialValues={{  email: '', }}
+                initialValues={{ email: 'sa@yopmail.com', }}
                 validationSchema={validationSchema}
                 onSubmit={login}
             >
