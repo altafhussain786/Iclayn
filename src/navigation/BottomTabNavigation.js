@@ -1,4 +1,4 @@
-import { StatusBar, StyleSheet, Image } from 'react-native';
+import { StatusBar, StyleSheet, Image, Alert, BackHandler } from 'react-native';
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -13,11 +13,36 @@ import Activities from '../screens/tabs/activities/Activities'
 import { COLORS, IconUri } from '../constants';
 import { responsiveHeight as hp } from "react-native-responsive-dimensions";
 import Tasks from '../screens/tabs/tasks/Tasks';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const BottomTabNavigation = () => {
+
+  useFocusEffect(
+    React.useCallback(() => {
+        const backAction = () => {
+            Alert.alert('Hold on!', 'Are you sure you want to exit the app?', [
+                {
+                    text: 'Cancel',
+                    onPress: () => null,
+                    style: 'cancel',
+                },
+                { text: 'YES', onPress: () => BackHandler.exitApp() },
+            ]);
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, [])
+);
+
 
   const getTabIcon = (routeName, focused) => {
     switch (routeName) {

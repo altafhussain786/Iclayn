@@ -10,6 +10,7 @@ import TouchableButton from '../../../components/TouchableButton'
 import Icon from 'react-native-vector-icons/MaterialIcons'; // or any icon library you're using
 import { OtpInput } from "react-native-otp-entry";
 import httpRequest from '../../../api/apiHandler'
+import { useToast } from 'react-native-toast-notifications'
 
 
 
@@ -20,8 +21,9 @@ const validationSchema = Yup.object().shape({
 const Otp = ({ navigation, route }) => {
     const userEmail = route?.params?.userEmail
     const [loader, setLoader] = React.useState(false)
+    const toast=useToast()
 
-    const Otp = async (values) => {
+    const otpSend = async (values) => {
         setLoader(true)
         const { res, err } = await httpRequest({
             method: "post",
@@ -29,10 +31,11 @@ const Otp = ({ navigation, route }) => {
         })
         if (res) {
             setLoader(false)
-            console.log(res, 'login res==========>');
+            toast.show('Login successfully',{type:'success'})
             navigation.navigate('BottomTabNavigation')
         }
         else {
+            toast.show(err?.message,{type:'danger'})
             setLoader(false)
             console.log("err", err);
         }
@@ -61,7 +64,7 @@ const Otp = ({ navigation, route }) => {
             <Formik
                 initialValues={{ otp: '' }}
                 validationSchema={validationSchema}
-                onSubmit={Otp}
+                onSubmit={otpSend}
             >
                 {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
                     <View style={styles.loginContainer}>

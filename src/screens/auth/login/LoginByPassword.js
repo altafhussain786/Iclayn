@@ -10,6 +10,7 @@ import TouchableButton from '../../../components/TouchableButton'
 import Icon from 'react-native-vector-icons/MaterialIcons'; // or any icon library you're using
 import httpRequest from '../../../api/apiHandler'
 import { saveToken } from '../../../helper/Helpers'
+import { useToast } from 'react-native-toast-notifications'
 
 
 
@@ -23,8 +24,9 @@ const LoginByPassword = ({ navigation, route }) => {
     const email = route?.params?.email
     const emailData = route?.params?.emailData
     const [loader, setLoader] = React.useState(false)
+    const toast=useToast()
 
-    const LoginByPassword = async (values) => {
+    const login = async (values) => {
         console.log(email,values.password,"====>");
         
         setLoader(true)
@@ -48,12 +50,14 @@ const LoginByPassword = ({ navigation, route }) => {
 
             }
             else {
+                toast.show('Login successfully',{type:'success'})
                 navigation.navigate('BottomTabNavigation')
                 setLoader(false)
             }
             setLoader(false)
         }
         else {
+            toast.show(err?.message,{type:'danger'})
             console.log(err,"err login---<",status);
             setLoader(false)
         }
@@ -69,7 +73,7 @@ const LoginByPassword = ({ navigation, route }) => {
             <Formik
                 initialValues={{ email: email, password: '' }}
                 validationSchema={validationSchema}
-                onSubmit={LoginByPassword}
+                onSubmit={login}
             >
                 {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
                     <View style={styles.loginContainer}>

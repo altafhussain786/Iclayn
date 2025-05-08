@@ -10,6 +10,7 @@ import { calculatefontSize } from '../../helper/responsiveHelper'
 
 import { HttpStatusCode } from 'axios'
 import httpRequest from '../../api/apiHandler'
+import { useToast } from 'react-native-toast-notifications'
 
 const validationSchema = Yup.object().shape({
 
@@ -19,6 +20,7 @@ const validationSchema = Yup.object().shape({
 
 const Login = ({ navigation }) => {
     const [loader, setLoader] = React.useState(false)
+    const toast=useToast()
 
     const login = async (values) => {
 
@@ -29,13 +31,15 @@ const Login = ({ navigation }) => {
             header: { "X_TENANT_ID": X_TENANT_ID }
         });
         if (status === HttpStatusCode.NoContent) {
-            console.log('No account associated with this email. Please try again or register.');
+            toast.show('No account associated with this email. Please try again or register.',{type:'danger'})
+            // console.log('No account associated with this email. Please try again or register.');
             setLoader(false);
             return;
         }
         if (res) {
             console.log(res,"res data");
             setLoader(false)
+            // toast.show('Login successfully',{type:'success'})
             navigation.navigate('LoginByPassword', { email: values.email,emailData:res?.data })
 
         } else {
