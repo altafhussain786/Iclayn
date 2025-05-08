@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import LoaderKit from 'react-native-loader-kit';
 import { API_URL, BASE_URL, COLORS } from '../../constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Splash = ({ navigation }) => {
   const logoOpacity = useRef(new Animated.Value(0)).current;
@@ -44,8 +45,12 @@ const Splash = ({ navigation }) => {
       ])
     ).start();
 
-    const timer = setTimeout(() => {
-      navigation.navigate('Login');
+    const timer = setTimeout(async() => {
+      const token = await AsyncStorage.getItem('access_token');
+      if (token) { navigation.navigate('BottomTabNavigation') }
+      else {
+        navigation.navigate('Login')
+      }
     }, 2500);
 
     return () => clearTimeout(timer);

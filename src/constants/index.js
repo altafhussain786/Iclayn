@@ -29,6 +29,9 @@ export const COLORS = {
     ACTIVE_TEXT_COLOR: '#80C6FF',
     ORANGE_COLOR: '#F7C69C',
     LIGHT_RED: '#ef4f68',
+    RED_COLOR: '#F85544',
+    GREY_COLOR: '#8A8A8D',
+    GREY_COLOR_LIGHT: '#8A8A8D',
 }
 export const RANDOM_COLOR = ["#6aabed", "#49ac96", "#f28195", "#e7b15f", "#8a7fe6"];
 

@@ -52,7 +52,7 @@
 
 // export default InputText;
 
-import React from 'react';
+import React, { useState } from 'react';
 import { TextInput, View, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS } from '../constants';
 import MyText from './MyText';
@@ -71,11 +71,18 @@ const InputText = ({
   secureTextEntry = false,
   ...rest
 }) => {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
+  const showSecureToggle = secureTextEntry;
   return (
     <View style={[styles.wrapper, extraStyle]}>
       {title && <MyText style={styles.label}>{title}</MyText>}
       <View style={[styles.container, !editable && styles.disabledContainer]}>
-      {iconName && (
+        {iconName && (
           <TouchableOpacity onPress={onIconPress} disabled={!onIconPress}>
             <Icon name={iconName} size={22} color={COLORS.LIGHT_COLOR} />
           </TouchableOpacity>
@@ -87,10 +94,18 @@ const InputText = ({
           placeholder={placeholder}
           value={value}
           onChangeText={onChangeText}
-          secureTextEntry={secureTextEntry}
+          secureTextEntry={secureTextEntry && !isPasswordVisible}
           {...rest}
         />
-        
+        {showSecureToggle && (
+          <TouchableOpacity onPress={togglePasswordVisibility}>
+            <Icon
+              name={isPasswordVisible ? 'visibility' : 'visibility-off'}
+              size={22}
+              color={COLORS.LIGHT_COLOR}
+            />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

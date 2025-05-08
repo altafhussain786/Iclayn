@@ -7,29 +7,62 @@ import InputText from '../../../components/InputText'
 import TouchableButton from '../../../components/TouchableButton'
 import { API_URL, BASE_URL, COLORS, IconUri } from '../../../constants'
 import { calculatefontSize } from '../../../helper/responsiveHelper'
+import httpRequest from '../../../api/apiHandler'
+import { HttpStatusCode } from 'axios'
+import { useToast } from 'react-native-toast-notifications'
 
 
 
 const validationSchema = Yup.object().shape({
-    companyUrl: Yup.string().required('Company URL is required'),
+   
     email: Yup.string().email('Invalid email').required('Email is required'),
-    password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+    
 })
 
 const ForgetPassword = ({ navigation }) => {
     const [loader, setLoader] = React.useState(false)
+    const toast = useToast()
 
     const ForgetPassword = async (values) => {
-        if (!values?.email) {
-            Alert.alert('Email is required')
-            return
+  
 
-        }
-        setLoader(true)
-        setTimeout(() => {
-            setLoader(false)
-            navigation.navigate('ForgetPasswordByPassword')
-        }, 2000)
+            setLoader(true)
+    
+            const { res, status, err } = await httpRequest({
+                method:'put',
+                path: `/ic/un-auth/forgot-password?email=dfdsfsdfsdfsdf@g`,
+                params:{},
+                header: { "X_TENANT_ID": X_TENANT_ID }
+            });
+            if (status === HttpStatusCode.NoContent) {
+                toast.show('No account associated with this email. Please try again or register.',{type:'danger'})
+                // console.log('No account associated with this email. Please try again or register.');
+                setLoader(false);
+                return;
+            }
+            if (res) {
+                console.log(res,"res data");
+                setLoader(false)
+                // toast.show('Login successfully',{type:'success'})
+                // navigation.navigate('LoginByPassword', { email: values.email,emailData:res?.data })
+    
+            } else {
+                console.log("err", err);
+    
+            }
+            setLoader(false);
+    
+    
+        // if (!values?.email) {
+        //     Alert.alert('Email is required')
+        //     return
+
+        // }
+        // setLoader(true)
+        // setTimeout(() => {
+        //     setLoader(false)
+        //     navigation.navigate('ForgetPasswordByPassword')
+        // }, 2000)
     }
 
     return (
@@ -38,8 +71,8 @@ const ForgetPassword = ({ navigation }) => {
                 <Image tintColor={COLORS?.whiteColors} source={{ uri: `${BASE_URL}/assets/logo-DuQxixZj.png`}} style={{ width: 150, height: 50, resizeMode: "contain", }} />
             </View>
             <Formik
-                initialValues={{ companyUrl: '', email: '', password: '' }}
-                // validationSchema={validationSchema}
+                initialValues={{  email: '',  }}
+                validationSchema={validationSchema}
                 onSubmit={ForgetPassword}
             >
                 {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (

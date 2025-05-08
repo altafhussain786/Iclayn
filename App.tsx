@@ -39,7 +39,7 @@ const App = () => {
           danger: (toast) => (
             <CustomToast
               icon="times-circle"
-              backgroundColor="#dc3545"
+              backgroundColor="#F85544"
               textColor="white"
               message={toast.message}
             />
