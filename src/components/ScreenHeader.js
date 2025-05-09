@@ -8,7 +8,7 @@ import { calculatefontSize } from '../helper/responsiveHelper';
 const ScreenHeader = ({
   isShowTitle = false,
   title = 'Inventory',
-  onPress = () => { },
+  onPress = () => {},
   isGoBack = false
 }) => {
   return (

@@ -13,7 +13,7 @@ import { CalendarList } from 'react-native-calendars';
 import Entypo from "react-native-vector-icons/Entypo";
 import SearchBar from '../../../components/SearchBar';
 
-const Home = () => {
+const Home = ({navigation}) => {
   const [tabs, setTabs] = React.useState("Events");
 
   const [selectedDate, setSelectedDate] = React.useState('2025-05-06');
@@ -29,7 +29,7 @@ const Home = () => {
 
   return (
     <>
-      <ScreenHeader />
+      <ScreenHeader onPress={() => {navigation.navigate("Settings")}}/>
       <WelcomeContainer />
 
       {/* Tabs */}
