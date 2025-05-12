@@ -147,50 +147,50 @@ const Calender = () => {
   };
 
   const getWeekData = (calenderData) => {
-  // const weeks = [];
-  
-  // for (let i = 0; i < 7; i++) {
-  //   const weekStart = moment().startOf('week').add(i, 'weeks').toDate();
-  //   const weekEnd = moment(weekStart).endOf('week').toDate();
-    
-  //   // Filter events for the current week
-  //   const weekEvents = calenderData.filter((item) => {
-  //     return item;
-  //   });
+    // const weeks = [];
 
-  //   weeks.push({
-  //     weekName: `Week ${i + 1}`,
-  //     events: weekEvents,
-  //   });
-  // }
-  
-  // return weeks;
-  const weeks = [];
+    // for (let i = 0; i < 7; i++) {
+    //   const weekStart = moment().startOf('week').add(i, 'weeks').toDate();
+    //   const weekEnd = moment(weekStart).endOf('week').toDate();
 
-  for (let i = 0; i < 7; i++) {
-    const weekStart = moment().startOf('week').add(i, 'weeks');
-    const weekEnd = moment(weekStart).endOf('week');
+    //   // Filter events for the current week
+    //   const weekEvents = calenderData.filter((item) => {
+    //     return item;
+    //   });
 
-    const weekName = `${weekStart.format('dddd')} `;
+    //   weeks.push({
+    //     weekName: `Week ${i + 1}`,
+    //     events: weekEvents,
+    //   });
+    // }
 
-    // Filter events for the current week (you can update this condition)
-    const weekEvents = calenderData.filter((item) => {
-      return item;
-    });
+    // return weeks;
+    const weeks = [];
 
-    weeks.push({
-      weekName: weekName,
-      startDate: weekStart.toDate(),
-      endDate: weekEnd.toDate(),
-      events: weekEvents,
-    });
-  }
+    for (let i = 0; i < 7; i++) {
+      const weekStart = moment().startOf('week').add(i, 'weeks');
+      const weekEnd = moment(weekStart).endOf('week');
 
-  return weeks;
-};
+      const weekName = `${weekStart.format('dddd')} `;
 
-// Getting the data for 7 weeks
-const weeksData = getWeekData(calenderData);
+      // Filter events for the current week (you can update this condition)
+      const weekEvents = calenderData.filter((item) => {
+        return item;
+      });
+
+      weeks.push({
+        weekName: weekName,
+        startDate: weekStart.toDate(),
+        endDate: weekEnd.toDate(),
+        events: weekEvents,
+      });
+    }
+
+    return weeks;
+  };
+
+  // Getting the data for 7 weeks
+  const weeksData = getWeekData(calenderData);
 
   return (
     <>
@@ -255,43 +255,43 @@ const weeksData = getWeekData(calenderData);
           placeholder="Search an event"
         />
 
-        {calenderData?.length > 0 ? 
-        <FlatList
-    showsVerticalScrollIndicator={false}
-    data={weeksData}
-    keyExtractor={(item, index) => index.toString()}
-    renderItem={({ item }) => (
-      <View style={styles.weekContainer}>
-        <Text style={styles.weekTitle}>{item.weekName}</Text>
+        {calenderData?.length > 0 ?
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={weeksData}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.weekContainer}>
+                <Text style={styles.weekTitle}>{item.weekName}</Text>
 
-        {item.events.length > 0 ? (
-          item.events.map((event) => (
-            <View key={event.matterId} style={styles.eventItem}>
-              <View>
-                <MyText style={styles.timeColor}>
-                  {moment(event.eventScheduleDTOList[0]?.startOnTime).format('hh:mm A')} - {moment(event.eventScheduleDTOList[0]?.endOnTime).format('hh:mm A')}
-                </MyText>
-                <MyText style={[styles.txtStyle, { fontWeight: '600' }]}>
-                  {event.title}
-                </MyText>
-                <MyText style={styles.timeColor}>{event?.description}</MyText>
+                {item.events.length > 0 ? (
+                  item.events.map((event) => (
+                    <View key={event.matterId} style={styles.eventItem}>
+                      <View>
+                        <MyText style={styles.timeColor}>
+                          {moment(event.eventScheduleDTOList[0]?.startOnTime).format('hh:mm A')} - {moment(event.eventScheduleDTOList[0]?.endOnTime).format('hh:mm A')}
+                        </MyText>
+                        <MyText style={[styles.txtStyle, { fontWeight: '600' }]}>
+                          {event.title}
+                        </MyText>
+                        <MyText style={styles.timeColor}>{event?.description}</MyText>
+                      </View>
+                      <View>
+                        <View style={[styles.draftBox, { backgroundColor: event?.userColor, height: 10, width: 10 }]}>
+                          {/* Draft */}
+                        </View>
+                        <MyText style={[styles.timeColor, { fontWeight: '600', textAlign: 'right' }]}>
+                          {event?.location}
+                        </MyText>
+                      </View>
+                    </View>
+                  ))
+                ) : (
+                  <MyText>No events</MyText>
+                )}
               </View>
-              <View>
-                <View style={[styles.draftBox, { backgroundColor: event?.userColor, height: 10, width: 10 }]}>
-                  {/* Draft */}
-                </View>
-                <MyText style={[styles.timeColor, { fontWeight: '600', textAlign: 'right' }]}>
-                  {event?.location}
-                </MyText>
-              </View>
-            </View>
-          ))
-        ) : (
-          <MyText>No events</MyText>
-        )}
-      </View>
-    )}
-  />
+            )}
+          />
           :
           <>
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -387,12 +387,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     borderRadius: 10,
   },
-  weekTitle:{
-    paddingVertical:5,
-    backgroundColor:COLORS?.BORDER_LIGHT_COLOR
+  weekTitle: {
+    paddingVertical: 5,
+    backgroundColor: COLORS?.BORDER_LIGHT_COLOR
   },
   weekContainer: {
-    padding:10,
+    padding: 10,
     borderBottomWidth: 1,
     borderColor: COLORS?.BORDER_LIGHT_COLOR,
     // backgroundColor: COLORS?.PRIMARY_COLOR,
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 10,
-   
+
     // borderBottomWidth: 1,
     // paddingVertical: 15,
 

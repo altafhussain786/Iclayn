@@ -1,8 +1,8 @@
 import { FlatList, Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import ScreenHeader from '../../../components/ScreenHeader'
 import { COLORS, IconUri } from '../../../constants';
-import { calculatefontSize } from '../../../helper/responsiveHelper';
+import { calculatefontSize, getResponsiveWidth } from '../../../helper/responsiveHelper';
 import MyText from '../../../components/MyText';
 
 //Icons
@@ -10,10 +10,41 @@ import Entypo from "react-native-vector-icons/Entypo";
 import Wrapper from '../../../components/Wrapper';
 import SearchBar from '../../../components/SearchBar';
 import FloatingButton from '../../../components/FloatingButton';
+import httpRequest from '../../../api/apiHandler';
+import Loader from '../../../components/Loader';
+import { formatNumber } from '../../../helper/Helpers';
+import moment from 'moment';
 
 const Activities = () => {
   const [tabs, setTabs] = React.useState("Time entries");
+  const [activityData, setActivityData] = React.useState([]);
+  const [loader, setLoader] = React.useState(false);
 
+
+  const getActivityData = async () => {
+    setLoader(true)
+    const { res, err } = await httpRequest({
+      method: 'get',
+      path: tabs === "Time entries" ? `/ic/matter/time-entry/` : `/ic/matter/exp-entry/`
+    })
+    if (res) {
+
+      console.log(res, "====>");
+      setActivityData(res?.data);
+      setLoader(false)
+    }
+    else {
+
+      setActivityData([]);
+      console.log("err", err);
+      setLoader(false)
+
+    }
+  }
+
+  useEffect(() => {
+    getActivityData();
+  }, [tabs])
   return (
     <>
 
@@ -47,43 +78,51 @@ const Activities = () => {
           />
         </View>
         {/* ///RENDER ITEM =====================> */}
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          data={[1, 2, 3, 4, 5, 5, 6, 6]}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={() => {
-            return (
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: 10,
-                  borderBottomWidth: 1,
-                  paddingVertical: 15,
-                  borderColor: COLORS?.BORDER_LIGHT_COLOR,
-                }}
-              >
-                <View style={{ gap: 5 }}>
-                  <MyText style={styles.timeColor}>01-05-2025 - 01:30 PM</MyText>
-                  <MyText style={[styles.txtStyle, { fontWeight: "600" }]}>Phone consultation</MyText>
-                  <MyText style={styles.timeColor}>
-                    Matter name here
-                  </MyText>
-                </View>
-                <View style={{ gap: 5 }}>
-                  <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "right" }]}>$50.00</MyText>
-                  <MyText style={[styles.txtStyle, { textAlign: "right" }]}>01:00:00</MyText>
-                  <View style={{ backgroundColor: "#ffc2cd", alignSelf: "flex-end", width: "80%", borderRadius: 5, paddinHorizontal: 20 }}>
-                    <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "center", color: "#6c0014" }]}>
-                      Draft
-                    </MyText>
+        {loader ? <Loader /> :
+
+          activityData?.length > 0 ?
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              data={activityData}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item, i }) => {
+                return (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      gap: 10,
+                      borderBottomWidth: 1,
+                      paddingVertical: 15,
+                      borderColor: COLORS?.BORDER_LIGHT_COLOR,
+                    }}
+                  >
+                    <View style={{ gap: 5 }}>
+                      <MyText style={styles.timeColor}>{moment(item?.entryDate).format("DD-MM-YYYY")}</MyText>
+                      <MyText style={[styles.txtStyle, { fontWeight: "600" }]}>{item?.matterName}</MyText>
+                      {item?.description !== "" && <MyText style={styles.timeColor}>
+                        {item?.description}
+                      </MyText>}
+                    </View>
+                    <View style={{ gap: 5 }}>
+                      <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "right" }]}>${formatNumber(item?.amount)}</MyText>
+                      <MyText style={[styles.txtStyle, { textAlign: "right" }]}>{item?.duration}</MyText>
+                      <View style={{ backgroundColor: "#ffc2cd", alignSelf: "flex-end", width: getResponsiveWidth(20), borderRadius: 5, paddinHorizontal: 30 }}>
+                        <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "center", color: "#6c0014" }]}>
+                          {item?.billed ? "Billed" : "Unbilled"}
+                        </MyText>
+                      </View>
+                    </View>
                   </View>
-                </View>
-              </View>
-            );
-          }}
-        />
+                );
+              }}
+            />
+            :
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+              <MyText>  No data found</MyText>
+            </View>
+        }
         <FloatingButton
           icon="plus"
           navigateTo="CreateScreen"
