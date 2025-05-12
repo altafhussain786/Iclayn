@@ -22,7 +22,7 @@ import SearchBar from '../../../components/SearchBar';
 import FloatingButton from '../../../components/FloatingButton';
 import httpRequest from '../../../api/apiHandler';
 
-const Tasks = () => {
+const Tasks = ({ navigation }) => {
   const [tabs, setTabs] = React.useState('Upcoming');
 
   const tabList = ['Upcoming', 'Overdue', 'No due date', 'Completed', 'Archived', 'Delegated'];
@@ -65,7 +65,7 @@ const Tasks = () => {
 
   return (
     <>
-      <ScreenHeader isShowTitle={true} title="Tasks" />
+      <ScreenHeader onPress={() => { navigation.navigate("Settings") }} isShowTitle={true} title="Tasks" />
 
       {/* Scrollable Tabs */}
       <View style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}>

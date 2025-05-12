@@ -15,7 +15,7 @@ import Loader from '../../../components/Loader';
 import { formatNumber } from '../../../helper/Helpers';
 import moment from 'moment';
 
-const Activities = () => {
+const Activities = ({ navigation }) => {
   const [tabs, setTabs] = React.useState("Time entries");
   const [activityData, setActivityData] = React.useState([]);
   const [loader, setLoader] = React.useState(false);
@@ -28,7 +28,6 @@ const Activities = () => {
       path: tabs === "Time entries" ? `/ic/matter/time-entry/` : `/ic/matter/exp-entry/`
     })
     if (res) {
-
       console.log(res, "====>");
       setActivityData(res?.data);
       setLoader(false)
@@ -48,7 +47,7 @@ const Activities = () => {
   return (
     <>
 
-      <ScreenHeader isShowTitle={true} title='Activities' />
+      <ScreenHeader onPress={() => { navigation.navigate("Settings") }} isShowTitle={true} title='Activities' />
       <View style={styles.tabContainer}>
         {["Time entries", "Expenses"].map((item) => (
           <TouchableOpacity

@@ -13,9 +13,8 @@ import { CalendarList } from 'react-native-calendars';
 import Entypo from "react-native-vector-icons/Entypo";
 import SearchBar from '../../../components/SearchBar';
 
-const Home = ({navigation}) => {
+const Home = ({ navigation }) => {
   const [tabs, setTabs] = React.useState("Events");
-
   const [selectedDate, setSelectedDate] = React.useState('2025-05-06');
   const days = Array.from({ length: 7 }).map((_, i) => {
     const date = new Date();
@@ -29,7 +28,7 @@ const Home = ({navigation}) => {
 
   return (
     <>
-      <ScreenHeader onPress={() => {navigation.navigate("Settings")}}/>
+      <ScreenHeader onPress={() => { navigation.navigate("Settings") }} />
       <WelcomeContainer />
 
       {/* Tabs */}
@@ -173,7 +172,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   timeColor: {
-    color: COLORS?.LIGHT_COLOR, 
+    color: COLORS?.LIGHT_COLOR,
     fontSize: calculatefontSize(1.5),
   },
   txtStyle: {

@@ -25,7 +25,7 @@ import httpRequest from '../../../api/apiHandler';
 import { formatNumber } from '../../../helper/Helpers';
 import moment from 'moment';
 
-const Bills = () => {
+const Bills = ({ navigation }) => {
   const [tabs, setTabs] = React.useState('Upcoming');
 
   const tabList = ['Upcoming', 'Overdue', 'No due date', 'Completed', 'Archived', 'Delegated'];
@@ -36,57 +36,57 @@ const Bills = () => {
   const [clients, setClients] = useState([]);
 
 
-const getBills = async () => {
-  try {
-    const [billRes, clientRes,matterBill] = await Promise.all([
-      httpRequest({ method: 'get', path: `/ic/matter/client-fund/` }),
-      httpRequest({ method: 'get', path: `/ic/client/` }), // Replace with actual client endpoint
-      httpRequest({ method: 'get', path: `/ic/matter/bill/` }), // Replace with actual client endpoint
-    ]);
+  const getBills = async () => {
+    try {
+      const [billRes, clientRes, matterBill] = await Promise.all([
+        httpRequest({ method: 'get', path: `/ic/matter/client-fund/` }),
+        httpRequest({ method: 'get', path: `/ic/client/` }), // Replace with actual client endpoint
+        httpRequest({ method: 'get', path: `/ic/matter/bill/` }), // Replace with actual client endpoint
+      ]);
 
-    console.log(billRes,"BILL RESPO");
-    console.log(clientRes,"clientRes RESPO");
-    console.log(matterBill,"Matter bill RESPOd");
-    
-     if (billRes?.res && clientRes?.res && matterBill?.res) {
-      const clientList = clientRes.res.data;
+      console.log(billRes, "BILL RESPO");
+      console.log(clientRes, "clientRes RESPO");
+      console.log(matterBill, "Matter bill RESPOd");
 
-      // Transform bill data
-      const mappedBillData = billRes.res.data.map(bill => {
-        const client = clientList.find(c => c.clientId?.toString() === bill.clientIds);
-        return {
-          ...bill,
-          clientName: client?.firstName + ' ' + client?.lastName || 'Unknown',
-          type:"Client Funds"
-        };
-      });
+      if (billRes?.res && clientRes?.res && matterBill?.res) {
+        const clientList = clientRes.res.data;
 
-      // Transform matter bill data to match keys
-      const transformedMatterBillData = matterBill.res.data.map(m => {
+        // Transform bill data
+        const mappedBillData = billRes.res.data.map(bill => {
+          const client = clientList.find(c => c.clientId?.toString() === bill.clientIds);
+          return {
+            ...bill,
+            clientName: client?.firstName + ' ' + client?.lastName || 'Unknown',
+            type: "Client Funds"
+          };
+        });
 
-        
-        const client = clientList.find(c => c.clientId?.toString() === m.clientIds);
-        return {
-          ...m,
-          clientName:(m?.toFirstName + ' ' + m?.toLastName) || (client?.firstName + ' ' + client?.lastName) || 'Unknown',
-          issueDate: m.issueDate || m.createdAt || new Date(),
-          dueDate: m.dueDate || new Date(),
-          amount: m.amount || 0,
-          status: m.status || 'Pending',
-          type:"Bill"
-         
-        };
-      });
+        // Transform matter bill data to match keys
+        const transformedMatterBillData = matterBill.res.data.map(m => {
 
-      const mergedData = [...mappedBillData, ...transformedMatterBillData];
 
-      setData(mergedData);
-      setFilteredData(mergedData);
+          const client = clientList.find(c => c.clientId?.toString() === m.clientIds);
+          return {
+            ...m,
+            clientName: (m?.toFirstName + ' ' + m?.toLastName) || (client?.firstName + ' ' + client?.lastName) || 'Unknown',
+            issueDate: m.issueDate || m.createdAt || new Date(),
+            dueDate: m.dueDate || new Date(),
+            amount: m.amount || 0,
+            status: m.status || 'Pending',
+            type: "Bill"
+
+          };
+        });
+
+        const mergedData = [...mappedBillData, ...transformedMatterBillData];
+
+        setData(mergedData);
+        setFilteredData(mergedData);
+      }
+    } catch (err) {
+      console.log('Fetching error:', err);
     }
-  } catch (err) {
-    console.log('Fetching error:', err);
-  }
-};
+  };
 
   useEffect(() => {
     getBills()
@@ -109,7 +109,7 @@ const getBills = async () => {
 
   return (
     <>
-      <ScreenHeader isShowTitle={true} title="Bills" />
+      <ScreenHeader onPress={() => { navigation.navigate("Settings") }} isShowTitle={true} title="Bills" />
 
       {/* Scrollable Tabs */}
       <View style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}>
@@ -162,7 +162,7 @@ const getBills = async () => {
                 <View style={{ gap: 5 }}>
                   <MyText style={styles.timeColor}>Issue {moment(item?.issueDate).format('DD-MM-YYYY')}</MyText>
                   <MyText style={[styles.txtStyle, { fontWeight: '600' }]}>
-                     {item?.clientName} - {item?.type}
+                    {item?.clientName} - {item?.type}
                   </MyText>
                   <MyText style={[styles.timeColor,]}>Overdue {moment(item?.dueDate).fromNow()}</MyText>
                 </View>
@@ -171,7 +171,7 @@ const getBills = async () => {
                     {formatNumber(item?.amount)}
                   </MyText>                  <View
                     style={{
-                      backgroundColor: '#ffc2cd',
+                      backgroundColor: item?.status === 'PENDING' ? COLORS?.PRIMARY_COLOR : '#ffc2cd',
                       alignSelf: 'flex-end',
                       borderRadius: 5,
                       paddingHorizontal: 8,
@@ -182,7 +182,7 @@ const getBills = async () => {
                       style={{
                         fontWeight: '600',
                         textAlign: 'center',
-                        color: '#6c0014',
+                        color: item?.status === 'PENDING' ? COLORS?.whiteColors : '#6c0014',
                         fontSize: calculatefontSize(1.4),
                       }}
                     >
