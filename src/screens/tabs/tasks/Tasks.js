@@ -1,6 +1,7 @@
 import {
   FlatList,
   Image,
+  RefreshControl,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -8,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ScreenHeader from '../../../components/ScreenHeader';
 import { COLORS, IconUri } from '../../../constants';
 import { calculatefontSize } from '../../../helper/responsiveHelper';
@@ -19,11 +20,48 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import Wrapper from '../../../components/Wrapper';
 import SearchBar from '../../../components/SearchBar';
 import FloatingButton from '../../../components/FloatingButton';
+import httpRequest from '../../../api/apiHandler';
 
 const Tasks = () => {
   const [tabs, setTabs] = React.useState('Upcoming');
 
   const tabList = ['Upcoming', 'Overdue', 'No due date', 'Completed', 'Archived', 'Delegated'];
+
+  const [data, setData] = useState([])
+  const [refreshing, setRefreshing] = useState(false); // ✅ for refresh
+  const [searchText, setSearchText] = useState(''); // ✅ for search
+  const [filteredData, setFilteredData] = useState([]);
+  const getTasks = async () => {
+    const { res, err } = await httpRequest({
+      method: 'get',
+      path: `/ic/matter/task/`,
+    })
+    if (res) {
+      setFilteredData(res?.data);
+      setData(res?.data)
+    }
+    else {
+      console.log("err", err);
+    }
+  }
+
+  useEffect(() => {
+    getTasks()
+  }, [])
+
+  // ✅ Search logic
+  useEffect(() => {
+    if (searchText === '') {
+      setFilteredData(data);
+    } else {
+      const filtered = data.filter(item =>
+        (item?.name + item?.code + item?.matterName)
+          .toLowerCase()
+          .includes(searchText.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+  }, [searchText, data]);
 
   return (
     <>
@@ -78,7 +116,12 @@ const Tasks = () => {
             justifyContent: 'space-between',
           }}
         >
-          <SearchBar containerStyle={{ width: '90%' }} placeholder="Search a time entry" />
+          <SearchBar
+            containerStyle={{ width: '90%' }}
+            placeholder="Search a task"
+            value={searchText}
+            onChangeText={text => setSearchText(text)}
+          />
           <Image
             source={IconUri?.CalenderSearch}
             style={{ height: 25, width: 25, resizeMode: 'contain' }}
@@ -88,10 +131,10 @@ const Tasks = () => {
         {/* Task List */}
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 1, 3, 14]}
+          data={filteredData}
           keyExtractor={(item, index) => index.toString()}
           contentContainerStyle={{ paddingBottom: 100 }}
-          renderItem={() => {
+          renderItem={({ item, index }) => {
             return (
               <View
                 style={{
@@ -107,9 +150,9 @@ const Tasks = () => {
                 <View style={{ gap: 5 }}>
                   <MyText style={styles.timeColor}>Due 01-05-2025</MyText>
                   <MyText style={[styles.txtStyle, { fontWeight: '600' }]}>
-                    Review documents with client
+                    {item?.code} - {item?.name}
                   </MyText>
-                  <MyText style={styles.timeColor}>Matter name here</MyText>
+                  <MyText style={styles.timeColor}>{item?.matterName}</MyText>
                 </View>
                 <View style={{ gap: 5 }}>
 
@@ -130,13 +173,16 @@ const Tasks = () => {
                         fontSize: calculatefontSize(1.4),
                       }}
                     >
-                      Draft
+                      {item?.status}
                     </MyText>
                   </View>
                 </View>
               </View>
             );
           }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={getTasks} />
+          }
         />
 
         {/* Floating Button */}

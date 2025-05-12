@@ -1,6 +1,7 @@
 import {
   FlatList,
   Image,
+  RefreshControl,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -8,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ScreenHeader from '../../../components/ScreenHeader';
 import { COLORS, IconUri } from '../../../constants';
 import { calculatefontSize } from '../../../helper/responsiveHelper';
@@ -20,11 +21,91 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Wrapper from '../../../components/Wrapper';
 import SearchBar from '../../../components/SearchBar';
 import FloatingButton from '../../../components/FloatingButton';
+import httpRequest from '../../../api/apiHandler';
+import { formatNumber } from '../../../helper/Helpers';
+import moment from 'moment';
 
 const Bills = () => {
   const [tabs, setTabs] = React.useState('Upcoming');
 
   const tabList = ['Upcoming', 'Overdue', 'No due date', 'Completed', 'Archived', 'Delegated'];
+  const [data, setData] = useState([])
+  const [refreshing, setRefreshing] = useState(false); // ✅ for refresh
+  const [searchText, setSearchText] = useState(''); // ✅ for search
+  const [filteredData, setFilteredData] = useState([]);
+  const [clients, setClients] = useState([]);
+
+
+const getBills = async () => {
+  try {
+    const [billRes, clientRes,matterBill] = await Promise.all([
+      httpRequest({ method: 'get', path: `/ic/matter/client-fund/` }),
+      httpRequest({ method: 'get', path: `/ic/client/` }), // Replace with actual client endpoint
+      httpRequest({ method: 'get', path: `/ic/matter/bill/` }), // Replace with actual client endpoint
+    ]);
+
+    console.log(billRes,"BILL RESPO");
+    console.log(clientRes,"clientRes RESPO");
+    console.log(matterBill,"Matter bill RESPOd");
+    
+     if (billRes?.res && clientRes?.res && matterBill?.res) {
+      const clientList = clientRes.res.data;
+
+      // Transform bill data
+      const mappedBillData = billRes.res.data.map(bill => {
+        const client = clientList.find(c => c.clientId?.toString() === bill.clientIds);
+        return {
+          ...bill,
+          clientName: client?.firstName + ' ' + client?.lastName || 'Unknown',
+          type:"Client Funds"
+        };
+      });
+
+      // Transform matter bill data to match keys
+      const transformedMatterBillData = matterBill.res.data.map(m => {
+
+        
+        const client = clientList.find(c => c.clientId?.toString() === m.clientIds);
+        return {
+          ...m,
+          clientName:(m?.toFirstName + ' ' + m?.toLastName) || (client?.firstName + ' ' + client?.lastName) || 'Unknown',
+          issueDate: m.issueDate || m.createdAt || new Date(),
+          dueDate: m.dueDate || new Date(),
+          amount: m.amount || 0,
+          status: m.status || 'Pending',
+          type:"Bill"
+         
+        };
+      });
+
+      const mergedData = [...mappedBillData, ...transformedMatterBillData];
+
+      setData(mergedData);
+      setFilteredData(mergedData);
+    }
+  } catch (err) {
+    console.log('Fetching error:', err);
+  }
+};
+
+  useEffect(() => {
+    getBills()
+  }, [])
+
+  // ✅ Search logic
+  useEffect(() => {
+    if (searchText === '') {
+      setFilteredData(data);
+    } else {
+      const filtered = data.filter(item =>
+        (item?.name + item?.code + item?.fromName)
+          .toLowerCase()
+          .includes(searchText.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+  }, [searchText, data]);
+
 
   return (
     <>
@@ -37,45 +118,7 @@ const Bills = () => {
           <AntDesign name={'down'} size={20} color={COLORS?.whiteColors} />
         </View>
       </View>
-      {/* <View style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}>
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={tabList}
 
-          renderItem={({ item, i }) => {
-            return (
-              <>
-                <TouchableOpacity
-                  key={item}
-                  style={[
-                    styles.tab,
-
-                    {
-                      opacity: tabs === item ? 1 : 0.5,
-                      backgroundColor:
-                        COLORS.PRIMARY_COLOR
-                    },
-                  ]}
-                  onPress={() => setTabs(item)}
-                >
-                  <MyText
-                    style={{
-
-                      color: '#fff',
-                      fontWeight: tabs === item ? '400' : '400',
-                      fontSize: calculatefontSize(1.9),
-                    }}
-                    numberOfLines={1}
-                  >
-                    {item}
-                  </MyText>
-                </TouchableOpacity>
-              </>
-            )
-          }}
-        />
-      </View> */}
       <Wrapper>
         {/* Search Row */}
         <View
@@ -85,7 +128,12 @@ const Bills = () => {
             justifyContent: 'space-between',
           }}
         >
-          <SearchBar containerStyle={{ width: '90%' }} placeholder="Search bills" />
+          <SearchBar
+            containerStyle={{ width: '90%' }}
+            placeholder="Search a task"
+            value={searchText}
+            onChangeText={text => setSearchText(text)}
+          />
           <Image
             source={IconUri?.CalenderSearch}
             style={{ height: 25, width: 25, resizeMode: 'contain' }}
@@ -95,10 +143,10 @@ const Bills = () => {
         {/* Task List */}
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 1, 3, 14]}
+          data={data}
           keyExtractor={(item, index) => index.toString()}
           contentContainerStyle={{ paddingBottom: 100 }}
-          renderItem={() => {
+          renderItem={({ item, index }) => {
             return (
               <View
                 style={{
@@ -112,18 +160,16 @@ const Bills = () => {
                 }}
               >
                 <View style={{ gap: 5 }}>
-                  <MyText style={styles.timeColor}>Due 01-05-2025</MyText>
+                  <MyText style={styles.timeColor}>Issue {moment(item?.issueDate).format('DD-MM-YYYY')}</MyText>
                   <MyText style={[styles.txtStyle, { fontWeight: '600' }]}>
-                    Client name
+                     {item?.clientName} - {item?.type}
                   </MyText>
-                  <MyText style={styles.timeColor}>Bill #: bill-may-50150</MyText>
+                  <MyText style={[styles.timeColor,]}>Overdue {moment(item?.dueDate).fromNow()}</MyText>
                 </View>
                 <View style={{ gap: 5 }}>
-                  <MyText style={[styles.txtStyle, { fontWeight: '600' }]}>
-                    50050.00
-                  </MyText>
-                  <MyText />
-                  <View
+                  <MyText style={[styles.txtStyle, { fontWeight: '600', textAlign: 'right' }]}>
+                    {formatNumber(item?.amount)}
+                  </MyText>                  <View
                     style={{
                       backgroundColor: '#ffc2cd',
                       alignSelf: 'flex-end',
@@ -140,13 +186,16 @@ const Bills = () => {
                         fontSize: calculatefontSize(1.4),
                       }}
                     >
-                      Draft
+                      {item?.status}
                     </MyText>
                   </View>
                 </View>
               </View>
             );
           }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={getBills} />
+          }
         />
 
         {/* Floating Button */}

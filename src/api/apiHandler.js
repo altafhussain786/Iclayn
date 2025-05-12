@@ -64,6 +64,8 @@ const httpRequest = async ({
     baseUrl = API_URL,
 }) => {
     const token = await AsyncStorage.getItem("access_token");
+    // console.log(token,"==");
+    
     const headers = {
         ...header,
         ...(token && { "Authorization": `Bearer ${token}` })

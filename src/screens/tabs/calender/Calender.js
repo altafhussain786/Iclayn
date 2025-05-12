@@ -21,6 +21,8 @@ import Wrapper from '../../../components/Wrapper';
 import SearchBar from '../../../components/SearchBar';
 import FloatingButton from '../../../components/FloatingButton';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import httpRequest from '../../../api/apiHandler';
+import moment from 'moment';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -30,6 +32,7 @@ const Calender = () => {
   const [showMonthPicker, setShowMonthPicker] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const flatListRef = useRef(null);
+  const [calenderData, setCalenderData] = useState([]);
 
   const eventsData = [
     { id: 1, date: '2025-05-01', title: 'MAY 1 consultation' },
@@ -46,6 +49,47 @@ const Calender = () => {
     return d;
   };
 
+  const getToDate = (fromDate) => {
+    const startOfWeek = getStartOfWeek(fromDate); // Sunday
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6); // Saturday
+    return endOfWeek;
+  };
+  const getCalenderData = async () => {
+    let fromDate = selectedDate;
+    let toDate = getToDate(fromDate);
+
+    // Check if the selectedDate falls within the same week, and if so, keep fromDate the same
+    const currentStartOfWeek = getStartOfWeek(new Date()); // Current week's start (Sunday)
+    if (selectedDate >= currentStartOfWeek && selectedDate <= getToDate(currentStartOfWeek)) {
+      fromDate = currentStartOfWeek;
+    }
+
+    const formattedFromDate = moment(fromDate).format('MM/DD/YYYY');
+    const formattedToDate = moment(toDate).format('MM/DD/YYYY');
+
+    console.log(`/ic/event/date-range?fromDate=${formattedFromDate}&toDate=${formattedToDate}`, "from date to date==================>");
+    const { res, err } = await httpRequest({
+      method: 'get',
+      path: `/ic/event/date-range?fromDate=${formattedFromDate}&toDate=${formattedToDate}`,
+    });
+
+    if (res) {
+      console.log(res, "====>");
+
+      setCalenderData(res?.data);
+    } else {
+      setCalenderData([]);
+      console.log("err", err);
+    }
+  }
+
+  useEffect(() => {
+    getCalenderData()
+  }, [selectedDate])
+
+
+
   const getWeekDays = (baseDate) => {
     const startOfWeek = getStartOfWeek(baseDate);
     return Array.from({ length: 7 }, (_, i) => {
@@ -59,8 +103,8 @@ const Calender = () => {
       };
     });
   };
-   // Swipe gesture logic
-   const panResponder = PanResponder.create({
+  // Swipe gesture logic
+  const panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: (_, gestureState) =>
       Math.abs(gestureState.dx) > 20,
     onPanResponderRelease: (_, gestureState) => {
@@ -85,7 +129,7 @@ const Calender = () => {
     year: 'numeric',
   });
 
-  const filteredEvents = eventsData.filter((event) => {
+  const filteredEvents = calenderData.filter((event) => {
     const eventMonth = new Date(event.date).getMonth();
     const selectedMonth = selectedDate.getMonth();
     const titleMatch = event.title
@@ -101,6 +145,52 @@ const Calender = () => {
       setWeekOffset((prev) => prev - 1);
     }
   };
+
+  const getWeekData = (calenderData) => {
+  // const weeks = [];
+  
+  // for (let i = 0; i < 7; i++) {
+  //   const weekStart = moment().startOf('week').add(i, 'weeks').toDate();
+  //   const weekEnd = moment(weekStart).endOf('week').toDate();
+    
+  //   // Filter events for the current week
+  //   const weekEvents = calenderData.filter((item) => {
+  //     return item;
+  //   });
+
+  //   weeks.push({
+  //     weekName: `Week ${i + 1}`,
+  //     events: weekEvents,
+  //   });
+  // }
+  
+  // return weeks;
+  const weeks = [];
+
+  for (let i = 0; i < 7; i++) {
+    const weekStart = moment().startOf('week').add(i, 'weeks');
+    const weekEnd = moment(weekStart).endOf('week');
+
+    const weekName = `${weekStart.format('dddd')} `;
+
+    // Filter events for the current week (you can update this condition)
+    const weekEvents = calenderData.filter((item) => {
+      return item;
+    });
+
+    weeks.push({
+      weekName: weekName,
+      startDate: weekStart.toDate(),
+      endDate: weekEnd.toDate(),
+      events: weekEvents,
+    });
+  }
+
+  return weeks;
+};
+
+// Getting the data for 7 weeks
+const weeksData = getWeekData(calenderData);
 
   return (
     <>
@@ -165,40 +255,49 @@ const Calender = () => {
           placeholder="Search an event"
         />
 
+        {calenderData?.length > 0 ? 
         <FlatList
-          showsVerticalScrollIndicator={false}
-          data={filteredEvents}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.eventItem}>
+    showsVerticalScrollIndicator={false}
+    data={weeksData}
+    keyExtractor={(item, index) => index.toString()}
+    renderItem={({ item }) => (
+      <View style={styles.weekContainer}>
+        <Text style={styles.weekTitle}>{item.weekName}</Text>
+
+        {item.events.length > 0 ? (
+          item.events.map((event) => (
+            <View key={event.matterId} style={styles.eventItem}>
               <View>
                 <MyText style={styles.timeColor}>
-                  {item.date} - 01:30 PM
+                  {moment(event.eventScheduleDTOList[0]?.startOnTime).format('hh:mm A')} - {moment(event.eventScheduleDTOList[0]?.endOnTime).format('hh:mm A')}
                 </MyText>
                 <MyText style={[styles.txtStyle, { fontWeight: '600' }]}>
-                  {item.title}
+                  {event.title}
                 </MyText>
-                <MyText style={styles.timeColor}>Matter name here</MyText>
+                <MyText style={styles.timeColor}>{event?.description}</MyText>
               </View>
               <View>
-                <MyText
-                  style={[
-                    styles.timeColor,
-                    { fontWeight: '600', textAlign: 'right' },
-                  ]}
-                >
-                  $50.00
-                </MyText>
-                <MyText style={[styles.txtStyle, { textAlign: 'right' }]}>
-                  01:00:00
-                </MyText>
-                <View style={styles.draftBox}>
-                  <MyText style={styles.draftText}>Draft</MyText>
+                <View style={[styles.draftBox, { backgroundColor: event?.userColor, height: 10, width: 10 }]}>
+                  {/* Draft */}
                 </View>
+                <MyText style={[styles.timeColor, { fontWeight: '600', textAlign: 'right' }]}>
+                  {event?.location}
+                </MyText>
               </View>
             </View>
-          )}
-        />
+          ))
+        ) : (
+          <MyText>No events</MyText>
+        )}
+      </View>
+    )}
+  />
+          :
+          <>
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+              <MyText>No Data Found</MyText>
+            </View>
+          </>}
 
         <FloatingButton
           icon="plus"
@@ -207,9 +306,27 @@ const Calender = () => {
           size={50}
           iconSize={25}
         />
+
       </Wrapper>
 
       {showMonthPicker && (
+        // <DateTimePicker
+        //   mode="date"
+        //   display={Platform.OS === 'ios' ? 'inline' : 'calendar'}
+        //   value={selectedDate}
+        //   onChange={(event, date) => {
+        //     setShowMonthPicker(false);
+        //     if (date && !date.getTime() === selectedDate.getTime()) {
+        //       setSelectedDate(date); // Only update if the date is different
+        //       setWeekOffset(0); // Reset the week offset when a new date is selected
+        //     }
+        //     else{
+        //        setSelectedDate(date);
+        //        setWeekOffset(3);
+
+        //     }
+        //   }}
+        // />
         <DateTimePicker
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'calendar'}
@@ -270,18 +387,28 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     borderRadius: 10,
   },
+  weekTitle:{
+    paddingVertical:5,
+    backgroundColor:COLORS?.BORDER_LIGHT_COLOR
+  },
   weekContainer: {
-    backgroundColor: COLORS?.PRIMARY_COLOR,
-    borderRadius: 10,
-    paddingVertical: 20,
-    flexDirection: 'row',
+    padding:10,
+    borderBottomWidth: 1,
+    borderColor: COLORS?.BORDER_LIGHT_COLOR,
+    // backgroundColor: COLORS?.PRIMARY_COLOR,
+    // borderRadius: 10,
+    //  marginVertical:10,
+    // // paddingVertical: 20,
+    // flexDirection: 'row',
   },
   eventItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 10,
-    borderBottomWidth: 1,
-    paddingVertical: 15,
+   
+    // borderBottomWidth: 1,
+    // paddingVertical: 15,
+
     borderColor: COLORS?.BORDER_LIGHT_COLOR,
   },
   timeColor: {
