@@ -99,7 +99,7 @@ const Activities = ({ navigation }) => {
                   >
                     <View style={{ gap: 5 }}>
                       <MyText style={styles.timeColor}>{moment(item?.entryDate).format("DD-MM-YYYY")}</MyText>
-                      <MyText style={[styles.txtStyle, { fontWeight: "600" }]}>{item?.matterName}</MyText>
+                      <MyText style={[styles.txtStyle, { fontWeight: "300" }]}>{item?.matterName}</MyText>
                       {item?.description !== "" && <MyText style={styles.timeColor}>
                         {item?.description}
                       </MyText>}
@@ -108,7 +108,7 @@ const Activities = ({ navigation }) => {
                       <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "right" }]}>${formatNumber(item?.amount)}</MyText>
                       <MyText style={[styles.txtStyle, { textAlign: "right" }]}>{item?.duration}</MyText>
                       <View style={{ backgroundColor: "#ffc2cd", alignSelf: "flex-end", width: getResponsiveWidth(20), borderRadius: 5, paddinHorizontal: 30 }}>
-                        <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "center", color: "#6c0014" }]}>
+                        <MyText style={[styles.timeColor, { fontWeight: "400", textAlign: "center", color: "#6c0014" }]}>
                           {item?.billed ? "Billed" : "Unbilled"}
                         </MyText>
                       </View>

@@ -98,7 +98,7 @@ const Bills = ({ navigation }) => {
       setFilteredData(data);
     } else {
       const filtered = data.filter(item =>
-        (item?.name + item?.code + item?.fromName)
+        (item?.type  + item?.clientName)
           .toLowerCase()
           .includes(searchText.toLowerCase())
       );
@@ -161,13 +161,13 @@ const Bills = ({ navigation }) => {
               >
                 <View style={{ gap: 5 }}>
                   <MyText style={styles.timeColor}>Issue {moment(item?.issueDate).format('DD-MM-YYYY')}</MyText>
-                  <MyText style={[styles.txtStyle, { fontWeight: '600',width: '70%' }]}>
+                  <MyText style={[styles.txtStyle, { fontWeight: '300',width: '70%' }]}>
                     {item?.clientName} - {item?.type}
                   </MyText>
                   <MyText style={[styles.timeColor,]}>Overdue {moment(item?.dueDate).fromNow()}</MyText>
                 </View>
                 <View style={{ gap: 5 }}>
-                  <MyText style={[styles.txtStyle, { fontWeight: '600', textAlign: 'right' }]}>
+                  <MyText style={[styles.txtStyle, { fontWeight: '300', textAlign: 'right' }]}>
                     {formatNumber(item?.amount)}
                   </MyText>                  <View
                     style={{
@@ -180,7 +180,7 @@ const Bills = ({ navigation }) => {
                   >
                     <MyText
                       style={{
-                        fontWeight: '600',
+                        // fontWeight: '600',
                         textAlign: 'center',
                         color: item?.status === 'PENDING' ? COLORS?.whiteColors : '#6c0014',
                         fontSize: calculatefontSize(1.4),

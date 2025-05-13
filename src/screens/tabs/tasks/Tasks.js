@@ -149,7 +149,7 @@ const Tasks = ({ navigation }) => {
               >
                 <View style={{ gap: 5 }}>
                   <MyText style={styles.timeColor}>Due 01-05-2025</MyText>
-                  <MyText style={[styles.txtStyle, { fontWeight: '600' }]}>
+                  <MyText style={[styles.txtStyle, { fontWeight: '300',width: '70%' }]}>
                     {item?.code} - {item?.name}
                   </MyText>
                   <MyText style={styles.timeColor}>{item?.matterName}</MyText>

@@ -135,14 +135,14 @@ setLoader(false)
     year: 'numeric',
   });
 
-  const filteredEvents = calenderData.filter((event) => {
-    const eventMonth = new Date(event.date).getMonth();
-    const selectedMonth = selectedDate.getMonth();
-    const titleMatch = event.title
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    return eventMonth === selectedMonth && titleMatch;
-  });
+  // const filteredEvents = calenderData.filter((event) => {
+  //   const eventMonth = new Date(event.date).getMonth();
+  //   const selectedMonth = selectedDate.getMonth();
+  //   const titleMatch = event.title
+  //     .toLowerCase()
+  //     .includes(searchQuery.toLowerCase());
+  //   return eventMonth === selectedMonth && titleMatch;
+  // });
 
   const handleSwipe = (direction) => {
     if (direction === 'left') {
@@ -175,7 +175,7 @@ setLoader(false)
 };
 
 // Getting the data for 7 weeks
-const weeksData = getWeekData(calenderData);
+// const weeksData = getWeekData(calenderData);
 
   return (
     <>
