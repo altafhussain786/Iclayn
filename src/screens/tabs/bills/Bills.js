@@ -218,7 +218,7 @@ const Bills = ({ navigation }) => {
       {/* Scrollable Tabs */}
       <View style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10, opacity: 0.8, backgroundColor: COLORS?.PRIMARY_COLOR, borderRadius: 10 }}>
-          <MyText style={{ color: COLORS?.whiteColors, fontWeight: '400', fontSize: calculatefontSize(1.9) }}>All matters</MyText>
+          <MyText style={{ color: COLORS?.whiteColors, fontWeight: '400', fontSize: calculatefontSize(1.7) }}>All matters</MyText>
           <AntDesign name={'down'} size={20} color={COLORS?.whiteColors} />
         </View>
       </View>

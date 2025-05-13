@@ -288,7 +288,7 @@ const Home = ({ navigation }) => {
             <FlatList
               showsVerticalScrollIndicator={false}
               data={filteredData}
-              keyExtractor={(item) => item.matterId}
+              keyExtractor={(item) => item.title}
               renderItem={({ item }) => (
                 <>
                   <View style={{ flexDirection: "row", gap: 10 }}>

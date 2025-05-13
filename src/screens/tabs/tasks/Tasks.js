@@ -95,7 +95,7 @@ const Tasks = ({ navigation }) => {
 
                       color: '#fff',
                       fontWeight: tabs === item ? '400' : '400',
-                      fontSize: calculatefontSize(1.9),
+                      fontSize: calculatefontSize(1.7),
                     }}
                     numberOfLines={1}
                   >
