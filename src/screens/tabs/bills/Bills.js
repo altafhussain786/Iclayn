@@ -161,7 +161,7 @@ const Bills = ({ navigation }) => {
               >
                 <View style={{ gap: 5 }}>
                   <MyText style={styles.timeColor}>Issue {moment(item?.issueDate).format('DD-MM-YYYY')}</MyText>
-                  <MyText style={[styles.txtStyle, { fontWeight: '600' }]}>
+                  <MyText style={[styles.txtStyle, { fontWeight: '600',width: '70%' }]}>
                     {item?.clientName} - {item?.type}
                   </MyText>
                   <MyText style={[styles.timeColor,]}>Overdue {moment(item?.dueDate).fromNow()}</MyText>

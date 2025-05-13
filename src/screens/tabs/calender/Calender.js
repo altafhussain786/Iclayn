@@ -260,7 +260,7 @@ const weeksData = getWeekData(calenderData);
                 <MyText style={styles.timeColor}>
                   {moment(item.eventScheduleDTOList[0]?.startOnTime).format('hh:mm A')} - {moment(item.eventScheduleDTOList[0]?.endOnTime).format('hh:mm A')}
                 </MyText>
-                <MyText style={[styles.txtStyle, { fontWeight: '600' }]}>
+                <MyText style={[styles.txtStyle, { fontWeight: '300' }]}>
                   {item.title}
                 </MyText>
                {item?.description && <MyText style={[styles.timeColor,{width:'70%'}]}>{item?.description}</MyText>}
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     fontSize: calculatefontSize(1.5),
   },
   txtStyle: {
-    color: COLORS?.BLACK_COLOR,
+    color: COLORS?.PRIMARY_COLOR,
     fontSize: calculatefontSize(1.9),
     fontWeight: '300',
   },

@@ -1,5 +1,5 @@
 import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import ScreenHeader from '../../../components/ScreenHeader';
 import Wrapper from '../../../components/Wrapper';
 import WelcomeContainer from './components/WelcomeContainer';
@@ -12,6 +12,9 @@ import { CalendarList } from 'react-native-calendars';
 //Icons
 import Entypo from "react-native-vector-icons/Entypo";
 import SearchBar from '../../../components/SearchBar';
+import httpRequest from '../../../api/apiHandler';
+import { adduserDetails } from '../../../store/slices/userDetails';
+import { useDispatch } from 'react-redux';
 
 const Home = ({ navigation }) => {
   const [tabs, setTabs] = React.useState("Events");
@@ -25,6 +28,32 @@ const Home = ({ navigation }) => {
       num: date.getDate(),
     };
   });
+
+  const getUserData=async () => {
+    const dispatch=useDispatch()
+   const {res,err}=await httpRequest(
+          {
+            method:'post',
+            path:`/ic/auth/authorize`,
+            params:{}
+          }
+        )
+        if (res) {
+          console.log(res,"resdddddd sdata");
+          
+                    dispatch(adduserDetails(res?.data))
+          
+        }
+        else {
+          console.log("errd", err);
+          
+        }
+  }
+
+  useEffect(() => {
+  getUserData()
+  }, [])
+  
 
   return (
     <>

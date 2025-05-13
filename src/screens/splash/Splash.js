@@ -9,10 +9,14 @@ import {
 import LoaderKit from 'react-native-loader-kit';
 import { API_URL, BASE_URL, COLORS } from '../../constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import httpRequest from '../../api/apiHandler';
+import { adduserDetails } from '../../store/slices/userDetails';
+import { useDispatch } from 'react-redux';
 
 const Splash = ({ navigation }) => {
   const logoOpacity = useRef(new Animated.Value(0)).current;
   const logoScale = useRef(new Animated.Value(0.8)).current;
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // Looping fade and scale animation for 2 seconds
@@ -44,12 +48,32 @@ const Splash = ({ navigation }) => {
         ]),
       ])
     ).start();
+    
 
     const timer = setTimeout(async() => {
       const token = await AsyncStorage.getItem('access_token');
-      if (token) { navigation.navigate('BottomTabNavigation') }
+      if (token) { 
+          const {res,err}=await httpRequest(
+          {
+            method:'post',
+            path:`/ic/auth/authorize`,
+            params:{}
+          }
+        )
+        if (res) {
+          console.log(res,"res data");
+          navigation.navigate('BottomTabNavigation')
+          dispatch(adduserDetails(res?.data))
+        }
+        else {
+              navigation.navigate('Login');
+
+          
+        }
+
+       }
       else {
-        navigation.navigate('Login')
+      navigation.navigate('Login');
       }
     }, 2500);
 

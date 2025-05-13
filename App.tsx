@@ -5,6 +5,8 @@ import { NavigationContainer } from '@react-navigation/native'
 import RootNavigation from './src/navigation/RootNavigation'
 import { ToastProvider } from 'react-native-toast-notifications'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { Provider } from 'react-redux'
+import store from './src/store'
 
 const App = () => {
   return (
@@ -46,9 +48,11 @@ const App = () => {
           ),
         }}
       >
-        <NavigationContainer>
-          <RootNavigation />
-        </NavigationContainer>
+        <Provider store={store}>
+          <NavigationContainer>
+            <RootNavigation />
+          </NavigationContainer>
+        </Provider>
       </ToastProvider>
     </>
   )

@@ -1,15 +1,21 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import MyText from '../../../../components/MyText'
 import { COLORS } from '../../../../constants'
 import { calculatefontSize } from '../../../../helper/responsiveHelper'
+import { useSelector } from 'react-redux'
 
 const WelcomeContainer = () => {
+    const userDetails=useSelector(state=>state?.userDetails?.userDetails);
+    console.log(userDetails,"userDetails=====>");
+    const {userProfileDTO}=userDetails
+      const imageURL = `data:image/jpeg;base64,${userProfileDTO?.image}`;
     return (
         <>
             <View style={styles.container}>
                 <View>
-                    <MyText style={styles.nameStyle}>Hi Imran</MyText>
+                    <Image source={{ uri: imageURL }} style={{ height: 30, width: 30, borderRadius: 50 ,resizeMode:"contain"}}/>
+                    <MyText style={styles.nameStyle}>Hi, {userProfileDTO?.fullName}</MyText>
                 </View>
                 <View>
                     <MyText style={styles.messageStyle}>You have <Text style={{ color: COLORS?.yellow }}>3 appointments </Text> </MyText>
@@ -31,7 +37,7 @@ const styles = StyleSheet.create({
     },
     nameStyle: {
         color: COLORS?.whiteColors,
-        fontSize: calculatefontSize(5),
+        fontSize: calculatefontSize(4),
         fontWeight: "bold"
     },
     messageStyle: {
