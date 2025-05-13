@@ -101,7 +101,7 @@ const Otp = ({ navigation, route }) => {
                                     pinCodeContainerStyle: styles.pinCodeContainer,
                                     pinCodeTextStyle: styles.pinCodeText,
                                     focusStickStyle: styles.focusStick,
-                                    // focusedPinCodeContainerStyle: styles.activePinCodeContainer,
+                                    focusedPinCodeContainerStyle: styles.activePinCodeContainer,
                                     // placeholderTextStyle: styles.placeholderText,
                                     // filledPinCodeContainerStyle: styles.filledPinCodeContainer,
                                     // disabledPinCodeContainerStyle: styles.disabledPinCodeContainer,
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
         // marginVertical: 10
     },
     pinCodeContainer: {
-        backgroundColor: COLORS?.whiteColors,
+        backgroundColor: COLORS?.LIGHT_COLOR,
         height: 50,
         borderRadius: 10,
         // borderRadius: 10,
@@ -150,5 +150,11 @@ const styles = StyleSheet.create({
         color: COLORS?.PRIMARY_COLOR,
         fontSize: calculatefontSize(1.9),
         fontWeight: 'bold'
-    }
+    },
+    activePinCodeContainer:{
+        backgroundColor:COLORS?.whiteColors
+    },
+    // filledPinCodeContainer:{
+    //       backgroundColor:COLORS?.whiteColors
+    // }
 })
