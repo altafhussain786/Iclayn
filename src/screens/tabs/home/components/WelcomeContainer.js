@@ -1,15 +1,35 @@
 import { Image, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import MyText from '../../../../components/MyText'
 import { COLORS } from '../../../../constants'
 import { calculatefontSize } from '../../../../helper/responsiveHelper'
 import { useSelector } from 'react-redux'
+import httpRequest from '../../../../api/apiHandler'
 
 const WelcomeContainer = () => {
+    const [personalData, setPersonalData] = React.useState({});
     const userDetails=useSelector(state=>state?.userDetails?.userDetails);
     console.log(userDetails,"userDetails=====>");
     const {userProfileDTO}=userDetails
       const imageURL = `data:image/jpeg;base64,${userProfileDTO?.image}`;
+
+      const getPersonalData=async()=>{
+        const { res, err } = await httpRequest({
+          method: 'get',
+          path: `/ic/db/personal/1`,
+        })
+        if (res) {
+            console.log(res, "res================>");
+            
+          setPersonalData(res?.data);
+        }
+        else {
+          console.log("err", err);
+        }
+      }
+      useEffect(() => {
+        getPersonalData();
+      },[userDetails])
     return (
         <>
             <View style={styles.container}>
@@ -18,8 +38,8 @@ const WelcomeContainer = () => {
                     <MyText style={styles.nameStyle}>Hi, {userProfileDTO?.fullName}</MyText>
                 </View>
                 <View>
-                    <MyText style={styles.messageStyle}>You have <Text style={{ color: COLORS?.yellow }}>3 appointments </Text> </MyText>
-                    <MyText style={styles.messageStyle}>and <Text style={{ color: COLORS?.yellow }}> 1 task </Text> schedule today</MyText>
+                    <MyText style={styles.messageStyle}>You have <Text style={{ color: COLORS?.yellow,fontWeight:"bold" }}>{personalData?.todayEventDTOList?.length} Event{personalData?.todayEventDTOList?.length > 1 && "s"} </Text> </MyText>
+                    <MyText style={styles.messageStyle}>and <Text style={{ color: COLORS?.yellow,fontWeight:"bold" }}> {personalData?.todayTaskDTOList?.length}  task{personalData?.todayTaskDTOList?.length > 1 && "s"} </Text> schedule today</MyText>
                 </View>
             </View>
         </>
@@ -43,6 +63,6 @@ const styles = StyleSheet.create({
     messageStyle: {
         color: COLORS?.whiteColors,
         fontSize: calculatefontSize(2),
-        fontWeight: "600"
+        fontWeight: "300"
     }
 })

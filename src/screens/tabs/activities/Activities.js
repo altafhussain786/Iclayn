@@ -97,18 +97,18 @@ const Activities = ({ navigation }) => {
                       borderColor: COLORS?.BORDER_LIGHT_COLOR,
                     }}
                   >
-                    <View style={{ gap: 5 }}>
+                    <View style={{ gap: 5 ,width: "65%",}}>
                       <MyText style={styles.timeColor}>{moment(item?.entryDate).format("DD-MM-YYYY")}</MyText>
                       <MyText style={[styles.txtStyle, { fontWeight: "300" }]}>{item?.matterName}</MyText>
                       {item?.description !== "" && <MyText style={styles.timeColor}>
                         {item?.description}
                       </MyText>}
                     </View>
-                    <View style={{ gap: 5 }}>
+                    <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
                       <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "right" }]}>${formatNumber(item?.amount)}</MyText>
                       <MyText style={[styles.txtStyle, { textAlign: "right" }]}>{item?.duration}</MyText>
                       <View style={{ backgroundColor: "#ffc2cd", alignSelf: "flex-end", width: getResponsiveWidth(20), borderRadius: 5, paddinHorizontal: 30 }}>
-                        <MyText style={[styles.timeColor, { fontWeight: "400", textAlign: "center", color: "#6c0014" }]}>
+                        <MyText style={[styles.timeColor, { fontWeight: "300", textAlign: "center", color: "#6c0014" }]}>
                           {item?.billed ? "Billed" : "Unbilled"}
                         </MyText>
                       </View>

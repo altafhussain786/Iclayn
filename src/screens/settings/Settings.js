@@ -44,7 +44,7 @@ const Settings = ({ navigation }) => {
     ]
     return (
         <>
-            <ScreenHeader leftIcon="left" onLeftPress={() => navigation.goBack()} title='Settings' />
+            <ScreenHeader isGoBack={true} leftIcon="left" onPress={() => navigation.goBack()} title='Settings' />
             <Wrapper>
                 <FlatList
                     removeClippedSubviews={false}

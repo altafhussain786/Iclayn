@@ -48,32 +48,32 @@ const Splash = ({ navigation }) => {
         ]),
       ])
     ).start();
-    
 
-    const timer = setTimeout(async() => {
+
+    const timer = setTimeout(async () => {
       const token = await AsyncStorage.getItem('access_token');
-      if (token) { 
-          const {res,err}=await httpRequest(
+      if (token) {
+        const { res, err } = await httpRequest(
           {
-            method:'post',
-            path:`/ic/auth/authorize`,
-            params:{}
+            method: 'post',
+            path: `/ic/auth/authorize`,
+            params: {}
           }
         )
         if (res) {
-          console.log(res,"res data");
+          console.log(res, "res data");
           navigation.navigate('BottomTabNavigation')
           dispatch(adduserDetails(res?.data))
         }
         else {
-              navigation.navigate('Login');
+          navigation.navigate('Login');
 
-          
+
         }
 
-       }
+      }
       else {
-      navigation.navigate('Login');
+        navigation.navigate('Login');
       }
     }, 2500);
 
@@ -82,7 +82,7 @@ const Splash = ({ navigation }) => {
 
   return (
     <>
-      <StatusBar hidden />
+      {/* <StatusBar backgroundColor={COLORS?.PRIMARY_COLOR} /> */}
       <ImageBackground
         blurRadius={2}
         source={require('../../assets/Images/bgimage.png')}

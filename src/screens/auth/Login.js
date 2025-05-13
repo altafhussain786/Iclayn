@@ -50,12 +50,13 @@ const Login = ({ navigation }) => {
     }
 
     return (
+        
         <ImageBackground blurRadius={2} source={require("../../assets/Images/bgimage.png")} style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
             <View >
                 <Image tintColor={COLORS?.whiteColors} source={{ uri: `${BASE_URL}/assets/logo-DuQxixZj.png` }} style={{ width: 150, height: 50, resizeMode: "contain", }} />
             </View>
             <Formik
-                initialValues={{ email: 'sa@yopmail.com', }}
+                initialValues={{ email: 'altaf@yopmail.com', }}
                 validationSchema={validationSchema}
                 onSubmit={login}
             >

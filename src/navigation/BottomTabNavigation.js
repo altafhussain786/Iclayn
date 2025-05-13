@@ -63,7 +63,7 @@ const BottomTabNavigation = () => {
 
   return (
     <>
-      <StatusBar backgroundColor={COLORS.PRIMARY_COLOR} barStyle={"light-content"} />
+      {/* <StatusBar backgroundColor={COLORS.PRIMARY_COLOR} barStyle={"light-content"} /> */}
       <Tab.Navigator
         initialRouteName='Home'
         screenOptions={({ route }) => ({

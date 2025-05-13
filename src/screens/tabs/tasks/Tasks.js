@@ -129,7 +129,7 @@ const Tasks = ({ navigation }) => {
         </View>
 
         {/* Task List */}
-        <FlatList
+      {filteredData?.length > 0 ?  <FlatList
           showsVerticalScrollIndicator={false}
           data={filteredData}
           keyExtractor={(item, index) => index.toString()}
@@ -147,19 +147,19 @@ const Tasks = ({ navigation }) => {
                   borderColor: COLORS?.BORDER_LIGHT_COLOR,
                 }}
               >
-                <View style={{ gap: 5 }}>
+                <View style={{ gap: 5,width: "65%"  }}>
                   <MyText style={styles.timeColor}>Due 01-05-2025</MyText>
                   <MyText style={[styles.txtStyle, { fontWeight: '300',width: '70%' }]}>
                     {item?.code} - {item?.name}
                   </MyText>
                   <MyText style={styles.timeColor}>{item?.matterName}</MyText>
                 </View>
-                <View style={{ gap: 5 }}>
+                <View style={{ gap: 5 ,width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10,  }}>
 
                   <View
                     style={{
                       backgroundColor: '#ffc2cd',
-                      alignSelf: 'flex-end',
+                      // alignSelf: 'flex-end',
                       borderRadius: 5,
                       paddingHorizontal: 8,
                       paddingVertical: 2,
@@ -167,8 +167,8 @@ const Tasks = ({ navigation }) => {
                   >
                     <MyText
                       style={{
-                        fontWeight: '600',
-                        textAlign: 'center',
+                        // fontWeight: '600',
+                        // textAlign: 'center',
                         color: '#6c0014',
                         fontSize: calculatefontSize(1.4),
                       }}
@@ -184,6 +184,12 @@ const Tasks = ({ navigation }) => {
             <RefreshControl refreshing={refreshing} onRefresh={getTasks} />
           }
         />
+      :
+       <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 10 }}>
+                <Image tintColor={COLORS.PRIMARY_COLOR} source={IconUri?.Tasks} style={{ height: 30, width: 30, resizeMode: "contain" }} />
+                <MyText style={{ fontSize: calculatefontSize(1.5), color: COLORS.PRIMARY_COLOR }}>No Data Found</MyText>
+              </View>
+      }
 
         {/* Floating Button */}
         <FloatingButton

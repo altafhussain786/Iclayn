@@ -299,9 +299,10 @@ setLoader(false)
         />
           :
           <>
-            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-              <MyText>No Data Found</MyText>
-            </View>
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center",gap:10 }}>
+                <Image tintColor={COLORS.PRIMARY_COLOR} source={IconUri?.Calender} style={{ height: 30, width: 30, resizeMode: "contain" }} />
+                <MyText style={{ fontSize: calculatefontSize(1.5),color:COLORS.PRIMARY_COLOR }}>No Data Found</MyText>
+              </View>
           </>}
 
         <FloatingButton

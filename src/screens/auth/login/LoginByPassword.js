@@ -71,7 +71,7 @@ const LoginByPassword = ({ navigation, route }) => {
                 <Image tintColor={COLORS?.whiteColors} source={{ uri: `${BASE_URL}/assets/logo-DuQxixZj.png` }} style={{ width: 150, height: 50, resizeMode: "contain", }} />
             </View>
             <Formik
-                initialValues={{ email: email, password: '' }}
+                initialValues={{ email: email, password: 'Secret@123' }}
                 validationSchema={validationSchema}
                 onSubmit={login}
             >
