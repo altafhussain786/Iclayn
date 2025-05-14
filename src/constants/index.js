@@ -25,13 +25,20 @@ export const COLORS = {
     BORDER_LIGHT_COLOR: '#f5f5f5',
     whiteColors: 'white',
     BLACK_COLOR: '#000',
-    GREEN_COLOR: '#36C85A',
+    GREEN_COLOR: '#E6FAEB',
+    // COMPLETD_TXT:"#007E17",
     ACTIVE_TEXT_COLOR: '#80C6FF',
     ORANGE_COLOR: '#F7C69C',
     LIGHT_RED: '#ef4f68',
     RED_COLOR: '#F85544',
     GREY_COLOR: '#8A8A8D',
     GREY_COLOR_LIGHT: '#8A8A8D',
+
+    //STATUS COLOR:
+    COMPLETE_BG: '#E6FAEB',
+    COMPLETD_TXT:"#007E17",
+    PENDING_BG:"#D2F6FF",
+    PENDING_TXT:"#3391A4",
 }
 export const RANDOM_COLOR = ["#6aabed", "#49ac96", "#f28195", "#e7b15f", "#8a7fe6"];
 

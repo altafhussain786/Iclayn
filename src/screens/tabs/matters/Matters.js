@@ -23,19 +23,19 @@ import FloatingButton from '../../../components/FloatingButton';
 import httpRequest from '../../../api/apiHandler';
 import moment from 'moment';
 
-const Tasks = ({ navigation }) => {
+const Matters = ({ navigation }) => {
   const [tabs, setTabs] = React.useState('All');
 
-  const tabList = ['All', 'Pending',  'Completed'];
+  const tabList = ['All', 'Open', 'Pending', 'Closed', ];
 
   const [data, setData] = useState([])
   const [refreshing, setRefreshing] = useState(false); // ✅ for refresh
   const [searchText, setSearchText] = useState(''); // ✅ for search
   const [filteredData, setFilteredData] = useState([]);
-  const getTasks = async () => {
+  const getMatters = async () => {
     const { res, err } = await httpRequest({
       method: 'get',
-      path: `/ic/matter/task/`,
+      path: `/ic/matter/listing`,
     })
     if (res) {
       setFilteredData(res?.data);
@@ -47,68 +47,33 @@ const Tasks = ({ navigation }) => {
   }
 
   useEffect(() => {
-    getTasks()
+    getMatters()
   }, [])
 
-  const checkBGStatusColor=(status)=>{
-    if(status.toLowerCase() === 'pending'){
-      return COLORS?.PENDING_BG
-    }
-    else if(status.toLowerCase() === 'completed'){
-      return COLORS?.COMPLETE_BG
-    }
-    else{
-      return COLORS?.PENDING_BG
-    }
-  }
-  const checkTxtStatusColor=(status)=>{
-    if(status.toLowerCase() === 'pending'){
-      return COLORS?.PENDING_TXT
-    }
-    else if(status.toLowerCase() === 'completed'){
-      return COLORS?.COMPLETD_TXT
-    }
-    else{
-      return COLORS?.PENDING_TXT
-    }
+  // ✅ Search logic
+ useEffect(() => {
+  let filtered = [...data];
+
+  // Filter based on tab
+  if (tabs !== 'All') {
+    filtered = filtered.filter(item => item.status?.toLowerCase() === tabs.toLowerCase());
   }
 
-  // ✅ Search logic
-  // useEffect(() => {
-  //   if (searchText === '') {
-  //     setFilteredData(data);
-  //   } else {
-  //     const filtered = data.filter(item =>
-  //       (item?.name + item?.code + item?.matterName)
-  //         .toLowerCase()
-  //         .includes(searchText.toLowerCase())
-  //     );
-  //     setFilteredData(filtered);
-  //   }
-  // }, [searchText, data]);
-  useEffect(() => {
-    let filtered = [...data];
-  
-    // Filter based on tab
-    if (tabs !== 'All') {
-      filtered = filtered.filter(item => item.status?.toLowerCase() === tabs.toLowerCase());
-    }
-  
-    // Filter based on search
-    if (searchText !== '') {
-      filtered = filtered.filter(item =>
-        (item?.name + item?.code + item?.matterName)
-          .toLowerCase()
-          .includes(searchText.toLowerCase())
-      );
-    }
-  
-    setFilteredData(filtered);
-  }, [searchText, data, tabs]);
+  // Filter based on search
+  if (searchText !== '') {
+    filtered = filtered.filter(item =>
+      (item?.name + item?.code + item?.matterName)
+        .toLowerCase()
+        .includes(searchText.toLowerCase())
+    );
+  }
+
+  setFilteredData(filtered);
+}, [searchText, data, tabs]);
 
   return (
     <>
-      <ScreenHeader onPress={() => { navigation.navigate("Settings") }} isShowTitle={true} title="Tasks" />
+      <ScreenHeader onPress={() => { navigation.navigate("Settings") }} isShowTitle={true} title="Matters" />
 
       {/* Scrollable Tabs */}
       <View style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}>
@@ -191,17 +156,19 @@ const Tasks = ({ navigation }) => {
                 }}
               >
                 <View style={{ gap: 5, width: "65%" }}>
-                  <MyText style={styles.timeColor}>{moment(item?.dueDate).fromNow()}</MyText>
+                  <MyText style={styles.timeColor}>Open {moment(item?.openDate).format('DD-MM-YYYY')}</MyText>
                   <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300', }]}>
-                    {item?.name}
+                  {item?.name}
                   </MyText>
-                  <MyText style={styles.timeColor}>{item?.matterName}</MyText>
+                  <MyText style={styles.timeColor}>{item?.clientNames}</MyText>
                 </View>
                 <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
 
                   <View
                     style={{
-                      backgroundColor: checkBGStatusColor(item?.status),
+                      backgroundColor: item?.status == "Open" ? '#EFE4FF' : '#ffc2cd',
+                      borderWidth:1,
+                      borderColor: item?.status == "COMPLETED" ? '#7C4EC9' : '#6c0014',
                       // alignSelf: 'flex-end',
                       borderRadius: 5,
                       paddingHorizontal: 8,
@@ -212,7 +179,7 @@ const Tasks = ({ navigation }) => {
                       style={{
                         // fontWeight: '600',
                         // textAlign: 'center',
-                        color: checkTxtStatusColor(item?.status),
+                        color: item?.status == "COMPLETED" ? COLORS?.whiteColors : '#6c0014',
                         fontSize: calculatefontSize(1.4),
                       }}
                     >
@@ -224,7 +191,7 @@ const Tasks = ({ navigation }) => {
             );
           }}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={getTasks} />
+            <RefreshControl refreshing={refreshing} onRefresh={getMatters} />
           }
         />
           :
@@ -247,7 +214,7 @@ const Tasks = ({ navigation }) => {
   );
 };
 
-export default Tasks;
+export default Matters;
 
 const styles = StyleSheet.create({
   tabContainer: {

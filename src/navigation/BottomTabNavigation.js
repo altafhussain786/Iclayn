@@ -14,6 +14,7 @@ import { COLORS, IconUri } from '../constants';
 import { responsiveHeight as hp } from "react-native-responsive-dimensions";
 import Tasks from '../screens/tabs/tasks/Tasks';
 import { useFocusEffect } from '@react-navigation/native';
+import Matters from '../screens/tabs/matters/Matters';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -52,7 +53,7 @@ const BottomTabNavigation = () => {
         return IconUri?.Bills;
       case "Calender":
         return IconUri?.Calender;
-      case "Activities":
+      case "Matters":
         return IconUri?.Activities;
       case "Tasks":
         return IconUri?.Tasks;
@@ -89,7 +90,8 @@ const BottomTabNavigation = () => {
       >
         <Tab.Screen name="Home" component={Home} />
         <Tab.Screen name="Calender" component={Calender} />
-        <Tab.Screen name="Activities" component={Activities} />
+        {/* <Tab.Screen name="Activities" component={Activities} /> */}
+        <Tab.Screen name="Matters" component={Matters} />
         <Tab.Screen name="Tasks" component={Tasks} />
         <Tab.Screen name="Bills" component={Bills} />
       </Tab.Navigator>
