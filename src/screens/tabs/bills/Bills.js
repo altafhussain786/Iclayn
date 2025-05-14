@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   timeColor: {
-    color: COLORS?.LIGHT_COLOR,
+    color: COLORS?.GREY_COLOR,
     fontSize: calculatefontSize(1.5),
   },
   txtStyle: {

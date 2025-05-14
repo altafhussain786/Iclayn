@@ -1,4 +1,4 @@
-import { FlatList, Image, PanResponder, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, PanResponder, RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import ScreenHeader from '../../../components/ScreenHeader';
 import Wrapper from '../../../components/Wrapper';
@@ -6,6 +6,7 @@ import WelcomeContainer from './components/WelcomeContainer';
 import MyText from '../../../components/MyText';
 import { COLORS, IconUri } from '../../../constants';
 import { calculatefontSize, getResponsiveHeight } from '../../../helper/responsiveHelper';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 //PKGS
 import { CalendarList } from 'react-native-calendars';
@@ -20,10 +21,11 @@ import Loader from '../../../components/Loader';
 
 const Home = ({ navigation }) => {
   const [tabs, setTabs] = React.useState("Events");
-  const [weekOffset, setWeekOffset] = useState(0);
   const dispatch = useDispatch()
-  const flatListRef = useRef(null);
+
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showMonthPicker, setShowMonthPicker] = useState(false);
+
   const [loader, setLoader] = useState(false);
   const [calenderData, setCalenderData] = useState([]);
   //search states here ========>
@@ -46,11 +48,11 @@ const Home = ({ navigation }) => {
     if (res) {
       setFilterTaskData(res?.data);
       setData(res?.data)
-    setTaskLoader(false)
+      setTaskLoader(false)
 
     }
     else {
-    setTaskLoader(false)
+      setTaskLoader(false)
 
       console.log("err", err);
     }
@@ -73,39 +75,15 @@ const Home = ({ navigation }) => {
   }, [searchTask, calenderData]);
   // ===================================================================>
 
-  const days = Array.from({ length: 7 }).map((_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() + i);
-    return {
-      date: date.toISOString().split('T')[0],
-      day: date.toDateString().slice(0, 3),
-      num: date.getDate(),
-    };
-  });
 
-  const getStartOfWeek = (date) => {
-    const d = new Date(date);
-    const day = d.getDay(); // 0 (Sunday) - 6
-    d.setDate(d.getDate() - day);
-    return d;
-  };
 
-  const getToDate = (fromDate) => {
-    const startOfWeek = getStartOfWeek(fromDate); // Sunday
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6); // Saturday
-    return endOfWeek;
-  };
+
   const getCalenderData = async () => {
 
-    let fromDate = selectedDate;
-    let toDate = getToDate(fromDate);
+
 
     // Check if the selectedDate falls within the same week, and if so, keep fromDate the same
-    const currentStartOfWeek = getStartOfWeek(new Date()); // Current week's start (Sunday)
-    if (selectedDate >= currentStartOfWeek && selectedDate <= getToDate(currentStartOfWeek)) {
-      fromDate = currentStartOfWeek;
-    }
+
     const selectedDateDate = moment(selectedDate).format('MM/DD/YYYY');
     console.log("hellfo");
     setLoader(true)
@@ -162,38 +140,8 @@ const Home = ({ navigation }) => {
     getUserData()
   }, [])
 
-  useEffect(() => {
-    setSelectedDate(currentWeek[3].date); // always center select (Thursday)
-  }, [weekOffset]);
 
-  const getWeekDays = (baseDate) => {
-    const startOfWeek = getStartOfWeek(baseDate);
-    return Array.from({ length: 7 }, (_, i) => {
-      const date = new Date(startOfWeek);
-      date.setDate(startOfWeek.getDate() + i);
-      return {
-        date,
-        dateStr: date.toISOString().split('T')[0],
-        day: date.toDateString().slice(0, 3),
-        num: date.getDate(),
-      };
-    });
-  };
-  const currentWeek = getWeekDays(
-    new Date(new Date().setDate(new Date().getDate() + weekOffset * 7))
-  );
 
-  const panResponder = PanResponder.create({
-    onMoveShouldSetPanResponder: (_, gestureState) =>
-      Math.abs(gestureState.dx) > 20,
-    onPanResponderRelease: (_, gestureState) => {
-      if (gestureState.dx > 50) {
-        setWeekOffset(prev => prev - 1); // swipe right → previous week
-      } else if (gestureState.dx < -50) {
-        setWeekOffset(prev => prev + 1); // swipe left → next week
-      }
-    },
-  });
 
   useEffect(() => {
     if (searchText.trim() === '') {
@@ -242,48 +190,30 @@ const Home = ({ navigation }) => {
             onChangeText={text => setSearchText(text)}
           />
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginVertical: 10 }}>
-            <MyText style={{ fontSize: calculatefontSize(2), color: COLORS?.PRIMARY_COLOR_LIGHT }}>Today</MyText>
-            <Image
-              source={IconUri?.CalenderSearch}
-              style={{ height: 20, width: 20, resizeMode: "contain" }}
-            />
+            <MyText style={{ fontSize: calculatefontSize(2), color: COLORS?.PRIMARY_COLOR_LIGHT }}>
+              {moment(selectedDate).isSame(moment(), 'day') ? "Today" : moment(selectedDate).format("MMM DD, YYYY")}
+            </MyText>
+            <TouchableOpacity onPress={() => setShowMonthPicker(true)}>
+              <Image
+                source={IconUri?.CalenderSearch}
+                style={{ height: 25, width: 25, resizeMode: "contain" }}
+              />
+            </TouchableOpacity>
           </View>
-
-          {/* Calendar Week Strip */}
-          {/* <View style={styles.tabContainer} {...panResponder.panHandlers}>
-            <FlatList
-              horizontal
-              ref={flatListRef}
-              showsHorizontalScrollIndicator={false}
-              data={currentWeek}
-              keyExtractor={(item) => item.dateStr}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  {...panResponder.panHandlers}
-                  style={styles.dayButton}
-                  onPress={() => setSelectedDate(item.date)}
-                >
-                  <Text style={styles.dayText}>{item.day}</Text>
-                  <Text
-                    style={{
-                      ...styles.dateText,
-                      backgroundColor:
-                        selectedDate.toISOString().split('T')[0] === item.dateStr
-                          ? COLORS.whiteColors
-                          : COLORS.PRIMARY_COLOR,
-                      color:
-                        selectedDate.toISOString().split('T')[0] === item.dateStr
-                          ? COLORS.PRIMARY_COLOR
-                          : COLORS.whiteColors,
-                    }}
-                  >
-                    {item.num}
-                  </Text>
-                </TouchableOpacity>
-              )}
+          {showMonthPicker && (
+            <DateTimePicker
+              mode="date"
+              display={Platform.OS === 'ios' ? 'inline' : 'calendar'}
+              value={selectedDate}
+              onChange={(event, date) => {
+                setShowMonthPicker(false);
+                if (date) {
+                  setSelectedDate(date);
+                  setWeekOffset(0);
+                }
+              }}
             />
-          </View> */}
-
+          )}
           {loader ? <Loader /> : filteredData?.length > 0 ?
             <FlatList
               showsVerticalScrollIndicator={false}
@@ -300,7 +230,7 @@ const Home = ({ navigation }) => {
                     </View>
                     <View style={{ width: "100%" }}>
                       <View style={styles.eventItem}>
-                        <View style={{width:"65%"}}>
+                        <View style={{ width: "65%" }}>
                           <MyText style={styles.timeColor}>
                             {moment(item.eventScheduleDTOList[0]?.startOnTime).format('hh:mm A')} - {moment(item.eventScheduleDTOList[0]?.endOnTime).format('hh:mm A')}
                           </MyText>
@@ -309,13 +239,13 @@ const Home = ({ navigation }) => {
                           </MyText>
                           {item?.description && <MyText style={[styles.timeColor, { width: '70%' }]}>{item?.description}</MyText>}
                         </View>
-                        <View style={{width:"35%"}}>
+                        <View style={{ width: "35%" }}>
                           {/* <View style={[styles.draftBox, { backgroundColor: item?.userColor, height: 10, width: 10, }]}>
                 </View> */}
                           {item?.location && <MyText
                             style={[
                               styles.timeColor,
-                              { fontWeight: '300',  },
+                              { fontWeight: '300', },
                             ]}
                           >
                             {item?.location}
@@ -324,22 +254,14 @@ const Home = ({ navigation }) => {
                         </View>
                       </View>
                       {/* //Agendas */}
-                      {/* {
-                        item?.eventScheduleDTOList?.length > 0 &&
-                        item?.eventScheduleDTOList?.map((schedule, index) => (
-                          <>
-                            <View style={{ left: 30, borderWidth: 0.5, borderColor: COLORS?.BORDER_LIGHT_COLOR, padding: 10, width: '90%' }}>
-                              <MyText style={{ fontSize: calculatefontSize(1.5), color: "gray" }}>{moment(schedule?.startOnDate).format('MM/DD/YYYY')} - {moment(schedule?.endOnDate).format('MM/DD/YYYY')}</MyText>
-                              <MyText style={{ fontSize: calculatefontSize(1.5), color: "gray" }}>{moment(schedule?.startOnTime).format('hh:mm A')} - {moment(schedule?.endOnTime).format('hh:mm A')}</MyText>
 
-                            </View>
-                          </>
-                        ))
-                      } */}
                     </View>
                   </View>
                 </>
               )}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={getCalenderData} />
+              }
             />
             :
             <>
@@ -390,13 +312,13 @@ const Home = ({ navigation }) => {
                     borderColor: COLORS?.BORDER_LIGHT_COLOR,
                   }}
                 >
-                  <View style={{ gap: 5,width:"70%" }}>
+                  <View style={{ gap: 5, width: "70%" }}>
                     <MyText style={styles.timeColor}>Due 01-05-2025</MyText>
-                    <MyText  numberOfLines={2}
-                      ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300',}]}>
-                       {item?.name}
+                    <MyText numberOfLines={2}
+                      ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300', }]}>
+                      {item?.name}
                     </MyText>
-                    <MyText  style={styles.timeColor}>{item?.matterName}</MyText>
+                    <MyText style={styles.timeColor}>{item?.matterName}</MyText>
                   </View>
                   <View style={{ gap: 5 }}>
 
@@ -410,13 +332,13 @@ const Home = ({ navigation }) => {
                       }}
                     >
                       <MyText
-                     
+
                         style={{
                           fontWeight: '600',
                           textAlign: 'center',
                           color: item?.status === 'COMPLETED' ? COLORS?.whiteColors : '#6c0014',
                           fontSize: calculatefontSize(1.4),
-                          
+
                         }}
                       >
                         {item?.status}
@@ -426,9 +348,9 @@ const Home = ({ navigation }) => {
                 </View>
               );
             }}
-          // refreshControl={
-          //   <RefreshControl refreshing={refreshing} onRefresh={getTasks} />
-          // }
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={getTasks} />
+            }
           />
             :
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 10 }}>
@@ -436,6 +358,8 @@ const Home = ({ navigation }) => {
               <MyText style={{ fontSize: calculatefontSize(1.5), color: COLORS.PRIMARY_COLOR }}>No Task Found</MyText>
             </View>
           }
+
+
         </Wrapper>
       )}
     </>

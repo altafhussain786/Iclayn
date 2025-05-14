@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { COLORS, fontFamily } from '../constants';
@@ -16,6 +16,30 @@ const SearchBar = ({
     inputStyle,
     containerStyle
 }) => {
+    const [internalValue, setInternalValue] = useState('');
+
+    useEffect(() => {
+        // Sync external value (if provided)
+        if (value !== undefined) {
+            setInternalValue(value);
+        }
+    }, [value]);
+
+    const handleChange = (text) => {
+        setInternalValue(text);
+        if (onChangeText) {
+            onChangeText(text);
+        }
+    };
+       const handleClear = () => {
+        setInternalValue('');
+        if (onChangeText) {
+            onChangeText('');
+        }
+        if (onClear) {
+            onClear(); // optional external onClear call
+        }
+    };
     return (
         <View style={[styles.container, containerStyle]}>
             <AntDesign name="search1" size={iconSize} color={iconColor} style={styles.icon} />
@@ -26,8 +50,8 @@ const SearchBar = ({
                 placeholderTextColor={COLORS.LIGHT_COLOR}
                 style={[styles.input, inputStyle]}
             />
-            {value?.length > 0 && (
-                <TouchableOpacity onPress={onClear} style={styles.clearButton}>
+            {internalValue.length > 0 && (
+                <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
                     <AntDesign name="closecircle" size={iconSize} color={COLORS.LIGHT_COLOR} />
                 </TouchableOpacity>
             )}

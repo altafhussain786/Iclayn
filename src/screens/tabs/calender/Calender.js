@@ -11,6 +11,7 @@ import {
   Platform,
   Dimensions,
   PanResponder,
+  RefreshControl,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { COLORS, IconUri } from '../../../constants';
@@ -31,6 +32,8 @@ const Calender = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [weekOffset, setWeekOffset] = useState(0);
   const [showMonthPicker, setShowMonthPicker] = useState(false);
+    const [refreshing, setRefreshing] = useState(false); // ✅ for refresh
+  
   const [searchQuery, setSearchQuery] = useState('');
   const flatListRef = useRef(null);
   const [loader, setLoader] = useState(false);
@@ -231,6 +234,7 @@ setLoader(false)
               </Text>
             </TouchableOpacity>
           )}
+           
         />
       </View>
 </View>
@@ -299,6 +303,9 @@ setLoader(false)
              </View>
             </>
           )}
+           refreshControl={
+                          <RefreshControl refreshing={refreshing} onRefresh={getCalenderData} />
+                        }
         />
           :
           <>
