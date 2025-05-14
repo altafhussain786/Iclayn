@@ -17,11 +17,13 @@ const FloatingButton = ({
   const navigation = navProp || useNavigation();
 
   const handlePress = () => {
-    if (onPress) {
-      onPress();
-    } else if (navigateTo && navigation?.navigate) {
-      navigation.navigate(navigateTo);
-    }
+    console.log("pressed");
+    
+    // if (onPress) {
+    //   onPress();
+    // } else if (navigateTo && navigation?.navigate) {
+    //   navigation.navigate(navigateTo);
+    // }
   };
 
   return (

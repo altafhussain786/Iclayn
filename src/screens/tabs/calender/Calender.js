@@ -199,10 +199,12 @@ setLoader(false)
       </View>
 
       {/* Calendar Week Strip */}
+      <View style={{backgroundColor:COLORS?.whiteColors}}>
       <View style={styles.tabContainer} {...panResponder.panHandlers}>
         <FlatList
           horizontal
           ref={flatListRef}
+        
           showsHorizontalScrollIndicator={false}
           data={currentWeek}
           keyExtractor={(item) => item.dateStr}
@@ -231,15 +233,16 @@ setLoader(false)
           )}
         />
       </View>
-
+</View>
       <Wrapper>
+        <View style={{bottom:25}}>
         <SearchBar
           value={searchQuery}
           onChangeText={setSearchQuery}
           containerStyle={{ width: '100%' }}
           placeholder="Search an event"
         />
-
+</View>
         {loader ? <Loader /> : calenderData?.length > 0 ? 
         <FlatList
           showsVerticalScrollIndicator={false}
@@ -255,8 +258,8 @@ setLoader(false)
                                   />
             </View>
             <View style={{width:"100%"}}>
-            <View style={styles.eventItem}>
-              <View>
+            <View style={[styles.eventItem]}>
+              <View style={{width:"65%"}}>
                 <MyText style={styles.timeColor}>
                   {moment(item.eventScheduleDTOList[0]?.startOnTime).format('hh:mm A')} - {moment(item.eventScheduleDTOList[0]?.endOnTime).format('hh:mm A')}
                 </MyText>
@@ -265,13 +268,13 @@ setLoader(false)
                 </MyText>
                {item?.description && <MyText style={[styles.timeColor,{width:'70%'}]}>{item?.description}</MyText>}
               </View>
-              <View>
+              <View style={{width:"35%"}}>
                 {/* <View style={[styles.draftBox, { backgroundColor: item?.userColor, height: 10, width: 10, }]}>
                 </View> */}
               {item?.location &&  <MyText
                   style={[
                     styles.timeColor,
-                    { fontWeight: '600', textAlign: 'right' },
+                    { fontWeight: '300',  },
                   ]}
                 >
                   {item?.location}
@@ -280,7 +283,7 @@ setLoader(false)
               </View>
             </View> 
             {/* //Agendas */}
-            {
+            {/* {
               item?.eventScheduleDTOList?.length > 0 &&
              item?.eventScheduleDTOList?.map((schedule, index) => (
                <>
@@ -291,7 +294,7 @@ setLoader(false)
                  </View>
                </>
              ))
-            }
+            } */}
             </View>
              </View>
             </>
@@ -339,6 +342,7 @@ export default Calender;
 
 const styles = StyleSheet.create({
   header: {
+
     padding: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -359,6 +363,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    margin:10,
+    borderRadius:10,
+    bottom:15,
     backgroundColor: COLORS.PRIMARY_COLOR,
   },
   dayButton: {

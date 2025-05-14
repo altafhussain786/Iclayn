@@ -250,7 +250,7 @@ const Home = ({ navigation }) => {
           </View>
 
           {/* Calendar Week Strip */}
-          <View style={styles.tabContainer} {...panResponder.panHandlers}>
+          {/* <View style={styles.tabContainer} {...panResponder.panHandlers}>
             <FlatList
               horizontal
               ref={flatListRef}
@@ -282,7 +282,7 @@ const Home = ({ navigation }) => {
                 </TouchableOpacity>
               )}
             />
-          </View>
+          </View> */}
 
           {loader ? <Loader /> : filteredData?.length > 0 ?
             <FlatList
@@ -300,7 +300,7 @@ const Home = ({ navigation }) => {
                     </View>
                     <View style={{ width: "100%" }}>
                       <View style={styles.eventItem}>
-                        <View>
+                        <View style={{width:"65%"}}>
                           <MyText style={styles.timeColor}>
                             {moment(item.eventScheduleDTOList[0]?.startOnTime).format('hh:mm A')} - {moment(item.eventScheduleDTOList[0]?.endOnTime).format('hh:mm A')}
                           </MyText>
@@ -309,13 +309,13 @@ const Home = ({ navigation }) => {
                           </MyText>
                           {item?.description && <MyText style={[styles.timeColor, { width: '70%' }]}>{item?.description}</MyText>}
                         </View>
-                        <View>
+                        <View style={{width:"35%"}}>
                           {/* <View style={[styles.draftBox, { backgroundColor: item?.userColor, height: 10, width: 10, }]}>
                 </View> */}
                           {item?.location && <MyText
                             style={[
                               styles.timeColor,
-                              { fontWeight: '600', textAlign: 'right' },
+                              { fontWeight: '300',  },
                             ]}
                           >
                             {item?.location}
@@ -324,7 +324,7 @@ const Home = ({ navigation }) => {
                         </View>
                       </View>
                       {/* //Agendas */}
-                      {
+                      {/* {
                         item?.eventScheduleDTOList?.length > 0 &&
                         item?.eventScheduleDTOList?.map((schedule, index) => (
                           <>
@@ -335,7 +335,7 @@ const Home = ({ navigation }) => {
                             </View>
                           </>
                         ))
-                      }
+                      } */}
                     </View>
                   </View>
                 </>
@@ -390,18 +390,19 @@ const Home = ({ navigation }) => {
                     borderColor: COLORS?.BORDER_LIGHT_COLOR,
                   }}
                 >
-                  <View style={{ gap: 5 }}>
+                  <View style={{ gap: 5,width:"70%" }}>
                     <MyText style={styles.timeColor}>Due 01-05-2025</MyText>
-                    <MyText style={[styles.txtStyle, { fontWeight: '300', width: '70%' }]}>
-                      {item?.code} - {item?.name}
+                    <MyText  numberOfLines={2}
+                      ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300',}]}>
+                       {item?.name}
                     </MyText>
-                    <MyText style={styles.timeColor}>{item?.matterName}</MyText>
+                    <MyText  style={styles.timeColor}>{item?.matterName}</MyText>
                   </View>
                   <View style={{ gap: 5 }}>
 
                     <View
                       style={{
-                        backgroundColor: '#ffc2cd',
+                        backgroundColor: item?.status === 'COMPLETED' ? COLORS?.GREEN_COLOR : '#ffc2cd',
                         alignSelf: 'flex-end',
                         borderRadius: 5,
                         paddingHorizontal: 8,
@@ -409,11 +410,13 @@ const Home = ({ navigation }) => {
                       }}
                     >
                       <MyText
+                     
                         style={{
                           fontWeight: '600',
                           textAlign: 'center',
-                          color: '#6c0014',
+                          color: item?.status === 'COMPLETED' ? COLORS?.whiteColors : '#6c0014',
                           fontSize: calculatefontSize(1.4),
+                          
                         }}
                       >
                         {item?.status}
@@ -490,7 +493,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   timeColor: {
-    color: COLORS?.LIGHT_COLOR,
+    color: COLORS.GREY_COLOR,
     fontSize: calculatefontSize(1.5),
   },
   txtStyle: {

@@ -1,5 +1,5 @@
 import { FlatList, Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import ScreenHeader from '../../../components/ScreenHeader'
 import { COLORS, IconUri } from '../../../constants';
 import { calculatefontSize, getResponsiveWidth } from '../../../helper/responsiveHelper';
@@ -18,6 +18,8 @@ import moment from 'moment';
 const Activities = ({ navigation }) => {
   const [tabs, setTabs] = React.useState("Time entries");
   const [activityData, setActivityData] = React.useState([]);
+  const [filteredData, setFilteredData] = React.useState([]);
+  const [searchText, setSearchText] = useState(''); // ✅ for search
   const [loader, setLoader] = React.useState(false);
 
 
@@ -29,6 +31,7 @@ const Activities = ({ navigation }) => {
     })
     if (res) {
       console.log(res, "====>");
+      setFilteredData(res?.data);
       setActivityData(res?.data);
       setLoader(false)
     }
@@ -41,9 +44,22 @@ const Activities = ({ navigation }) => {
     }
   }
 
+
   useEffect(() => {
     getActivityData();
   }, [tabs])
+  useEffect(() => {
+    if (searchText === '') {
+      setFilteredData(activityData);
+    } else {
+      const filtered = activityData.filter(item =>
+        (item?.matterName)
+          .toLowerCase()
+          .includes(searchText.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+  }, [searchText, activityData]);
   return (
     <>
 
@@ -70,7 +86,13 @@ const Activities = ({ navigation }) => {
       </View>
       <Wrapper>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-          <SearchBar containerStyle={{ width: "90%" }} placeholder='Search a time entry' />
+          <SearchBar
+            containerStyle={{ width: "90%" }}
+
+            placeholder="Search a task"
+            value={searchText}
+            onChangeText={text => setSearchText(text)}
+          />
           <Image
             source={IconUri?.CalenderSearch}
             style={{ height: 25, width: 25, resizeMode: "contain" }}
@@ -79,10 +101,10 @@ const Activities = ({ navigation }) => {
         {/* ///RENDER ITEM =====================> */}
         {loader ? <Loader /> :
 
-          activityData?.length > 0 ?
+          filteredData?.length > 0 ?
             <FlatList
               showsVerticalScrollIndicator={false}
-              data={activityData}
+              data={filteredData}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item, i }) => {
                 return (
@@ -97,7 +119,7 @@ const Activities = ({ navigation }) => {
                       borderColor: COLORS?.BORDER_LIGHT_COLOR,
                     }}
                   >
-                    <View style={{ gap: 5 ,width: "65%",}}>
+                    <View style={{ gap: 5, width: "65%", }}>
                       <MyText style={styles.timeColor}>{moment(item?.entryDate).format("DD-MM-YYYY")}</MyText>
                       <MyText style={[styles.txtStyle, { fontWeight: "300" }]}>{item?.matterName}</MyText>
                       {item?.description !== "" && <MyText style={styles.timeColor}>
@@ -118,8 +140,9 @@ const Activities = ({ navigation }) => {
               }}
             />
             :
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <MyText>  No data found</MyText>
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 10 }}>
+              <Image tintColor={COLORS.PRIMARY_COLOR} source={IconUri?.Activities} style={{ height: 30, width: 30, resizeMode: "contain" }} />
+              <MyText style={{ fontSize: calculatefontSize(1.5), color: COLORS.PRIMARY_COLOR }}>No Data Found</MyText>
             </View>
         }
         <FloatingButton
