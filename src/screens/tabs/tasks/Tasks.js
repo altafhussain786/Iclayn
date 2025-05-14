@@ -26,7 +26,7 @@ import moment from 'moment';
 const Tasks = ({ navigation }) => {
   const [tabs, setTabs] = React.useState('All');
 
-  const tabList = ['All', 'Pending',  'Completed'];
+  const tabList = ['All', 'Pending', 'Completed'];
 
   const [data, setData] = useState([])
   const [refreshing, setRefreshing] = useState(false); // ✅ for refresh
@@ -50,25 +50,25 @@ const Tasks = ({ navigation }) => {
     getTasks()
   }, [])
 
-  const checkBGStatusColor=(status)=>{
-    if(status.toLowerCase() === 'pending'){
+  const checkBGStatusColor = (status) => {
+    if (status.toLowerCase() === 'pending') {
       return COLORS?.PENDING_BG
     }
-    else if(status.toLowerCase() === 'completed'){
+    else if (status.toLowerCase() === 'completed') {
       return COLORS?.COMPLETE_BG
     }
-    else{
+    else {
       return COLORS?.PENDING_BG
     }
   }
-  const checkTxtStatusColor=(status)=>{
-    if(status.toLowerCase() === 'pending'){
+  const checkTxtStatusColor = (status) => {
+    if (status.toLowerCase() === 'pending') {
       return COLORS?.PENDING_TXT
     }
-    else if(status.toLowerCase() === 'completed'){
+    else if (status.toLowerCase() === 'completed') {
       return COLORS?.COMPLETD_TXT
     }
-    else{
+    else {
       return COLORS?.PENDING_TXT
     }
   }
@@ -88,12 +88,12 @@ const Tasks = ({ navigation }) => {
   // }, [searchText, data]);
   useEffect(() => {
     let filtered = [...data];
-  
+
     // Filter based on tab
     if (tabs !== 'All') {
       filtered = filtered.filter(item => item.status?.toLowerCase() === tabs.toLowerCase());
     }
-  
+
     // Filter based on search
     if (searchText !== '') {
       filtered = filtered.filter(item =>
@@ -102,7 +102,7 @@ const Tasks = ({ navigation }) => {
           .includes(searchText.toLowerCase())
       );
     }
-  
+
     setFilteredData(filtered);
   }, [searchText, data, tabs]);
 
