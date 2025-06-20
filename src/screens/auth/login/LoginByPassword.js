@@ -33,6 +33,7 @@ const LoginByPassword = ({ navigation, route }) => {
         const { res, err ,status} = await httpRequest({
             method: "post",
             path: `/ic/auth/login`,
+                 navigation:navigation,
              header: { "X_TENANT_ID": X_TENANT_ID },
             params: {
                 email: email,

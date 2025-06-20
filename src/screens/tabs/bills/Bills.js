@@ -46,7 +46,7 @@ const Bills = ({ navigation }) => {
   const fetchClients = async () => {
     setClientsStates(prev => ({ ...prev, loader: true }));
 
-    const { res, err } = await httpRequest({ path: "/ic/client/", method: "get", });
+    const { res, err } = await httpRequest({ path: "/ic/client/", method: "get", navigation: navigation, });
     if (res) {
       const data = res?.data?.map(v => ({
         label: v.companyName || `${v?.firstName} ${v?.lastName}`,
@@ -71,6 +71,7 @@ const Bills = ({ navigation }) => {
       const billResponse = await httpRequest({
         path: "/ic/matter/bill/",
         method: "get",
+        navigation: navigation,
       });
       if (billResponse.res) {
         const billData = billResponse.res.data.map(v => ({
@@ -90,6 +91,7 @@ const Bills = ({ navigation }) => {
       const fundsResponse = await httpRequest({
         path: "/ic/matter/client-fund/",
         method: "get",
+        navigation: navigation,
       });
       if (fundsResponse.res) {
         const fundsData = fundsResponse.res.data.map(v => {

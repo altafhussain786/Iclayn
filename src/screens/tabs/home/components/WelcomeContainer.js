@@ -6,7 +6,7 @@ import { calculatefontSize } from '../../../../helper/responsiveHelper'
 import { useSelector } from 'react-redux'
 import httpRequest from '../../../../api/apiHandler'
 
-const WelcomeContainer = () => {
+const WelcomeContainer = ({ navigation }) => {
   const [personalData, setPersonalData] = React.useState({});
   const userDetails = useSelector(state => state?.userDetails?.userDetails);
   console.log(userDetails, "userDetails=====>");
@@ -17,6 +17,7 @@ const WelcomeContainer = () => {
     const { res, err } = await httpRequest({
       method: 'get',
       path: `/ic/db/personal/${userDetails?.userId}`,
+      navigation: navigation,
     })
     if (res) {
       console.log(res, "res================>");

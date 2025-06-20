@@ -60,6 +60,7 @@ const httpRequest = async ({
     header = { "Content-Type": "application/json" },
     method = "get",
     path = "",
+    navigation,
     params = null,
     baseUrl = API_URL,
 }) => {
@@ -94,7 +95,8 @@ const httpRequest = async ({
         // console.log(err?.response?.data,"Catch error===========>");
         
         if (err.status === 401) {
-            removeToken();
+            removeToken(navigation);
+           
         }
         return {
             

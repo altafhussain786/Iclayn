@@ -27,6 +27,7 @@ const Otp = ({ navigation, route }) => {
         setLoader(true)
         const { res, err } = await httpRequest({
             method: "post",
+                 navigation:navigation,
             path: `/ic/auth/submit-login/${values.otp}`,
         })
         if (res) {

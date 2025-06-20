@@ -16,12 +16,12 @@ export const saveToken = async (token = "", tenantId) => {
     }
 };
 
-export const removeToken = async () => {
+export const removeToken = async (navigation) => {
     try {
         await AsyncStorage.removeItem(TOKEN_KEY);
         await AsyncStorage.removeItem(EXPIRATION_KEY);
         await AsyncStorage.removeItem("tenantId");
-
+        navigation.navigate("Login");
         return "SUCCESS";
     } catch (e) {
         console.error('Failed to remove the token from storage', e);
@@ -65,8 +65,8 @@ export const ApiConfig = async () => {
 export const formatNumber = (num) => {
     if (!num && num !== 0) return "0.00"; // Handle null/undefined
     return num?.toFixed(2)?.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
-  
+};
+
 
 
 // export const calculateDateRange = (option) => {
@@ -106,17 +106,17 @@ export const formatNumber = (num) => {
 //             dateFrom = moment([today.year(), 11, 31]).format("YYYY-MM-DD"); // Dec 31 (Start)
 //             dateTo = moment([today.year() + 1, 11, 30]).format("YYYY-MM-DD"); // Dec 30 (End)
 //             break;
-        
+
 //         case "Last Month":
 //             dateFrom = today.clone().subtract(1, "month").startOf("month").format("YYYY-MM-DD");
 //             dateTo = today.clone().subtract(1, "month").endOf("month").format("YYYY-MM-DD");
 //             break;
-        
+
 //         case "Last Fiscal Year":
 //             dateFrom = moment([today.year() - 1, 11, 31]).format("YYYY-MM-DD"); // Dec 31 (Start)
 //             dateTo = moment([today.year(), 11, 30]).format("YYYY-MM-DD"); // Dec 30 (End)
 //             break;
-        
+
 //         default:
 //             dateFrom = today.clone().subtract(29, "days").format("YYYY-MM-DD");
 //             dateTo = today.format("YYYY-MM-DD");
@@ -134,7 +134,7 @@ export const formatNumber = (num) => {
 export const calculateDateRange = (option) => {
     const today = moment();
     let dateFrom, dateTo;
-console.log(option);
+    console.log(option);
 
     switch (option) {
         case "Last 30 Days":
@@ -166,21 +166,21 @@ console.log(option);
         case "This fiscal Year": // 1st July to 30th June (Pakistan)
             dateFrom = moment([today.year() - 1, 11, 31]).format("YYYY-MM-DD");
             // dateFrom: '2025-02-26', dateTo: '2025-03-27'
-            dateTo = moment([today.year() , 11, 30]).format("YYYY-MM-DD");
+            dateTo = moment([today.year(), 11, 30]).format("YYYY-MM-DD");
             break;
 
         case "Last Month":
             dateTo = today.clone().subtract(2, "month").endOf("month").format("YYYY-MM-DD");
             dateFrom = today.clone().subtract(1, "month").format("YYYY-MM-DD");
 
-// dateFrom: '2025-02-27', dateTo: '2025-01-31'
+            // dateFrom: '2025-02-27', dateTo: '2025-01-31'
             // ?dateFrom=2025-02-27&dateTo=2025-01-31
             break;
 
         case "Last fiscal Year": // 1st July (previous year) to 30th June (current year)
-        dateFrom = moment([today.year() - 2, 11, 31]).format("YYYY-MM-DD");
-        // dateFrom: '2025-02-26', dateTo: '2025-03-27'
-        dateTo = moment([today.year() - 1 , 11, 30]).format("YYYY-MM-DD");
+            dateFrom = moment([today.year() - 2, 11, 31]).format("YYYY-MM-DD");
+            // dateFrom: '2025-02-26', dateTo: '2025-03-27'
+            dateTo = moment([today.year() - 1, 11, 30]).format("YYYY-MM-DD");
             break;
 
         default:

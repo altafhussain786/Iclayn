@@ -36,6 +36,7 @@ const Matters = ({ navigation }) => {
         const { res, err } = await httpRequest({
             method: 'get',
             path: `/ic/matter/listing`,
+            navigation: navigation,
         })
         if (res) {
             setFilteredData(res?.data);

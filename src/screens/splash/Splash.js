@@ -57,7 +57,8 @@ const Splash = ({ navigation }) => {
           {
             method: 'post',
             path: `/ic/auth/authorize`,
-            params: {}
+            params: {},
+                 navigation:navigation,
           }
         )
         if (res) {

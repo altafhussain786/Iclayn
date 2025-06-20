@@ -44,6 +44,7 @@ const Home = ({ navigation }) => {
     const { res, err } = await httpRequest({
       method: 'get',
       path: `/ic/matter/task/`,
+      navigation: navigation,
     })
     if (res) {
       setFilterTaskData(res?.data);
@@ -91,6 +92,7 @@ const Home = ({ navigation }) => {
     const { res, err } = await httpRequest({
       method: 'get',
       path: `/ic/event/date-range?fromDate=${selectedDateDate}&toDate=${selectedDateDate}`,
+      navigation: navigation,
     });
 
     if (res) {
@@ -121,7 +123,8 @@ const Home = ({ navigation }) => {
       {
         method: 'post',
         path: `/ic/auth/authorize`,
-        params: {}
+        params: {},
+        navigation: navigation
       }
     )
     if (res) {

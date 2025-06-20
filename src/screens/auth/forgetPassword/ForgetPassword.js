@@ -32,6 +32,7 @@ const ForgetPassword = ({ navigation }) => {
                 method:'put',
                 path: `/ic/un-auth/forgot-password?email=dfdsfsdfsdfsdf@g`,
                 params:{},
+                 navigation:navigation,
                 header: { "X_TENANT_ID": X_TENANT_ID }
             });
             if (status === HttpStatusCode.NoContent) {

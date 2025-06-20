@@ -27,6 +27,7 @@ const Activities = ({ navigation }) => {
     setLoader(true)
     const { res, err } = await httpRequest({
       method: 'get',
+           navigation:navigation,
       path: tabs === "Time entries" ? `/ic/matter/time-entry/` : `/ic/matter/exp-entry/`
     })
     if (res) {

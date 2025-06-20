@@ -28,7 +28,8 @@ const Login = ({ navigation }) => {
 
         const { res, status, err } = await httpRequest({
             path: `/ic/un-auth/user/${values.email}`,
-            header: { "X_TENANT_ID": X_TENANT_ID }
+            header: { "X_TENANT_ID": X_TENANT_ID },
+             navigation:navigation
         });
         if (status === HttpStatusCode.NoContent) {
             toast.show('No account associated with this email. Please try again or register.',{type:'danger'})
