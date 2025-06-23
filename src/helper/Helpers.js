@@ -16,12 +16,12 @@ export const saveToken = async (token = "", tenantId) => {
     }
 };
 
-export const removeToken = async (navigation) => {
+export const removeToken = async () => {
     try {
         await AsyncStorage.removeItem(TOKEN_KEY);
         await AsyncStorage.removeItem(EXPIRATION_KEY);
         await AsyncStorage.removeItem("tenantId");
-        navigation.navigate("Login");
+        // navigation.navigate("Login");
         return "SUCCESS";
     } catch (e) {
         console.error('Failed to remove the token from storage', e);

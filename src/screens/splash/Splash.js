@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import {
   View,
-  StatusBar,
   Animated,
   StyleSheet,
   ImageBackground,
+  StatusBar,
 } from 'react-native';
 import LoaderKit from 'react-native-loader-kit';
 import { API_URL, BASE_URL, COLORS } from '../../constants';
@@ -83,7 +83,6 @@ const Splash = ({ navigation }) => {
 
   return (
     <>
-      {/* <StatusBar backgroundColor={COLORS?.PRIMARY_COLOR} /> */}
       <ImageBackground
         blurRadius={2}
         source={require('../../assets/Images/bgimage.png')}

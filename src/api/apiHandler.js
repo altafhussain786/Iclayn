@@ -17,7 +17,7 @@
 //     const token = await AsyncStorage.getItem("access_token");
 //     let tenantId = await AsyncStorage.getItem("tenantId");
 //     console.log(token,'===================================================dd==>',tenantId);
-    
+
 //     let config = {
 //         headers: {
 //             'Authorization': `Bearer ${token}`,
@@ -53,9 +53,9 @@ import { API_URL } from '../constants';
 import { getToken, removeToken } from "../helper/Helpers";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
- 
 
- 
+
+
 const httpRequest = async ({
     header = { "Content-Type": "application/json" },
     method = "get",
@@ -66,16 +66,18 @@ const httpRequest = async ({
 }) => {
     const token = await AsyncStorage.getItem("access_token");
     // console.log(token,"==");
-    
+
     const headers = {
         ...header,
         ...(token && { "Authorization": `Bearer ${token}` })
     };
- 
+
     try {
         let response;
-        const endPoint= `${baseUrl}${path}`;
- 
+        const endPoint = `${baseUrl}${path}`;
+        console.log(endPoint,"BASEL URL ====================>");
+        
+
         if (["post", "put", "patch", "delete"].includes(method)) {
             response = await axios({
                 method,
@@ -92,18 +94,18 @@ const httpRequest = async ({
         }
         return { res: response?.data, status: response.status };
     } catch (err) {
-        // console.log(err?.response?.data,"Catch error===========>");
-        
+        console.log(err,"Catch error==================================================>",baseUrl);
+
         if (err.status === 401) {
             removeToken(navigation);
-           
+            navigation.navigate("Login");
         }
         return {
-            
+
             err: err?.response?.data || err?.response?.message || err?.response?.data?.message || err?.response?.data?.error || "ERROR",
             status: err?.response?.status || 500, // Return the status code in case of error
         };
     }
 };
- 
+
 export default httpRequest;

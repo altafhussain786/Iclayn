@@ -1,4 +1,4 @@
-// import { StatusBar, StyleSheet, Text, View } from 'react-native'
+// import {  StyleSheet, Text, View } from 'react-native'
 // import React from 'react'
 // import { createDrawerNavigator } from '@react-navigation/drawer'
 // import Home from '../screens/drawer/home/Home';
@@ -8,7 +8,6 @@
 //   const Drawer = createDrawerNavigator();
 //   return (
 //     <>
-//       <StatusBar barStyle={'dark-content'} />
 //       <Drawer.Navigator
 //         screenOptions={{ headerShown: false }}
 //         drawerContent={(props) => <CustomDrawer {...props} />}

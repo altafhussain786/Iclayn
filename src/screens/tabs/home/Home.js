@@ -92,7 +92,7 @@ const Home = ({ navigation }) => {
     const { res, err } = await httpRequest({
       method: 'get',
       path: `/ic/event/date-range?fromDate=${selectedDateDate}&toDate=${selectedDateDate}`,
-      navigation: navigation,
+      // navigation: navigation,
     });
 
     if (res) {
@@ -124,7 +124,7 @@ const Home = ({ navigation }) => {
         method: 'post',
         path: `/ic/auth/authorize`,
         params: {},
-        navigation: navigation
+        // navigation: navigation
       }
     )
     if (res) {

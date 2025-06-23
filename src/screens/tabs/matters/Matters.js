@@ -3,7 +3,6 @@ import {
     Image,
     RefreshControl,
     ScrollView,
-    StatusBar,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -145,7 +144,7 @@ const Matters = ({ navigation }) => {
                     contentContainerStyle={{ paddingBottom: 100 }}
                     renderItem={({ item, index }) => {
                         return (
-                            <View
+                            <TouchableOpacity onPress={() => navigation.navigate('MatterDetails', { matterData:item })}
                                 style={{
                                     flexDirection: 'row',
                                     justifyContent: 'space-between',
@@ -188,7 +187,7 @@ const Matters = ({ navigation }) => {
                                         </MyText>
                                     </View>
                                 </View>
-                            </View>
+                            </TouchableOpacity>
                         );
                     }}
                     refreshControl={

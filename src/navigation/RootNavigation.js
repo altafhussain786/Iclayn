@@ -9,17 +9,29 @@ import LoginByPassword from '../screens/auth/login/LoginByPassword';
 import ForgetPassword from '../screens/auth/forgetPassword/ForgetPassword';
 import Otp from '../screens/auth/otp/Otp';
 import Settings from '../screens/settings/Settings';
+import MatterDetails from '../screens/tabs/matters/screens/MatterDetails';
+import { getToken } from '../helper/Helpers';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
 const RootNavigation = () => {
   const Stack = createNativeStackNavigator();
+  const tokenFUnction = async () => {
+    const token = await getToken();
+    return token
+
+  }
+
 
 
   return (
     <>
-      <StatusBar hidden />
+      {/* <StatusBar hidden /> */}
+      <StatusBar hidden backgroundColor={COLORS.PRIMARY_COLOR_LIGHT} barStyle="light-content" />
+
       <Stack.Navigator
+
         screenOptions={{
           headerShown: false,
           animation: 'slide_from_right', // 👈 Smooth left-to-right animation
@@ -32,8 +44,12 @@ const RootNavigation = () => {
         <Stack.Screen name="ForgetPassword" component={ForgetPassword} />
         <Stack.Screen name="BottomTabNavigation" component={BottomTabNavigation} />
         <Stack.Screen name="Settings" component={Settings} />
-  
- 
+
+        {/* //Matters  */}
+        <Stack.Screen name="MatterDetails" component={MatterDetails} />
+
+
+
 
       </Stack.Navigator>
     </>

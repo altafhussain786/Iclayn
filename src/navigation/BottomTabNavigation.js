@@ -1,4 +1,4 @@
-import { StatusBar, StyleSheet, Image, Alert, BackHandler } from 'react-native';
+import {  StyleSheet, Image, Alert, BackHandler } from 'react-native';
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -64,7 +64,6 @@ const BottomTabNavigation = () => {
 
   return (
     <>
-      {/* <StatusBar backgroundColor={COLORS.PRIMARY_COLOR} barStyle={"light-content"} /> */}
       <Tab.Navigator
         initialRouteName='Home'
         screenOptions={({ route }) => ({
