@@ -248,30 +248,42 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { COLORS } from '../constants';
 import { calculatefontSize } from '../helper/responsiveHelper';
+import { useIsFocused } from '@react-navigation/native';
 
 const TIMER_KEY = 'TIMEKEEPER_STATE';
 
-const options = [
-    { label: 'Matter', icon: 'briefcase' },
-    { label: 'Event', icon: 'calendar' },
-    { label: 'Time entry', icon: 'clock-o' },
-    { label: 'Expense', icon: 'file-text' },
-    { label: 'Task', icon: 'check-square' },
-];
 
-const TimekeeperModal = ({ visible, onClose }) => {
+
+
+
+const TimekeeperModal = ({ visible, onClose, navigation }) => {
     const [description, setDescription] = useState('No description');
     const [matter, setMatter] = useState('No matter');
     const [duration, setDuration] = useState(0);
     const [isRunning, setIsRunning] = useState(false);
     const [startTime, setStartTime] = useState(null);
     const intervalRef = useRef(null);
+    const options = [
+        { label: 'Matter', icon: 'briefcase', onPress: () => navigation.navigate("") },
+        { label: 'Event', icon: 'calendar', onPress: () => navigation.navigate("Event") },
+        { label: 'Time entry', icon: 'clock-o', onPress: () => navigation.navigate("") },
+        { label: 'Expense', icon: 'file-text', onPress: () => navigation.navigate("") },
+        { label: 'Task', icon: 'check-square', onPress: () => navigation.navigate("") },
+    ];
 
-    useEffect(() => {
-        if (visible) {
+        
+ 
+    
+        useEffect(() => {
             loadTimer();
-        }
-    }, [visible]);
+        }, []);
+
+    // useEffect(() => {
+    //     if (visible) {
+    //         loadTimer();
+    //     }
+       
+    // }, [visible]);
 
     useEffect(() => {
         const subscription = AppState.addEventListener('change', (state) => {
@@ -315,6 +327,8 @@ const TimekeeperModal = ({ visible, onClose }) => {
             startTime,
             ...extra,
         };
+        console.log(data,"Timmer modal");
+        
         await AsyncStorage.setItem(TIMER_KEY, JSON.stringify(data));
     };
 
@@ -337,6 +351,7 @@ const TimekeeperModal = ({ visible, onClose }) => {
         setIsRunning(false);
         await saveTimerState({ isRunning: false, duration });
     };
+
 
     const toggleTimer = () => {
         isRunning ? stopTimer() : startTimer();
@@ -366,7 +381,7 @@ const TimekeeperModal = ({ visible, onClose }) => {
                                 ● {description} ({matter})
                             </Text>
                         </View>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => { onClose(), navigation.navigate("TimmerDetails") }}>
                             <Text style={styles.addDetails}>Add details</Text>
                         </TouchableOpacity>
                     </View>
@@ -385,7 +400,7 @@ const TimekeeperModal = ({ visible, onClose }) => {
                         keyExtractor={(item) => item.label}
                         renderItem={({ item }) => (
                             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                                <TouchableOpacity style={styles.optionItem}>
+                                <TouchableOpacity onPress={() => { onClose(), item.onPress() }} style={styles.optionItem}>
                                     <FontAwesome name={item.icon} size={30} color="#B6F0E2" />
                                 </TouchableOpacity>
                                 <Text style={styles.optionLabel}>{item.label}</Text>

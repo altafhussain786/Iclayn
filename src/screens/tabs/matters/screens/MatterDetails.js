@@ -219,7 +219,7 @@ const MatterDetails = ({ navigation, route }) => {
     return (
         <>
             <StatusBar backgroundColor={COLORS.PRIMARY_COLOR_LIGHT} barStyle="light-content" />
-            <ScreenHeader onPress={() => { navigation.navigate("Settings") }} isShowTitle={true} title="Matters" />
+            <ScreenHeader  isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="Matters" />
             <DescriptionContainer isShowLoader={matterLoading} title={matterDetails?.code} description={matterDetails?.description} />
             <Wrapper>
                 <FlatList

@@ -214,7 +214,7 @@ const Matters = ({ navigation }) => {
                     size={50}
                     iconSize={25}
                 />
-                <TimekeeperModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+                <TimekeeperModal navigation={navigation} visible={modalVisible} onClose={() => setModalVisible(false)} />
             </Wrapper>
         </>
     );

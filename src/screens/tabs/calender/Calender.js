@@ -579,7 +579,7 @@ const Calender = ({ navigation }) => {
             data={calenderData}
             keyExtractor={(item) => item.matterId}
             renderItem={({ item }) => (
-              <View style={{ flexDirection: 'row', gap: 10 }}>
+              <TouchableOpacity onPress={() => navigation.navigate('CalenderDetails', { item })} style={{ flexDirection: 'row', gap: 10 }}>
                 <View>
                   <Image
                     source={IconUri?.CalenderColor}
@@ -607,7 +607,7 @@ const Calender = ({ navigation }) => {
                     </View>
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             )}
             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={getCalenderData} />}
           />

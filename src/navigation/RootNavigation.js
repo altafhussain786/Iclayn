@@ -12,6 +12,10 @@ import Settings from '../screens/settings/Settings';
 import MatterDetails from '../screens/tabs/matters/screens/MatterDetails';
 import { getToken } from '../helper/Helpers';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CalenderDetails from '../screens/tabs/calender/screens/CalenderDetails';
+import TaskDetails from '../screens/tabs/tasks/screens/TaskDetails';
+import Event from '../screens/events/Event';
+import TimmerDetails from '../screens/timmerDetails/TimmerDetails';
 
 
 
@@ -46,7 +50,11 @@ const RootNavigation = () => {
         <Stack.Screen name="Settings" component={Settings} />
 
         {/* //Matters  */}
+        <Stack.Screen name="Event" component={Event} />
+        <Stack.Screen name="TimmerDetails" component={TimmerDetails} />
         <Stack.Screen name="MatterDetails" component={MatterDetails} />
+        <Stack.Screen name="CalenderDetails" component={CalenderDetails} />
+        <Stack.Screen name="TaskDetails" component={TaskDetails} />
 
 
 

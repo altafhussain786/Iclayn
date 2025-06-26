@@ -179,7 +179,8 @@ const Tasks = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 100 }}
           renderItem={({ item, index }) => {
             return (
-              <View
+              <TouchableOpacity
+              onPress={()=>navigation.navigate("TaskDetails", {item})}
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
@@ -220,7 +221,7 @@ const Tasks = ({ navigation }) => {
                     </MyText>
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           }}
           refreshControl={
