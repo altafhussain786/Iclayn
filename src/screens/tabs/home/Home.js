@@ -47,6 +47,7 @@ const Home = ({ navigation }) => {
       navigation: navigation,
     })
     if (res) {
+
       setFilterTaskData(res?.data);
       setData(res?.data)
       setTaskLoader(false)
@@ -81,12 +82,10 @@ const Home = ({ navigation }) => {
 
   const getCalenderData = async () => {
 
-
-
     // Check if the selectedDate falls within the same week, and if so, keep fromDate the same
 
     const selectedDateDate = moment(selectedDate).format('MM/DD/YYYY');
-    console.log("hellfo");
+    console.log("hellfod");
     setLoader(true)
     console.log(`/ic/event/date-range?fromDate=${selectedDateDate}&toDate=${selectedDateDate}`, "from date to date===d===============>");
     const { res, err } = await httpRequest({
@@ -111,9 +110,10 @@ const Home = ({ navigation }) => {
 
 
 
-
   useEffect(() => {
     getCalenderData()
+    getUserData()
+
   }, [selectedDate])
 
 
@@ -128,12 +128,13 @@ const Home = ({ navigation }) => {
       }
     )
     if (res) {
-      console.log(res, "resdddddd sdata=====dddddddddd=====");
 
       dispatch(adduserDetails(res?.data))
 
     }
     else {
+      console.log(err, "GET USER DATA RES=====================>", res);
+
       console.log("errd", err);
 
     }

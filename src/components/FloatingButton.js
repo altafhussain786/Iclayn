@@ -28,7 +28,7 @@ const FloatingButton = ({
 
   return (
     <TouchableOpacity
-      onPress={handlePress}
+      onPress={onPress}
       style={[
         styles.fab,
         {

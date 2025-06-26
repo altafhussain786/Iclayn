@@ -432,11 +432,11 @@ const MatterDetails = ({ navigation, route }) => {
                                 </ContentContainer>
                                 <View style={{justifyContent:"center",alignItems:"center",marginVertical:30}}>
                                     <TouchableOpacity onPress={scrollToTopOrBottom} style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
-                                        <MyText>Back to Top </MyText>
+                                        <MyText style={{ color: COLORS?.GREY_COLOR }}>Back to Top </MyText>
                                         <MaterialIcons
                                             name={'arrow-upward'}
                                             size={24}
-                                            color={COLORS?.BLACK_COLOR}
+                                            color={COLORS?.GREY_COLOR}
                                         />
                                     </TouchableOpacity>
                                 </View>

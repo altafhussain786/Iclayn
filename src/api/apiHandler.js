@@ -97,7 +97,7 @@ const httpRequest = async ({
         console.log(err,"Catch error==================================================>",baseUrl);
 
         if (err.status === 401) {
-            removeToken(navigation);
+            removeToken();
             navigation.navigate("Login");
         }
         return {

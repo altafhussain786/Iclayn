@@ -21,9 +21,11 @@ import SearchBar from '../../../components/SearchBar';
 import FloatingButton from '../../../components/FloatingButton';
 import httpRequest from '../../../api/apiHandler';
 import moment from 'moment';
+import TimekeeperModal from '../../../components/TimekeeperModal';
 
 const Matters = ({ navigation }) => {
     const [tabs, setTabs] = React.useState('All');
+    const [modalVisible, setModalVisible] = useState(false);
 
     const tabList = ['All', 'Open', 'Pending', 'Closed',];
 
@@ -144,7 +146,7 @@ const Matters = ({ navigation }) => {
                     contentContainerStyle={{ paddingBottom: 100 }}
                     renderItem={({ item, index }) => {
                         return (
-                            <TouchableOpacity onPress={() => navigation.navigate('MatterDetails', { matterData:item })}
+                            <TouchableOpacity onPress={() => navigation.navigate('MatterDetails', { matterData: item })}
                                 style={{
                                     flexDirection: 'row',
                                     justifyContent: 'space-between',
@@ -201,14 +203,18 @@ const Matters = ({ navigation }) => {
                     </View>
                 }
 
+
+
                 {/* Floating Button */}
                 <FloatingButton
+                onPress={() => setModalVisible(true)}
                     icon="plus"
                     navigateTo="CreateScreen"
                     backgroundColor={COLORS.PRIMARY_COLOR_LIGHT}
                     size={50}
                     iconSize={25}
                 />
+                <TimekeeperModal visible={modalVisible} onClose={() => setModalVisible(false)} />
             </Wrapper>
         </>
     );
