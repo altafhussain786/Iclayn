@@ -57,7 +57,7 @@ const Login = ({ navigation }) => {
                 <Image tintColor={COLORS?.whiteColors} source={{ uri: `${BASE_URL}/assets/logo-DuQxixZj.png` }} style={{ width: 150, height: 50, resizeMode: "contain", }} />
             </View>
             <Formik
-                initialValues={{ email: 'Sa@yopmail.com', }}
+                initialValues={{ email: 'altaf@yopmail.com', }}
                 validationSchema={validationSchema}
                 onSubmit={login}
             >
