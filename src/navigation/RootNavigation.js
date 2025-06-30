@@ -16,6 +16,7 @@ import CalenderDetails from '../screens/tabs/calender/screens/CalenderDetails';
 import TaskDetails from '../screens/tabs/tasks/screens/TaskDetails';
 import Event from '../screens/events/Event';
 import TimmerDetails from '../screens/timmerDetails/TimmerDetails';
+import CreateMatter from '../screens/tabs/matters/screens/CreateMatter';
 
 
 
@@ -51,6 +52,7 @@ const RootNavigation = () => {
 
         {/* //Matters  */}
         <Stack.Screen name="Event" component={Event} />
+        <Stack.Screen name="CreateMatter" component={CreateMatter} />
         <Stack.Screen name="TimmerDetails" component={TimmerDetails} />
         <Stack.Screen name="MatterDetails" component={MatterDetails} />
         <Stack.Screen name="CalenderDetails" component={CalenderDetails} />
