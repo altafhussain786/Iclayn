@@ -10,11 +10,15 @@ const ScreenHeader = ({
   isShowTitle = false,
   title = 'Inventory',
   onPress = () => { },
-  isGoBack = false
+  isGoBack = false,
+  isShowSave=false,
+  onPressSave = () => { }, // ✅ Added
 }) => {
   const userDetails = useSelector(state => state?.userDetails?.userDetails);
   const { userProfileDTO } = userDetails
   const imageURL = `data:image/jpeg;base64,${userProfileDTO?.image}`;
+  
+
   return (
     <View style={styles.container1}>
       <View style={styles.container}>
@@ -24,19 +28,23 @@ const ScreenHeader = ({
 
         <View style={styles.titleWrapper}>
           {isShowTitle && (
-
             <MyText style={styles.titleText}>{title}</MyText>
-          )
-          }
+          )}
         </View>
 
-        {/* Placeholder to center the title */}
+        {/* Right Side Icons */}
         <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+
           <TouchableOpacity onPress={onPress} style={styles.iconWrapper}>
             <Feather name={'bell'} size={20} color={COLORS?.whiteColors} />
-
           </TouchableOpacity>
-          <Image source={{ uri: imageURL }} style={{ height: 30, width: 30, borderRadius: 50, resizeMode: "contain" }} />
+          {isShowSave &&<TouchableOpacity onPress={onPressSave} style={styles.iconWrapper}>
+            <Feather name={'save'} size={20} color={COLORS?.whiteColors} />
+          </TouchableOpacity>}
+          <Image
+            source={{ uri:userProfileDTO?.image ? imageURL : 'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740' }}
+            style={{ height: 30, width: 30, borderRadius: 50, resizeMode: "contain", }}
+          />
         </View>
       </View>
     </View>
@@ -58,9 +66,8 @@ const styles = StyleSheet.create({
     top: 10,
     backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT,
   },
-
   iconWrapper: {
-    width: 30, // Ensures symmetry for centered title/logo
+    width: 30,
     alignItems: 'center'
   },
   titleWrapper: {

@@ -6,9 +6,11 @@ import { COLORS } from '../constants';
 import MyText from './MyText';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // or any icon library you're using
 import { calculatefontSize } from '../helper/responsiveHelper';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const TextInputWithTitle = ({
     value,
+    setFieldValue,
     keyboardType = 'default',
     editable = true,
     onChangeText,
@@ -20,8 +22,11 @@ const TextInputWithTitle = ({
     onIconPress, // optional action on icon press
     secureTextEntry = false,
     isRequired = false,
+    arrayValue = [],
     isButton = false,
+    onPressButton = () => { },
     buttonText = 'Invite attendees',
+    customView,
     ...rest
 }) => {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -36,16 +41,60 @@ const TextInputWithTitle = ({
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center" }}>
                 <MyText style={styles.label}>{title} {isRequired && <MyText style={{ color: 'red' }}>*</MyText>}
                 </MyText>
-                
+
             </View>
             <View style={[styles.container, !editable && styles.disabledContainer]}>
                 {isButton ?
-                    <TouchableOpacity style={{ paddingVertical: 10 }}>
-                        <MyText style={styles.btnTextStyle}>{buttonText}</MyText>
-                    </TouchableOpacity>
+                    customView ? (
+                        customView({ arrayValue, setFieldValue, onPressButton, buttonText })
+                        
+                    )
+                        // arrayValue?.length > 0 ?
+                        //     <>
+                        //         <View style={{ marginTop: 10 }}>
+                        //             {arrayValue.map((item, index) => (
+                        //                 <View
+                        //                     key={item.clientId}
+                        //                     style={{
+                        //                         flexDirection: 'row',
+                        //                         justifyContent: 'space-between',
+                        //                         alignItems: 'center',
+                        //                         padding: 10,
+                        //                         marginBottom: 5,
+                        //                         backgroundColor: '#f0f0f0',
+                        //                         width: '100%',
+                        //                         borderRadius: 5,
+                        //                     }}
+                        //                 >
+                        //                     <MyText>
+                        //                         {item?.type === 'Individual'
+                        //                             ? `${item?.firstName} ${item?.lastName}`
+                        //                             : item?.companyName}
+                        //                     </MyText>
+                        //                     <TouchableOpacity
+                        //                         onPress={() => {
+                        //                             const updatedList = arrayValue.filter(
+                        //                                 (c) => c.clientId !== item.clientId
+                        //                             );
+                        //                             setFieldValue('clientItems', updatedList);
+                        //                         }}
+                        //                     >
+                        //                         <AntDesign name="delete" size={20} color="red" />
+                        //                     </TouchableOpacity>
+                        //                 </View>
+                        //             ))}
+                        //             <TouchableOpacity onPress={onPressButton} style={{ paddingVertical: 10 }}>
+                        //                 <MyText style={styles.btnTextStyle}>{buttonText}</MyText>
+                        //             </TouchableOpacity>
+                        //         </View>
+                        //     </>
+                        :
+                        <TouchableOpacity onPress={onPressButton} style={{ paddingVertical: 10 }}>
+                            <MyText style={styles.btnTextStyle}>{buttonText}</MyText>
+                        </TouchableOpacity>
 
                     : <TextInput
-                    keyboardType={keyboardType}
+                        keyboardType={keyboardType}
                         editable={editable}
                         placeholderTextColor={COLORS.LIGHT_COLOR}
                         style={[styles.input, extraInputStyle]}
@@ -76,7 +125,7 @@ const styles = StyleSheet.create({
     btnTextStyle: {
         fontSize: calculatefontSize(1.9),
         fontWeight: '600',
-        bottom:10,
+        bottom: 10,
         color: COLORS?.PRIMARY_COLOR_LIGHT
     },
     label: {

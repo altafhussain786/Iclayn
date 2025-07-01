@@ -1,4 +1,4 @@
-import { FlatList, Image, PanResponder, RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, PanResponder, Platform, RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import ScreenHeader from '../../../components/ScreenHeader';
 import Wrapper from '../../../components/Wrapper';
