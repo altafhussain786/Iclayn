@@ -75,8 +75,8 @@ const httpRequest = async ({
     try {
         let response;
         const endPoint = `${baseUrl}${path}`;
-        console.log(endPoint,"BASEL URL ====================>");
-        
+        console.log(endPoint, "BASEL URL ====================>");
+
 
         if (["post", "put", "patch", "delete"].includes(method)) {
             response = await axios({
@@ -94,7 +94,7 @@ const httpRequest = async ({
         }
         return { res: response?.data, status: response.status };
     } catch (err) {
-        console.log(err,"Catch error==================================================>",baseUrl);
+        console.log(err, "Catch error==================================================>", baseUrl);
 
         if (err.status === 401) {
             removeToken();

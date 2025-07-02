@@ -1,0 +1,105 @@
+const payload = {
+    "createdOn": "",
+    "updatedOn": null,
+    "createdBy": 1,
+    "updatedBy": null,
+    "revision": null,
+    "matterId": 0,
+    "clientIds": "1",
+    "clientNames": "Irfan Khan (test1@yopmail.com)",
+    "name": "Fahad Kamran",
+    "code": null,
+    "description": "Fahad Kamran",
+    "supervisorSolicitorId": 1,
+    "supervisorSolicitorName": "Super Admin",
+    "feeEarnerSolicitorId": 1,
+    "feeEarnerSolicitorName": "Super Admin",
+    "clientRefNo": "Fahad-Kamran",
+    "location": "karachi, sindh pakistan",
+    "status": "Open",
+    "stage": "New",
+    "openDate": "2025-07-02T13:51:52+05:00",
+    "practiceAreaId": 28,
+    "practiceAreaName": "13-june",
+    "taskGroupId": 1,
+    "matterPermission": "SPECIFIC",
+    "billable": true,
+    "budgetSet": false,
+    "budgetAmount": 0,
+    "docProcessed": false,
+    "matterPerUserDTOList": [
+        {
+            "createdOn": "",
+            "updatedOn": null,
+            "createdBy": null,
+            "updatedBy": null,
+            "revision": null,
+            "matterPerUserId": null,
+            "userId": 1,
+            "email": "sa@yopmail.com",
+            "fullName": "Super Admin"
+        }
+    ],
+    "matterPerNotifUserDTOList": [
+        {
+            "createdOn": "",
+            "updatedOn": null,
+            "createdBy": null,
+            "updatedBy": null,
+            "revision": null,
+            "matterPerNotifUserId": null,
+            "userId": 1,
+            "email": "sa@yopmail.com",
+            "fullName": "Super Admin"
+        }
+    ],
+    "matterRelatedPartyDTOList": [
+        {
+            "createdOn": "",
+            "updatedOn": null,
+            "createdBy": null,
+            "updatedBy": null,
+            "revision": null,
+            "matterRelatedPartyId": null,
+            "partyId": 11,
+            "partyTypeId": 1,
+            "relationship": "relation"
+        }
+    ],
+    "matterBillingDTOList": [
+        {
+            "createdOn": "",
+            "updatedOn": null,
+            "createdBy": null,
+            "updatedBy": null,
+            "revision": null,
+            "matterBillingId": null,
+            "method": "HOURLY",
+            "matterBillingItemDTOList": [
+                {
+                    "createdOn": "",
+                    "updatedOn": null,
+                    "createdBy": null,
+                    "updatedBy": null,
+                    "revision": null,
+                    "matterBillingItemId": null,
+                    "userId": 1,
+                    "rate": 1500,
+                    "fixedFeeCategory": null
+                }
+            ]
+        }
+    ],
+    "matterReferralDTOList": [
+        {
+            "createdOn": "",
+            "updatedOn": null,
+            "createdBy": null,
+            "updatedBy": null,
+            "revision": null,
+            "matterReferralId": null,
+            "referralId": 12
+        }
+    ],
+    "depositAmount": null
+}

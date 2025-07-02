@@ -6,6 +6,7 @@ const initialState = {
 
 const createBillingRate = (payload) => ({
   pId: payload.pId, // unique ID per item
+  firmUserObj: payload.firmUserObj || {},
   firmUser: payload.firmUser || '',
   firmUserId: payload.firmUserId || '',
   hourlyRate: payload.hourlyRate || 0,
@@ -25,6 +26,7 @@ const billingRateSlice = createSlice({
     updateBillingRate: (state, action) => {
       const item = state.items.find(item => item.pId === action.payload.pId);
       if (item) {
+        item.firmUserObj = action.payload.firmUserObj;
         item.firmUser = action.payload.firmUser;
         item.firmUserId = action.payload.firmUserId;
         item.hourlyRate = action.payload.hourlyRate;

@@ -20,12 +20,15 @@ import BillingRateItem from '../components/BillingRateItem'
 import { addBillingRate } from '../../../../store/slices/matterSlice/createItemForBillingRate'
 import httpRequest from '../../../../api/apiHandler'
 import BottomModalListWithSearch from '../../../../components/BottomModalListWithSearch'
-// import DatePicker from '@react-native-community/datetimepicker';
+import DatePicker from 'react-native-date-picker';
+import { useToast } from 'react-native-toast-notifications'
+
 
 
 
 const CreateMatter = ({ navigation }) => {
     const dispatch = useDispatch()
+    const toast = useToast();
     const items = useSelector(state => state.createItemforRelateParties.items);
     const itemsForBilling = useSelector(state => state.createItemForBillingRate.items);
 
@@ -38,8 +41,13 @@ const CreateMatter = ({ navigation }) => {
     const [referalData, setReferalData] = React.useState([]);
 
     //
-      const [selectedDate, setSelectedDate] = useState(new Date());
-      const [showMonthPicker, setShowMonthPicker] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [showMonthPicker, setShowMonthPicker] = useState(false);
+
+    const userDetails = useSelector(state => state?.userDetails?.userDetails);
+
+    // console.log(userDetails, "USER DETAILS=======>");
+
 
     const getClientData = async () => {
         const { res, err } = await httpRequest({
@@ -78,7 +86,7 @@ const CreateMatter = ({ navigation }) => {
             navigation: navigation
         })
         if (res) {
-            console.log(res, "Task group===============d=======d==>");
+            // console.log(res, "Task group===============d=======d==>");
             setTaskGroupData(res?.data);
         }
         else {
@@ -183,7 +191,7 @@ const CreateMatter = ({ navigation }) => {
         {
             id: 3,
             name: 'Contingency fee default',
-            value: 'contingencyfeedefault'
+            value: 'contingencyfeedefaults'
         },
     ]
 
@@ -196,7 +204,7 @@ const CreateMatter = ({ navigation }) => {
         {
             id: 2,
             name: 'Specificusers',
-            value: 'specificusers'
+            value: 'specific'
         },
 
     ]
@@ -224,6 +232,7 @@ const CreateMatter = ({ navigation }) => {
                         description: '',
 
                         openDate: moment().format('DD/MM/YYYY'),
+                        selectedDate: moment().format('MM/DD/YYYY'),
                         isOpenDate: false,
                         // ==========================================================================>
                         // //Supervisor Solicitor
@@ -287,6 +296,7 @@ const CreateMatter = ({ navigation }) => {
                         //Billing Method
                         billingMethod: '',
                         billingMethodObj: {},
+                        billingMethodValue: '',
                         isOpenBillingMethod: false,
 
                         //Matter budger
@@ -299,17 +309,159 @@ const CreateMatter = ({ navigation }) => {
                         selectReferalObj: {},
                         isOpenSelectReferal: false,
 
-
-
+                        //loader
+                        loader: false
                     }
                 }
                 validationSchema={validationSchema}
-                onSubmit={values => console.log(values, 'Values =======================>')}
+                onSubmit={async (values, { setFieldValue }) => {
+                    // console.log(values?.clientItems, "========================================== selectReferalItems");
+
+                    const mappedData = itemsForBilling?.map((item, index) => {
+                        return {
+                            createdOn: "",
+                            updatedOn: null,
+                            createdBy: null,
+                            updatedBy: null,
+                            revision: null,
+                            matterBillingItemId: null,
+                            userId: item?.firmUserObj?.userId || 0,
+                            rate: item?.hourlyRate || 0,
+                            fixedFeeCategory: null,
+                        }
+                    })
+
+                    const mappedPerUser = values?.addUserItems?.map((item, index) => {
+                        return {
+                            createdOn: "",
+                            updatedOn: null,
+                            createdBy: null,
+                            updatedBy: null,
+                            revision: null,
+                            matterPerUserId: null,
+                            userId: item?.userId || 0,
+                            email: item?.email || 0,
+                            fullName: item?.userProfileDTO?.fullName || 0,
+                        }
+                    })
+                    const mappedPerNotification = values?.matterNotificationItem?.map((item, index) => {
+                        return {
+                            createdOn: "",
+                            updatedOn: null,
+                            createdBy: null,
+                            updatedBy: null,
+                            revision: null,
+                            matterPerNotifUserId: null,
+                            userId: item?.userId || 0,
+                            email: item?.email || 0,
+                            fullName: item?.userProfileDTO?.fullName || 0,
+                        }
+                    })
+                    const mappedmatterRelatedPar = items?.map((item, index) => {
+                        return {
+                            createdOn: "",
+                            updatedOn: null,
+                            createdBy: null,
+                            updatedBy: null,
+                            revision: null,
+                            matterRelatedPartyId: null,
+                            partyId: item?.partyId || null,
+                            partyTypeId: item?.partyTypeId || null,
+                            relationship: item?.relationship || '',
+                        }
+                    })
+                    const matterRelatedParty = values?.selectReferalItems?.map((item, index) => {
+                        return {
+                            createdOn: "",
+                            updatedOn: null,
+                            createdBy: null,
+                            updatedBy: null,
+                            revision: null,
+                            matterReferralId: null,
+                            referralId: item?.referralId,
+                        }
+                    })
+                    const payload = {
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: userDetails?.userId,
+                        updatedBy: null,
+                        revision: null,
+                        matterId: 0,
+                        clientIds: values?.clientItems?.map(v => v.clientId).join(','),
+                        clientNames: values?.clientItems
+                            ?.map(v =>
+                                v?.type === 'Individual'
+                                    ? `${v?.firstName} ${v?.lastName} `
+                                    : v?.companyName
+                            )
+                            .join(', '),
+                        name: values?.title,
+                        code: null,
+                        description: values?.description,
+                        supervisorSolicitorId: values?.supervisorSolicitorObj?.userId || 0,
+                        supervisorSolicitorName: values?.supervisorSolicitorObj?.userProfileDTO.fullName || "",
+                        feeEarnerSolicitorId: values?.feeEarnerSolicitorObj?.userId || 0,
+                        feeEarnerSolicitorName: values?.feeEarnerSolicitorObj?.userProfileDTO.fullName || "",
+                        clientRefNo: values?.clientRefNumber || "",
+                        location: values?.location || "",
+                        status: values?.matterStatus || "Open",
+                        stage: values?.matterStage || "New",
+                        openDate: values?.selectedDate || "",
+
+                        practiceAreaId: values?.practiceAreaObj?.practiceAreaId || 0,
+                        practiceAreaName: values?.practiceAreaObj?.name || "",
+
+                        // =============>RECHECK THIS</>
+                        taskGroupId: values?.taskGroupObj?.taskGroupId || null,
+                        // =============>RECHECK THIS</>
+
+                        matterPermission: values?.userPermission?.toUpperCase() || "EVERYONE",
+                        billable: values?.isBillable,
+                        budgetSet: values?.isMatterBudget || false,
+                        budgetAmount: values?.budgetAmmount || '0',
+                        docProcessed: false,
+                        matterBillingDTOList: [{
+                            createdOn: "",
+                            updatedOn: null,
+                            createdBy: null,
+                            updatedBy: null,
+                            revision: null,
+                            matterBillingId: null,
+                            method: values?.billingMethodValue?.toUpperCase() || "HOURLY",
+                            matterBillingItemDTOList: mappedData,
+                        }],
+                        matterPerUserDTOList: mappedPerUser,
+                        matterPerNotifUserDTOList: mappedPerNotification,
+                        matterRelatedPartyDTOList: mappedmatterRelatedPar,
+                        matterReferralDTOList: matterRelatedParty,
+                        depositAmount: null,
+                    };
+                    console.log(payload, 'Values =======================>')
+                    setFieldValue('loader', true)
+                    const { res, err } = await httpRequest({
+                        method: 'post',
+                        path: `/ic/matter/v1/`,
+                        params: payload,
+                        navigation: navigation
+                    })
+                    if (res) {
+                        toast.show('Matter created successfully', { type: 'success' })
+                        setFieldValue('loader', false)
+                        navigation.goBack()
+                    } else {
+                        setFieldValue('loader', false)
+
+                        console.log(err, 'ERR =======================>');
+
+                    }
+                }}
             >
+
                 {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
 
                     <>
-                        <ScreenHeader onPressSave={handleSubmit} isShowSave={true} extraStyle={{ backgroundColor: '#F5F6F8' }} isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="New Matter" />
+                        <ScreenHeader isLoading={values?.loader} onPressSave={handleSubmit} isShowSave={true} extraStyle={{ backgroundColor: '#F5F6F8' }} isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="New Matter" />
                         <Wrapper>
                             <KeyboardAvoidingView
                                 style={{ flex: 1 }}
@@ -367,20 +519,20 @@ const CreateMatter = ({ navigation }) => {
                                         )
                                     }
 
-                                    <TextInputWithTitle placeholder={'Matter title'} isRequired={true} />
+                                    <TextInputWithTitle onChangeText={(txt) => setFieldValue('title', txt)} placeholder={'Matter title'} isRequired={true} />
                                     {
                                         errors.title && touched.title && (
                                             <MyText style={{ color: 'red' }}>{errors.title}</MyText>
                                         )
                                     }
-                                    <TextInputWithTitle title="Matter Description" isRequired={true} placeholder={'Enter description'} />
+                                    <TextInputWithTitle onChangeText={(txt) => setFieldValue('description', txt)} title="Matter Description" isRequired={true} placeholder={'Enter description'} />
                                     {
                                         errors.description && touched.description && (
                                             <MyText style={{ color: 'red' }}>{errors.description}</MyText>
                                         )
                                     }
                                     <TextInputWithTitle
-                                    onPressButton={() => setFieldValue('isOpenDate', true)}
+                                        onPressButton={() => setFieldValue('isOpenDate', true)}
                                         title="Open Date"
                                         isButton={true}
                                         buttonText={values.openDate ? values.openDate : 'Select Open date'}
@@ -448,14 +600,14 @@ const CreateMatter = ({ navigation }) => {
                                                 {userWithAccess.map((item, index) => {
                                                     return (
                                                         <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-                                                            <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                                                            <TouchableOpacity onPress={() => setFieldValue('userPermission', item.value)} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
                                                                 <View style={{ height: 15, width: 15, borderWidth: 1, borderColor: COLORS?.PRIMARY_COLOR_LIGHT, justifyContent: "center", alignItems: "center", borderRadius: 30 }} >
                                                                     <View style={{ height: 10, width: 10, backgroundColor: item.value == values.userPermission ? COLORS?.PRIMARY_COLOR_LIGHT : '#D0D9E0', justifyContent: "center", alignItems: "center", borderRadius: 30 }} />
                                                                 </View>
-                                                                <TouchableOpacity onPress={() => setFieldValue('userPermission', item.value)}>
+                                                                <View >
                                                                     <MyText>{item.name}</MyText>
-                                                                </TouchableOpacity>
-                                                            </View>
+                                                                </View>
+                                                            </TouchableOpacity>
                                                         </View>
                                                     )
                                                 })}
@@ -616,7 +768,7 @@ const CreateMatter = ({ navigation }) => {
                                         {
                                             values?.isMatterBudget &&
                                             <>
-                                                <TextInputWithTitle keyboardType='numeric' isRequired={true} title="Budget amount" placeholder={'0.00'} />
+                                                <TextInputWithTitle onChangeText={value => setFieldValue('budgetAmmount', value)} keyboardType='numeric' isRequired={true} title="Budget amount" placeholder={'0.00'} />
                                             </>
                                         }
                                     </View>
@@ -885,6 +1037,7 @@ const CreateMatter = ({ navigation }) => {
                                         <TouchableOpacity
                                             onPress={() => {
                                                 setFieldValue('billingMethodObj', item);
+                                                setFieldValue('billingMethodValue', item?.value);
                                                 setFieldValue('billingMethod', item?.name);
                                                 setFieldValue('isOpenBillingMethod', false);
                                             }}
@@ -934,23 +1087,23 @@ const CreateMatter = ({ navigation }) => {
                                     searchKey="firstName"
                                 />
                                 {/* //////////////////////////////////////////////=============================================== MODALS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\========> */}
-                                 {/* <DatePicker
-                                        modal
-                                        mode='date'
-                                        open={values.isOpenDate}
-                                        date={new Date()}
-                                        onConfirm={date => {
-                                            setFieldValue('openDate', date?.toISOString())
-                                            setFieldValue('isOpenDate', false);
-                                            // setFieldValue(
-                                            //     'selectedDueDate',
-                                            //     moment(date).format(capitalizeAllLetters(orgDateFormat)),
-                                            // );
-                                        }}
-                                        onCancel={() => {
-                                            setFieldValue('isOpenDate', false);
-                                        }}
-                                    /> */}
+                                <DatePicker
+                                    modal
+                                    mode='date'
+                                    open={values.isOpenDate}
+                                    date={new Date()}
+                                    onConfirm={date => {
+                                        setFieldValue('selectedDate', date?.toISOString())
+                                        setFieldValue('isOpenDate', false);
+                                        setFieldValue(
+                                            'openDate',
+                                            moment(date).format('MM/DD/YYYY'),
+                                        );
+                                    }}
+                                    onCancel={() => {
+                                        setFieldValue('isOpenDate', false);
+                                    }}
+                                />
                             </KeyboardAvoidingView>
                         </Wrapper>
                     </>

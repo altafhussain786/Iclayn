@@ -98,6 +98,7 @@ const BillingRateItem = ({ item, navigation }) => {
                                         dispatch(updateBillingRate(
                                             {
                                                 pId: PID,
+                                                firmUserObj: item,
                                                 firmUser: item.userProfileDTO?.fullName || '',
                                                 firmUserId: 9934,
                                                 hourlyRate: item.userProfileDTO?.billingRate

@@ -15,7 +15,6 @@ import { calculatefontSize } from '../../../helper/responsiveHelper';
 import MyText from '../../../components/MyText';
 
 // Icons
-import Entypo from 'react-native-vector-icons/Entypo';
 import Wrapper from '../../../components/Wrapper';
 import SearchBar from '../../../components/SearchBar';
 import FloatingButton from '../../../components/FloatingButton';
@@ -82,7 +81,7 @@ const Matters = ({ navigation }) => {
                 <FlatList
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    data={tabList}
+                    data={tabList?.reverse()}
 
                     renderItem={({ item, i }) => {
                         return (

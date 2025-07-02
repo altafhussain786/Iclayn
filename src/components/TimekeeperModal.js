@@ -265,10 +265,10 @@ const TimekeeperModal = ({ visible, onClose, navigation }) => {
     const intervalRef = useRef(null);
     const options = [
         { label: 'Matter', icon: 'briefcase', onPress: () => navigation.navigate("CreateMatter") },
+        { label: 'Task', icon: 'check-square', onPress: () => navigation.navigate("CreateTask") },
         { label: 'Event', icon: 'calendar', onPress: () => navigation.navigate("Event") },
         { label: 'Time entry', icon: 'clock-o', onPress: () => navigation.navigate("") },
         { label: 'Expense', icon: 'file-text', onPress: () => navigation.navigate("") },
-        { label: 'Task', icon: 'check-square', onPress: () => navigation.navigate("") },
     ];
 
         

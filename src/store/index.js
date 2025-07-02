@@ -3,12 +3,15 @@ import { configureStore } from "@reduxjs/toolkit";
 import userDetailsReducer from "./slices/userDetails";
 import createItemforRelatePartiesReducer from "./slices/matterSlice/createItemforRelateParties";
 import createItemForBillingRateReducer from "./slices/matterSlice/createItemForBillingRate";
+import createItemforReminderReducer from "./slices/taskSlice/createItemforReminder";
 
 const store = configureStore({
   reducer: {
     userDetails: userDetailsReducer,
     createItemforRelateParties: createItemforRelatePartiesReducer,
-    createItemForBillingRate: createItemForBillingRateReducer
+    createItemForBillingRate: createItemForBillingRateReducer,
+    //tasks
+    createItemforReminder: createItemforReminderReducer
   },
 });
 

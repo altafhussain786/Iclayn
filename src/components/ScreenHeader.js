@@ -6,11 +6,14 @@ import { COLORS } from '../constants';
 import { calculatefontSize } from '../helper/responsiveHelper';
 import { useSelector } from 'react-redux';
 
+import LoaderKit from 'react-native-loader-kit'
+
 const ScreenHeader = ({
   isShowTitle = false,
   title = 'Inventory',
   onPress = () => { },
   isGoBack = false,
+  isLoading=false,
   isShowSave=false,
   onPressSave = () => { }, // ✅ Added
 }) => {
@@ -38,9 +41,17 @@ const ScreenHeader = ({
           <TouchableOpacity onPress={onPress} style={styles.iconWrapper}>
             <Feather name={'bell'} size={20} color={COLORS?.whiteColors} />
           </TouchableOpacity>
-          {isShowSave &&<TouchableOpacity onPress={onPressSave} style={styles.iconWrapper}>
-            <Feather name={'save'} size={20} color={COLORS?.whiteColors} />
-          </TouchableOpacity>}
+          {isShowSave &&
+            isLoading ? <LoaderKit
+            style={{ width: 30, height: 30 }}
+            name={'BallSpinFadeLoader'} // Optional: see list of animations below
+            color={COLORS?.whiteColors} // Optional: color can be: 'red', 'green',... or '#ddd', '#ffffff',...
+          /> :
+            <TouchableOpacity onPress={onPressSave} style={styles.iconWrapper}>
+              <Feather name={'save'} size={20} color={COLORS?.whiteColors} />
+            </TouchableOpacity>
+
+          }
           <Image
             source={{ uri:userProfileDTO?.image ? imageURL : 'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740' }}
             style={{ height: 30, width: 30, borderRadius: 50, resizeMode: "contain", }}
