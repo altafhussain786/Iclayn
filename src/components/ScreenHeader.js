@@ -88,6 +88,6 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: calculatefontSize(2),
     color: COLORS?.whiteColors,
-    fontWeight: '400'
+    fontWeight: '600'
   }
 });

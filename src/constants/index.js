@@ -5,8 +5,8 @@ import {
     responsiveFontSize
 } from "react-native-responsive-dimensions";
 //
-export const API_URL = 'http://149.107.116.212:8000'; // local
-// export const API_URL = 'https://api.iclayn.com:8443'; // Live
+// export const API_URL = 'http://149.107.116.212:8000'; // local
+export const API_URL = 'https://api.iclayn.com:8443'; // Live
 export const BASE_URL = 'https://api.iclayn.com';
 export const X_TENANT_ID = "5024000001";
 
@@ -89,6 +89,8 @@ export const IconUri = {
     Activities: require('../assets/Icons/Activities.png'),
     Bills: require('../assets/Icons/Bills.png'),
     Tasks: require('../assets/Icons/Tasks.png'),
+    folder: require('../assets/Icons/folder.png'),
+    word: require('../assets/Icons/word.png'),
     
     //New
     CalenderColor: require('../assets/Icons/CalenderColor.png'),

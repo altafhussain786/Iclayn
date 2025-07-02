@@ -22,6 +22,8 @@ import httpRequest from '../../../../api/apiHandler'
 import BottomModalListWithSearch from '../../../../components/BottomModalListWithSearch'
 import DatePicker from 'react-native-date-picker';
 import { useToast } from 'react-native-toast-notifications'
+import ReminderItems from '../components/ReminderItems'
+import { addReminderItem } from '../../../../store/slices/taskSlice/createItemforReminder'
 
 
 
@@ -29,7 +31,8 @@ import { useToast } from 'react-native-toast-notifications'
 const CreateTask = ({ navigation }) => {
     const dispatch = useDispatch()
     const toast = useToast();
-    const items = useSelector(state => state.createItemforRelateParties.items);
+    const items = useSelector(state => state.createItemforReminder.items);
+    const itemsDocuments = useSelector(state => state.createItemforDocuments.items);
 
     //CLients state===============
     const [billingData, setBillingData] = React.useState([]);
@@ -197,7 +200,7 @@ const CreateTask = ({ navigation }) => {
                                         isButton={true}
                                         buttonText={values.priorityStatus ? values.priorityStatus : 'Normal '}
                                     />
-                                    <TextInputWithTitle onChangeText={(txt) => setFieldValue('description', txt)} title="Matter Description" isRequired={true} placeholder={'Enter description'} />
+                                    <TextInputWithTitle onChangeText={(txt) => setFieldValue('description', txt)} title="Matter Description" placeholder={'Enter description'} />
                                     {
                                         errors.description && touched.description && (
                                             <MyText style={{ color: 'red' }}>{errors.description}</MyText>
@@ -207,6 +210,7 @@ const CreateTask = ({ navigation }) => {
                                     <TextInputWithTitle
                                         title="Matter"
                                         isButton={true}
+                                        isRequired={true}
                                         buttonText={values.matterSelected || 'Select Matter'}
                                         onPressButton={() => setFieldValue('isOpenMatterSelected', true)}
                                     />
@@ -222,6 +226,7 @@ const CreateTask = ({ navigation }) => {
                                     </View>
                                     <TextInputWithTitle
                                         title="Assign to"
+                                        isRequired={true}
                                         isButton={true}
                                         buttonText={values.feeEarnerSolicitor || 'Select Assign to'}
                                         onPressButton={() => {
@@ -231,10 +236,19 @@ const CreateTask = ({ navigation }) => {
                                     />
 
                                     <TextInputWithTitle
-                                        onPressButton={() => setFieldValue('isOpentaskType', true)}
-                                        title="Task Type"
+                                        onPressButton={() => navigation.navigate('TaskDocuments', { indexValue: 0 })}
+                                        title="Document"
                                         isButton={true}
-                                        buttonText={values.taskType ? values.taskType : 'Find a task type '}
+                                        // buttonText={values.taskType ? values.taskType : 'Select Document'}
+                                        buttonText={itemsDocuments?.length > 0 ? itemsDocuments?.[0]?.name : 'Select Document'}
+                                    />
+
+                                    <TextInputWithTitle
+                                        title="Matter"
+                                        isButton={true}
+                                        isRequired={true}
+                                        buttonText={values.matterSelected || 'Select Matter'}
+                                        onPressButton={() => setFieldValue('isOpenMatterSelected', true)}
                                     />
 
                                     <TextInputWithTitle
@@ -252,7 +266,8 @@ const CreateTask = ({ navigation }) => {
                                             items?.map((item, index) => {
                                                 return (
                                                     <>
-                                                        <MyText>Hello</MyText>
+
+                                                        <ReminderItems item={item} navigation={navigation} />
                                                         {/* <RelatedPartiesItems item={item} navigation={navigation} /> */}
 
                                                     </>
@@ -260,8 +275,8 @@ const CreateTask = ({ navigation }) => {
                                             })
 
                                         }
-                                        <AddButton onPress={() => dispatch(addRelatedContact({
-                                            pId: Math.floor(Math.random() * 1000),
+                                        <AddButton onPress={() => dispatch(addReminderItem({
+                                            rId: Math.floor(Math.random() * 1000),
                                         }))} title='Add a reminder' />
                                     </View>
                                     {/* =============================Relatd Parties  END*/}
