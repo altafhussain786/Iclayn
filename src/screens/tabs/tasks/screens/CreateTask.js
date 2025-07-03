@@ -14,10 +14,6 @@ import { calculatefontSize } from '../../../../helper/responsiveHelper'
 import { COLORS } from '../../../../constants'
 import AddButton from '../../../../components/AddButton'
 import { useDispatch, useSelector } from 'react-redux'
-import { addRelatedContact } from '../../../../store/slices/matterSlice/createItemforRelateParties'
-// import RelatedPartiesItems from '../components/RelatedPartiesItems'
-// import BillingRateItem from '../components/BillingRateItem'
-import { addBillingRate } from '../../../../store/slices/matterSlice/createItemForBillingRate'
 import httpRequest from '../../../../api/apiHandler'
 import BottomModalListWithSearch from '../../../../components/BottomModalListWithSearch'
 import DatePicker from 'react-native-date-picker';
@@ -32,17 +28,16 @@ const CreateTask = ({ navigation }) => {
     const dispatch = useDispatch()
     const toast = useToast();
     const items = useSelector(state => state.createItemforReminder.items);
-    const itemsDocuments = useSelector(state => state.createItemforDocuments.items);
+    const itemsDocuments = useSelector(state => state.createItemforDocuments.document);
+
+    console.log(itemsDocuments, "itemsDocuments============>");
+
 
     //CLients state===============
     const [billingData, setBillingData] = React.useState([]);
     const [matterData, setmatterData] = React.useState([]);
-
-
+    const [tasktypeData, setTasktypeData] = React.useState([]);
     const userDetails = useSelector(state => state?.userDetails?.userDetails);
-
-    // console.log(userDetails, "USER DETAILS=======>");
-
 
     const getMatterData = async () => {
         const { res, err } = await httpRequest({
@@ -59,6 +54,20 @@ const CreateTask = ({ navigation }) => {
 
         }
     }
+    const getTaskTypeData = async () => {
+        const { res, err } = await httpRequest({
+            method: `get`,
+            path: `/ic/task-type/?status=Active`,
+            navigation: navigation
+        })
+        if (res) {
+            setTasktypeData(res?.data);
+        }
+        else {
+            console.log(err, "GET CUSTOMER RESPONSE===>err");
+
+        }
+    }
 
 
     const getBillingData = async () => {
@@ -68,8 +77,6 @@ const CreateTask = ({ navigation }) => {
             navigation: navigation
         })
         if (res) {
-            // console.log(res?.data, "==>BIILLLIND DATA");
-
             setBillingData(res?.data);
         }
         else {
@@ -77,13 +84,47 @@ const CreateTask = ({ navigation }) => {
         }
     }
 
+    const getTimeEstimateArray = (unit) => {
+        console.log(unit, "===>");
 
+        let max = 0;
+        if (unit === 'Minutes') {
+            max = 60;
+        } else if (unit === 'Hours') {
+            max = 24;
+        } else if (unit === 'Days') {
+            max = 365;
+        }
+
+        return Array.from({ length: max }, (_, i) => ({
+            name: `${i + 1} ${unit}`,
+            value: i + 1,
+        }));
+    };
 
     useEffect(() => {
+        getTaskTypeData()
         getMatterData();
         getBillingData();
     }, [])
 
+    const timeEstimateData = [
+        {
+            id: 1,
+            name: 'Hours',
+            value: 'hours'
+        },
+        {
+            id: 2,
+            name: 'Minutes',
+            value: 'minutes'
+        },
+        {
+            id: 3,
+            name: 'Days',
+            value: 'days'
+        },
+    ]
 
     const priorityStatus = [
         {
@@ -102,29 +143,7 @@ const CreateTask = ({ navigation }) => {
             value: 'high'
         },
     ]
-    const taskType = [
-        {
-            id: 1,
-            name: 'Normal',
-            value: 'normal'
-        },
-        {
-            id: 2,
-            name: 'Urgent',
-            value: 'urgent'
-        },
-        {
-            id: 3,
-            name: 'Commercial',
-            value: 'commercial'
-        },
-    ]
-    const validationSchema = Yup.object().shape({
-        client: Yup.string().required('Client is required'),
-        title: Yup.string().required('Title is required'),
-        description: Yup.string().required('Description is required'),
 
-    })
     return (
         <>
 
@@ -158,13 +177,87 @@ const CreateTask = ({ navigation }) => {
                         dueDate: moment().format('DD/MM/YYYY'),
                         selectedDate: moment().format('MM/DD/YYYY'),
                         isdueDate: false,
+
+                        //timeEstimatetype
+                        timeEstimateType: '',
+                        isOpenTimeEstimateType: false,
+                        timeEstimateTypeObj: {},
+
+                        //time estimateNumber
+                        timeEstimateNumber: "",
+                        timeEstimateValue: "",
+                        timeEstimateNumberObj: {},
+                        isTimeEstimateNumberOpen: false,
+
                         //loader
                         loader: false
                     }
                 }
-                validationSchema={validationSchema}
+                // validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
-                    console.log(values, "========================================== selectReferalItems");
+                    const mappedDataForTask = items?.map(data => {
+                        return {
+                            createdOn: "",
+                            updatedOn: null,
+                            createdBy: null,
+                            updatedBy: null,
+                            revision: null,
+                            type: data?.reminderThrough,
+                            remTime: data?.counts,
+                            timeType: data?.reminderType,
+                            mtReminderId: null
+                        }
+                    })
+                    const paylod = {
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: userDetails?.userId,
+                        updatedBy: null,
+                        revision: null,
+                        taskId: null,
+                        name: values?.name,
+                        cod: null,
+                        priority: values?.priorityStatus,
+                        description: values?.description,
+
+                        assignTo: values?.feeEarnerSolicitorObj?.userId,
+                        taskPrivate: values.isPrivateTask,
+
+                        typeId: values?.taskTypeObj?.taskTypeId,
+                        status: "Pending",
+                        document: String(itemsDocuments?.templateId),
+                        documentName: itemsDocuments?.name,
+                        timeEstimate: values.timeEstimateValue,
+                        timeEstimateType: values.timeEstimateType,
+                        dueDateEnable: true,
+                        dueDate: values.selectedDate,
+                        dueTime: null,
+                        dueTimeType: "",
+                        afterBefore: "",
+                        matterId: values?.matterSelectedObj?.matterId,
+                        matterTaskReminderDTOList: mappedDataForTask,
+                        matterTimeEntryDTO: null
+                    }
+                    console.log(paylod, "========================================== selectReferalItems");
+                    setFieldValue('loader', true)
+                    const { res, err } = await httpRequest({
+                        method: `post`,
+                        path: `/ic/matter/task/`,
+                        params: paylod,
+                        navigation: navigation
+                    })
+                    if (res) {
+                        toast.show('Task created successfully', { type: 'success' })
+                    setFieldValue('loader', false)
+
+                        navigation.goBack()
+                    }
+                    else {
+                    setFieldValue('loader', false)
+
+                        toast.show('Something went wrong', { type: 'danger' })
+                    }
+
                 }}
             >
 
@@ -234,15 +327,35 @@ const CreateTask = ({ navigation }) => {
                                             setFieldValue('isOpenSolicitorModal', true);
                                         }}
                                     />
+                                    <TextInputWithTitle
+                                        title="Task type"
+                                        isButton={true}
+                                        isRequired={true}
+                                        buttonText={values.taskType || 'Find a task type'}
+                                        onPressButton={() => setFieldValue('isOpentaskType', true)}
+                                    />
 
                                     <TextInputWithTitle
                                         onPressButton={() => navigation.navigate('TaskDocuments', { indexValue: 0 })}
                                         title="Document"
                                         isButton={true}
-                                        // buttonText={values.taskType ? values.taskType : 'Select Document'}
-                                        buttonText={itemsDocuments?.length > 0 ? itemsDocuments?.[0]?.name : 'Select Document'}
+                                        buttonText={Object.keys(itemsDocuments || {}).length > 0 ? itemsDocuments?.name : 'Select Document'}
                                     />
 
+                                    <TextInputWithTitle
+                                        title="Select Type"
+                                        isButton={true}
+                                        isRequired={true}
+                                        buttonText={values.timeEstimateType || '1 Hours'}
+                                        onPressButton={() => setFieldValue('isOpenTimeEstimateType', true)}
+                                    />
+                                    <TextInputWithTitle
+                                        title="Time Estimate Number"
+                                        isButton={true}
+                                        isRequired={true}
+                                        buttonText={values.timeEstimateNumber || 1}
+                                        onPressButton={() => setFieldValue('isTimeEstimateNumberOpen', true)}
+                                    />
                                     <TextInputWithTitle
                                         title="Matter"
                                         isButton={true}
@@ -250,6 +363,7 @@ const CreateTask = ({ navigation }) => {
                                         buttonText={values.matterSelected || 'Select Matter'}
                                         onPressButton={() => setFieldValue('isOpenMatterSelected', true)}
                                     />
+
 
                                     <TextInputWithTitle
                                         onPressButton={() => setFieldValue('isdueDate', true)}
@@ -268,7 +382,6 @@ const CreateTask = ({ navigation }) => {
                                                     <>
 
                                                         <ReminderItems item={item} navigation={navigation} />
-                                                        {/* <RelatedPartiesItems item={item} navigation={navigation} /> */}
 
                                                     </>
                                                 )
@@ -279,7 +392,6 @@ const CreateTask = ({ navigation }) => {
                                             rId: Math.floor(Math.random() * 1000),
                                         }))} title='Add a reminder' />
                                     </View>
-                                    {/* =============================Relatd Parties  END*/}
 
                                     <View style={{ height: 20 }} />
                                 </ScrollView>
@@ -380,7 +492,7 @@ const CreateTask = ({ navigation }) => {
                                         </TouchableOpacity>
                                     )}
                                     visible={values?.isOpentaskType}
-                                    data={taskType}
+                                    data={tasktypeData}
                                     searchKey="name"
                                 />
                                 {/* //////////////////////////////////////////////=============================================== MODALS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\========> */}
@@ -401,6 +513,52 @@ const CreateTask = ({ navigation }) => {
                                         setFieldValue('isdueDate', false);
                                     }}
                                 />
+                                {/* ==>TIME ESTIMATE  */}
+                                <BottomModalListWithSearch
+                                    onClose={() => setFieldValue('isOpenTimeEstimateType', false)}
+                                    renderItem={({ item }) => (
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                setFieldValue('timeEstimateType', item?.name);
+                                                setFieldValue('timeEstimateTypeObj', item);
+                                                setFieldValue('isOpenTimeEstimateType', false)
+                                            }}
+                                            style={styles.itemStyle}
+                                        >
+                                            <MyText style={{ fontSize: calculatefontSize(1.9) }}>
+                                                {item?.name}
+                                            </MyText>
+                                        </TouchableOpacity>
+                                    )}
+                                    visible={values?.isOpenTimeEstimateType}
+                                    data={timeEstimateData}
+                                    searchKey="name"
+                                />
+
+                                {/* Time EStimate Number ===============> */}
+
+                                <BottomModalListWithSearch
+                                    onClose={() => setFieldValue('isTimeEstimateNumberOpen', false)}
+                                    renderItem={({ item }) => (
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                setFieldValue('timeEstimateNumber', item?.name);
+                                                setFieldValue('timeEstimateValue', item?.value);
+                                                setFieldValue('timeEstimateNumberObj', item);
+                                                setFieldValue('isTimeEstimateNumberOpen', false)
+                                            }}
+                                            style={styles.itemStyle}
+                                        >
+                                            <MyText style={{ fontSize: calculatefontSize(1.9) }}>
+                                                {item?.name}
+                                            </MyText>
+                                        </TouchableOpacity>
+                                    )}
+                                    visible={values?.isTimeEstimateNumberOpen}
+                                    data={getTimeEstimateArray(values.timeEstimateType || 'Hours')}
+                                    searchKey="name"
+                                />
+
                             </KeyboardAvoidingView>
                         </Wrapper>
                     </>

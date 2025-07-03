@@ -18,14 +18,14 @@ const ReminderItems = ({ item }) => {
     const RID = item?.rId;
 
     const reminderThroughOptions = [
-        { label: 'Email', value: 'email' },
-        { label: 'Call', value: 'call' }
+        { label: 'Email', value: 'Email' },
+        { label: 'Call', value: 'Call' }
     ];
 
     const reminderTypeOptions = [
-        { label: 'Minutes', value: 'minutes' },
-        { label: 'Hours', value: 'hours' },
-        { label: 'Days', value: 'days' }
+        { label: 'Minutes', value: 'Minutes' },
+        { label: 'Hours', value: 'Hours' },
+        { label: 'Days', value: 'Days' }
     ];
 
     const handleRemoveItem = () => {

@@ -15,6 +15,7 @@ const ScreenHeader = ({
   isGoBack = false,
   isLoading=false,
   isShowSave=false,
+  isSHowSaveButton=false,
   onPressSave = () => { }, // ✅ Added
 }) => {
   const userDetails = useSelector(state => state?.userDetails?.userDetails);
@@ -47,6 +48,7 @@ const ScreenHeader = ({
             name={'BallSpinFadeLoader'} // Optional: see list of animations below
             color={COLORS?.whiteColors} // Optional: color can be: 'red', 'green',... or '#ddd', '#ffffff',...
           /> :
+            isShowSave &&
             <TouchableOpacity onPress={onPressSave} style={styles.iconWrapper}>
               <Feather name={'save'} size={20} color={COLORS?.whiteColors} />
             </TouchableOpacity>

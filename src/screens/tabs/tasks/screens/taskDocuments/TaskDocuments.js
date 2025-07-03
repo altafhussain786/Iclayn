@@ -54,6 +54,7 @@ const TaskDocuments = ({ navigation, route }) => {
                 isGoBack={true}
                 onPress={() => { navigation.goBack() }}
                 isShowTitle={true}
+
                 title="Documents"
             />
             <Wrapper>
@@ -74,7 +75,19 @@ const TaskDocuments = ({ navigation, route }) => {
                                         }
                                         else {
                                             dispatch(addDocument(item));
-                                            navigation.navigate("CreateTask")
+
+                                            const state = navigation.getState();
+                                            const routes = state.routes;
+                                            let popCount = 1;
+
+                                            for (let i = routes.length - 1; i >= 0; i--) {
+                                                if (routes[i].name === "CreateTask") {
+                                                    break;
+                                                }
+                                                popCount++;
+                                            }
+
+                                            navigation.pop(popCount - 1); // Go back to CreateTask screen
 
                                         }
                                     }}

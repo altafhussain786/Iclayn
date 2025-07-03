@@ -237,6 +237,7 @@ const Tasks = ({ navigation }) => {
 
         {/* Floating Button */}
         <FloatingButton
+        onPress={()=>navigation.navigate("CreateTask")}
           icon="plus"
           navigateTo="CreateScreen"
           backgroundColor={COLORS.PRIMARY_COLOR_LIGHT}
