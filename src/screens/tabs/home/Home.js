@@ -180,7 +180,7 @@ const Home = ({ navigation }) => {
             onPress={() => setTabs(item)}
           >
             {tabs === item && <Entypo name={'check'} size={20} color={tabs === item ? "#fff" : "#000"} />}
-            <MyText style={{ color: tabs === item ? COLORS?.whiteColors : COLORS?.whiteColors, fontSize: calculatefontSize(2) }}>{item}</MyText>
+            <MyText style={{ color: tabs === item ? COLORS?.whiteColors : COLORS?.whiteColors, fontSize: calculatefontSize(2),fontWeight:'600', }}>{item}</MyText>
           </TouchableOpacity>
         ))}
       </View>

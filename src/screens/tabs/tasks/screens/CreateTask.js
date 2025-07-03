@@ -143,7 +143,12 @@ const CreateTask = ({ navigation }) => {
             value: 'high'
         },
     ]
+    const validationSchema = Yup.object().shape({
+        name: Yup.string().required('name is required'),
+        matterSelected: Yup.string().required('Matter is required'),
+        feeEarnerSolicitor: Yup.string().required('Assign to is required'),
 
+    })
     return (
         <>
 
@@ -193,7 +198,7 @@ const CreateTask = ({ navigation }) => {
                         loader: false
                     }
                 }
-                // validationSchema={validationSchema}
+                validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
                     const mappedDataForTask = items?.map(data => {
                         return {
@@ -248,12 +253,12 @@ const CreateTask = ({ navigation }) => {
                     })
                     if (res) {
                         toast.show('Task created successfully', { type: 'success' })
-                    setFieldValue('loader', false)
+                        setFieldValue('loader', false)
 
                         navigation.goBack()
                     }
                     else {
-                    setFieldValue('loader', false)
+                        setFieldValue('loader', false)
 
                         toast.show('Something went wrong', { type: 'danger' })
                     }
@@ -294,11 +299,7 @@ const CreateTask = ({ navigation }) => {
                                         buttonText={values.priorityStatus ? values.priorityStatus : 'Normal '}
                                     />
                                     <TextInputWithTitle onChangeText={(txt) => setFieldValue('description', txt)} title="Matter Description" placeholder={'Enter description'} />
-                                    {
-                                        errors.description && touched.description && (
-                                            <MyText style={{ color: 'red' }}>{errors.description}</MyText>
-                                        )
-                                    }
+
 
                                     <TextInputWithTitle
                                         title="Matter"
@@ -307,6 +308,11 @@ const CreateTask = ({ navigation }) => {
                                         buttonText={values.matterSelected || 'Select Matter'}
                                         onPressButton={() => setFieldValue('isOpenMatterSelected', true)}
                                     />
+                                    {
+                                        errors.matterSelected && touched.matterSelected && (
+                                            <MyText style={{ color: 'red' }}>{errors.matterSelected}</MyText>
+                                        )
+                                    }
                                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderBottomWidth: 1, paddingVertical: 10, borderColor: '#ddd', }}>
 
                                         <MyText style={styles.title}>Is Private Task</MyText>
@@ -327,6 +333,11 @@ const CreateTask = ({ navigation }) => {
                                             setFieldValue('isOpenSolicitorModal', true);
                                         }}
                                     />
+                                    {
+                                        errors.feeEarnerSolicitor && touched.feeEarnerSolicitor && (
+                                            <MyText style={{ color: 'red' }}>{errors.feeEarnerSolicitor}</MyText>
+                                        )
+                                    }
                                     <TextInputWithTitle
                                         title="Task type"
                                         isButton={true}

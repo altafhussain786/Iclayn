@@ -81,7 +81,7 @@ const Matters = ({ navigation }) => {
                 <FlatList
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    data={tabList?.reverse()}
+                    data={tabList}
 
                     renderItem={({ item, i }) => {
                         return (
@@ -103,7 +103,7 @@ const Matters = ({ navigation }) => {
                                         style={{
 
                                             color: '#fff',
-                                            fontWeight: tabs === item ? '400' : '400',
+                                            fontWeight:'600',
                                             fontSize: calculatefontSize(1.7),
                                         }}
                                         numberOfLines={1}

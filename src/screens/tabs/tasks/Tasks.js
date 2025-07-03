@@ -21,9 +21,12 @@ import SearchBar from '../../../components/SearchBar';
 import FloatingButton from '../../../components/FloatingButton';
 import httpRequest from '../../../api/apiHandler';
 import moment from 'moment';
+import { Swipeable } from 'react-native-gesture-handler';
+import TimekeeperModal from '../../../components/TimekeeperModal';
 
 const Tasks = ({ navigation }) => {
   const [tabs, setTabs] = React.useState('All');
+    const [modalVisible, setModalVisible] = useState(false);
 
   const tabList = ['All', 'Pending', 'Completed'];
 
@@ -73,19 +76,7 @@ const Tasks = ({ navigation }) => {
     }
   }
 
-  // ✅ Search logic
-  // useEffect(() => {
-  //   if (searchText === '') {
-  //     setFilteredData(data);
-  //   } else {
-  //     const filtered = data.filter(item =>
-  //       (item?.name + item?.code + item?.matterName)
-  //         .toLowerCase()
-  //         .includes(searchText.toLowerCase())
-  //     );
-  //     setFilteredData(filtered);
-  //   }
-  // }, [searchText, data]);
+
   useEffect(() => {
     let filtered = [...data];
 
@@ -105,6 +96,30 @@ const Tasks = ({ navigation }) => {
 
     setFilteredData(filtered);
   }, [searchText, data, tabs]);
+
+  const renderLeftActions = () => {
+    return (
+      <View style={{ flexDirection: 'row', width: 200 }}> {/* <-- fixed width */}
+        <TouchableOpacity
+          onPress={() => console.log("Edit")}
+          style={{ backgroundColor: '#0068D1', justifyContent: 'center', padding: 10, width: 100 }}
+        >
+          <Text style={{ color: COLORS?.whiteColors, textAlign: 'center', fontWeight: "bold" }}>
+            Mark as{'\n'}Complete
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => console.log("Delete")}
+          style={{ backgroundColor: '#D0D9E0', justifyContent: 'center', padding: 10, width: 100 }}
+        >
+          <Text style={{ color: COLORS?.BLACK_COLOR, textAlign: 'center' }}>
+            Update{'\n'}Status
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
 
   return (
     <>
@@ -137,7 +152,7 @@ const Tasks = ({ navigation }) => {
                     style={{
 
                       color: '#fff',
-                      fontWeight: tabs === item ? '400' : '400',
+                      fontWeight:'600',
                       fontSize: calculatefontSize(1.7),
                     }}
                     numberOfLines={1}
@@ -179,49 +194,52 @@ const Tasks = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 100 }}
           renderItem={({ item, index }) => {
             return (
-              <TouchableOpacity
-              onPress={()=>navigation.navigate("TaskDetails", {item})}
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: 10,
-                  borderBottomWidth: 1,
-                  paddingVertical: 15,
-                  borderColor: COLORS?.BORDER_LIGHT_COLOR,
-                }}
-              >
-                <View style={{ gap: 5, width: "65%" }}>
-                  <MyText style={styles.timeColor}>{moment(item?.dueDate).fromNow()}</MyText>
-                  <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300', }]}>
-                    {item?.name}
-                  </MyText>
-                  <MyText style={styles.timeColor}>{item?.matterName}</MyText>
-                </View>
-                <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
-
-                  <View
+              <Swipeable renderLeftActions={renderLeftActions}>
+                <View style={{ backgroundColor: '#fff' }}> {/* <-- needed so swipe action shows properly */}
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() => navigation.navigate("TaskDetails", { item })}
                     style={{
-                      backgroundColor: checkBGStatusColor(item?.status),
-                      // alignSelf: 'flex-end',
-                      borderRadius: 5,
-                      paddingHorizontal: 8,
-                      paddingVertical: 2,
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      paddingVertical: 15,
+                      paddingHorizontal: 10,
+                      borderBottomWidth: 1,
+                      borderColor: COLORS?.BORDER_LIGHT_COLOR,
+                      backgroundColor: '#fff',
                     }}
                   >
-                    <MyText
-                      style={{
-                        // fontWeight: '600',
-                        // textAlign: 'center',
-                        color: checkTxtStatusColor(item?.status),
-                        fontSize: calculatefontSize(1.4),
-                      }}
-                    >
-                      {item?.status}
-                    </MyText>
-                  </View>
+                    <View style={{ gap: 5, width: "65%" }}>
+                      <MyText style={styles.timeColor}>{moment(item?.dueDate).fromNow()}</MyText>
+                      <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300' }]}>
+                        {item?.name}
+                      </MyText>
+                      <MyText style={styles.timeColor}>{item?.matterName}</MyText>
+                    </View>
+
+                    <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10 }}>
+                      <View
+                        style={{
+                          backgroundColor: checkBGStatusColor(item?.status),
+                          borderRadius: 5,
+                          paddingHorizontal: 8,
+                          paddingVertical: 2,
+                        }}
+                      >
+                        <MyText
+                          style={{
+                            color: checkTxtStatusColor(item?.status),
+                            fontSize: calculatefontSize(1.4),
+                          }}
+                        >
+                          {item?.status}
+                        </MyText>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
                 </View>
-              </TouchableOpacity>
+              </Swipeable>
             );
           }}
           refreshControl={
@@ -236,14 +254,17 @@ const Tasks = ({ navigation }) => {
         }
 
         {/* Floating Button */}
-        <FloatingButton
-        onPress={()=>navigation.navigate("CreateTask")}
-          icon="plus"
-          navigateTo="CreateScreen"
-          backgroundColor={COLORS.PRIMARY_COLOR_LIGHT}
-          size={50}
-          iconSize={25}
-        />
+        
+
+         <FloatingButton
+                onPress={() => setModalVisible(true)}
+                    icon="plus"
+                    navigateTo="CreateScreen"
+                    backgroundColor={COLORS.PRIMARY_COLOR_LIGHT}
+                    size={50}
+                    iconSize={25}
+                />
+                <TimekeeperModal navigation={navigation} visible={modalVisible} onClose={() => setModalVisible(false)} />
       </Wrapper>
     </>
   );

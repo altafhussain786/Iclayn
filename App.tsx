@@ -7,53 +7,56 @@ import { ToastProvider } from 'react-native-toast-notifications'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { Provider } from 'react-redux'
 import store from './src/store'
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const App = () => {
   return (
     <>
-      <ToastProvider
-        placement="top" // Place the toast at the top of the screen
-        renderType={{
-          info: (toast) => (
-            <CustomToast
-              icon="info-circle"
-              backgroundColor="#007bff"
-              textColor="white"
-              message={toast.message}
-            />
-          ),
-          success: (toast) => (
-            <CustomToast
-              icon="check-circle"
-              backgroundColor="#28a745"
-              textColor="white"
-              message={toast.message}
-            />
-          ),
-          warning: (toast) => (
-            <CustomToast
-              icon="exclamation-circle"
-              backgroundColor="#ffc107"
-              textColor="black"
-              message={toast.message}
-            />
-          ),
-          danger: (toast) => (
-            <CustomToast
-              icon="times-circle"
-              backgroundColor="#F85544"
-              textColor="white"
-              message={toast.message}
-            />
-          ),
-        }}
-      >
-        <Provider store={store}>
-          <NavigationContainer>
-            <RootNavigation />
-          </NavigationContainer>
-        </Provider>
-      </ToastProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <ToastProvider
+          placement="top" // Place the toast at the top of the screen
+          renderType={{
+            info: (toast) => (
+              <CustomToast
+                icon="info-circle"
+                backgroundColor="#007bff"
+                textColor="white"
+                message={toast.message}
+              />
+            ),
+            success: (toast) => (
+              <CustomToast
+                icon="check-circle"
+                backgroundColor="#28a745"
+                textColor="white"
+                message={toast.message}
+              />
+            ),
+            warning: (toast) => (
+              <CustomToast
+                icon="exclamation-circle"
+                backgroundColor="#ffc107"
+                textColor="black"
+                message={toast.message}
+              />
+            ),
+            danger: (toast) => (
+              <CustomToast
+                icon="times-circle"
+                backgroundColor="#F85544"
+                textColor="white"
+                message={toast.message}
+              />
+            ),
+          }}
+        >
+          <Provider store={store}>
+            <NavigationContainer>
+              <RootNavigation />
+            </NavigationContainer>
+          </Provider>
+        </ToastProvider>
+      </GestureHandlerRootView>
     </>
   )
 }
