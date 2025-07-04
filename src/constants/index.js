@@ -107,6 +107,7 @@ export const IconUri = {
     matter: require('../assets/Icons/matter.png'),
     profile: require('../assets/Icons/profile.png'),
     logout: require('../assets/Icons/logout.png'),
+    checkmark: require('../assets/Icons/checkmark.png'),
 
     communication: require('../assets/Icons/communication.png'),
     documents: require('../assets/Icons/documents.png'),

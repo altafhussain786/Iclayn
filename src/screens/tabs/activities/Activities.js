@@ -15,6 +15,7 @@ import Loader from '../../../components/Loader';
 import { formatNumber } from '../../../helper/Helpers';
 import moment from 'moment';
 import TimekeeperModal from '../../../components/TimekeeperModal';
+import LinearGradient from 'react-native-linear-gradient';
 
 const Activities = ({ navigation }) => {
   const [tabs, setTabs] = React.useState("Time entries");
@@ -68,26 +69,35 @@ const Activities = ({ navigation }) => {
     <>
 
       <ScreenHeader isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title='Activities' />
-      <View style={styles.tabContainer}>
+       <LinearGradient
+               colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT,]}
+               start={{ x: 0, y: 0 }}
+               end={{ x: 1, y: 0 }}
+            style={styles.tabContainer}
+       
+             >
+      {/* <View > */}
         {["Time entries", "Expenses"].map((item) => (
+        
           <TouchableOpacity
             key={item}
             style={[
               styles.tab,
               {
                 borderBottomWidth: tabs === item ? 3 : 0,
-                borderColor: tabs === item ? COLORS.PRIMARY_COLOR : "transparent",
+                borderColor: tabs === item ? COLORS.PRIMARY_COLOR_LIGHT : "transparent",
                 backgroundColor:
-                  tabs === item ? COLORS.PRIMARY_COLOR_LIGHT : COLORS.PRIMARY_COLOR_LIGHT,
+                  tabs === item ? COLORS.PRIMARY_COLOR : COLORS.PRIMARY_COLOR,
               },
             ]}
             onPress={() => setTabs(item)}
           >
-            {tabs === item && <Entypo name={'check'} size={20} color={tabs === item ? "#fff" : "#000"} />}
+            {tabs === item &&  <Image source={IconUri?.checkmark} style={{ height: 20, width: 20 ,resizeMode:"contain",right:10}} />}
             <MyText style={{ color: tabs === item ? COLORS?.whiteColors : COLORS?.whiteColors, fontSize: calculatefontSize(2) }}>{item}</MyText>
           </TouchableOpacity>
         ))}
-      </View>
+      {/* </View> */}
+        </LinearGradient>
       <Wrapper>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <SearchBar

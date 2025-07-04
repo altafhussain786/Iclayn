@@ -26,6 +26,7 @@ import moment from 'moment';
 import { useToast } from 'react-native-toast-notifications';
 import Loader from '../../../components/Loader';
 import TimekeeperModal from '../../../components/TimekeeperModal';
+import LinearGradient from 'react-native-linear-gradient';
 
 const Bills = ({ navigation }) => {
   const [tabs, setTabs] = React.useState('Upcoming');
@@ -220,15 +221,24 @@ const Bills = ({ navigation }) => {
       <ScreenHeader isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="Bills" />
 
       {/* Scrollable Tabs */}
-      <View style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10, opacity: 0.8, backgroundColor: COLORS?.PRIMARY_COLOR, borderRadius: 10 }}>
-          <MyText style={{ color: COLORS?.whiteColors, fontWeight: '400', fontSize: calculatefontSize(1.7) }}>All matters</MyText>
-          <AntDesign name={'down'} size={20} color={COLORS?.whiteColors} />
+      <LinearGradient
+        colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT,]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}
+
+      >
+        <View >
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10, opacity: 0.8, backgroundColor: COLORS?.PRIMARY_COLOR, borderRadius: 10 }}>
+            <MyText style={{ color: COLORS?.whiteColors, fontWeight: '400', fontSize: calculatefontSize(1.7) }}>All matters</MyText>
+            <AntDesign name={'down'} size={20} color={COLORS?.whiteColors} />
+          </View>
         </View>
-      </View>
+      </LinearGradient>
 
       <Wrapper>
         {/* Search Row */}
+        
         <View
           style={{
             flexDirection: 'row',
@@ -258,6 +268,7 @@ const Bills = ({ navigation }) => {
             console.log(item, 'billl itration ====d=======>');
 
             return (
+
               <View
                 style={{
                   flexDirection: 'row',

@@ -186,7 +186,7 @@ const Home = ({ navigation }) => {
             ]}
             onPress={() => setTabs(item)}
           >
-            {tabs === item && <Entypo name={'check'} size={20} color={tabs === item ? "#fff" : "#000"} />}
+            {tabs === item && <Image source={IconUri?.checkmark} style={{ height: 20, width: 20 ,resizeMode:"contain",right:10}} />}
             <MyText style={{ color: tabs === item ? COLORS?.whiteColors : COLORS?.whiteColors, fontSize: calculatefontSize(2), fontWeight: '600', }}>{item}</MyText>
           </TouchableOpacity>
         ))}
