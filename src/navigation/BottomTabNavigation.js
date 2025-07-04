@@ -116,7 +116,7 @@ const CustomTabBarButton = (props) => {
       <TouchableNativeFeedback
 
         onPress={onPress}
-        background={TouchableNativeFeedback.Ripple('rgba(255,255,255,0.15)', false)} // light ripple
+        background={TouchableNativeFeedback.Ripple('rgba(255,255,255,0.16)', false)} // light ripple
       >
         <View style={{
           flex: 1,
@@ -135,7 +135,7 @@ const CustomTabBarButton = (props) => {
         justifyContent: 'center',
         alignItems: 'center', // ✅ iOS alignment fix too
       }}
-      onPress={onPress} activeOpacity={0.7}>
+      onPress={onPress} activeOpacity={0.}>
       {children}
     </TouchableOpacity>
   );

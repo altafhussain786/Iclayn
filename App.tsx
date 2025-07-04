@@ -8,6 +8,8 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { Provider } from 'react-redux'
 import store from './src/store'
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import LinearGradient from 'react-native-linear-gradient'
+import { COLORS } from './src/constants'
 
 const App = () => {
   return (
@@ -19,8 +21,8 @@ const App = () => {
             info: (toast) => (
               <CustomToast
                 icon="info-circle"
-                backgroundColor="#007bff"
-                textColor="white"
+                backgroundColor={COLORS?.whiteColors}
+                textColor={COLORS?.PRIMARY_COLOR}
                 message={toast.message}
               />
             ),
@@ -43,7 +45,7 @@ const App = () => {
             danger: (toast) => (
               <CustomToast
                 icon="times-circle"
-                backgroundColor="#F85544"
+                backgroundColor={COLORS?.RED_COLOR}
                 textColor="white"
                 message={toast.message}
               />
@@ -63,10 +65,19 @@ const App = () => {
 
 const CustomToast = ({ icon, backgroundColor, textColor, message }: any) => {
   return (
-    <View style={[styles.toastContainer, { backgroundColor }]}>
-      <FontAwesome name={icon} size={24} color={textColor} style={styles.icon} />
-      <Text style={[styles.toastText, { color: textColor }]}>{message}</Text>
-    </View>
+    <>
+      <LinearGradient
+        colors={[backgroundColor, COLORS?.PRIMARY_COLOR,]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.toastContainer, { backgroundColor }]}
+      >
+        {/* <View > */}
+        <FontAwesome name={icon} size={24} color={textColor} style={styles.icon} />
+        <Text style={[styles.toastText, { color: textColor }]}>{message}</Text>
+        {/* </View> */}
+      </LinearGradient>
+    </>
   );
 };
 
@@ -76,15 +87,16 @@ const styles = StyleSheet.create({
   toastContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    width: '80%',
     padding: 15,
     borderRadius: 10,
     marginHorizontal: 30,
-    elevation: 5, // Adds shadow for Android
+    // elevation: 5, // Adds shadow for Android
+    marginTop: 20,
     // shadowColor: '#000',
     // shadowOffset: { width: 0, height: 2 },
     // shadowOpacity: 0.25,
     // shadowRadius: 3.84,
-    marginTop: 20,
   },
   icon: {
     marginRight: 10,

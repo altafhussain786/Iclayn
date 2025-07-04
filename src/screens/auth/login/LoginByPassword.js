@@ -24,25 +24,25 @@ const LoginByPassword = ({ navigation, route }) => {
     const email = route?.params?.email
     const emailData = route?.params?.emailData
     const [loader, setLoader] = React.useState(false)
-    const toast=useToast()
+    const toast = useToast()
 
     const login = async (values) => {
-        console.log(email,values.password,"====>");
-        
+        console.log(email, values.password, "====>");
+
         setLoader(true)
-        const { res, err ,status} = await httpRequest({
+        const { res, err, status } = await httpRequest({
             method: "post",
             path: `/ic/auth/login`,
-                 navigation:navigation,
-             header: { "X_TENANT_ID": X_TENANT_ID },
+            navigation: navigation,
+            header: { "X_TENANT_ID": X_TENANT_ID },
             params: {
                 email: email,
                 password: values.password
             }
         })
         if (res) {
-            console.log(res,'login res==========>');
-            
+            console.log(res, 'login res==========>');
+
             let { token } = res
             await saveToken(token, X_TENANT_ID);
             if (emailData?.user2FADTO?.smsEnabled === true || emailData?.user2FADTO?.emailEnabled === true) {
@@ -51,25 +51,26 @@ const LoginByPassword = ({ navigation, route }) => {
 
             }
             else {
-                toast.show('Login successfully',{type:'success'})
+                toast.show('Login successfully', { type: 'success' })
                 navigation.navigate('BottomTabNavigation')
                 setLoader(false)
             }
             setLoader(false)
         }
         else {
-            toast.show(err?.message,{type:'danger'})
-            console.log(err,"err login---<",status);
+            toast.show(err?.message, { type: 'danger' })
+            console.log(err, "err login---<", status);
             setLoader(false)
         }
         setLoader(false)
-       
+
     }
 
     return (
         <ImageBackground blurRadius={2} source={require("../../../assets/Images/bgimage.png")} style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
             <View >
                 <Image tintColor={COLORS?.whiteColors} source={{ uri: `${BASE_URL}/assets/logo-DuQxixZj.png` }} style={{ width: 150, height: 50, resizeMode: "contain", }} />
+                
             </View>
             <Formik
                 initialValues={{ email: email, password: 'Secret@123' }}
