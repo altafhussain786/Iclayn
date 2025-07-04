@@ -15,29 +15,30 @@ import { calculatefontSize } from "../../../helper/responsiveHelper";
 
 const More = ({ navigation }) => {
     const data = [
+        { type: "Client", icon: IconUri?.client, screenName: "Clients" },
         { type: "Billing", icon: IconUri?.bill, screenName: "Bills" },
         { type: "Parties", icon: IconUri?.parties, screenName: "Parties" },
         { type: "Activities", icon: IconUri?.Activitie, screenName: "Activities" },
         { type: "Documents", icon: IconUri?.documents, screenName: "Documents" },
         { type: "Communications", icon: IconUri?.communication, screenName: "Communications" },
-        { type: "Reports", icon: IconUri?.report, screenName: "Reports" }, 
+        { type: "Reports", icon: IconUri?.report, screenName: "Reports" },
         { type: "Settings", icon: IconUri?.settings, screenName: "Settings" },
-     
+
     ];
 
 
     return (
         <>
             <ScreenHeader
-            isShowTitle={true}
+                isShowTitle={true}
                 title="More"
                 // leftIcon="bells"
                 onRightPress={() => navigation.navigate("Setting")} rightIcons={["account"]}
             />
-           
+
 
             <Wrapper>
-              
+
                 <FlatList
                     removeClippedSubviews={false}
                     showsVerticalScrollIndicator={false}
@@ -50,7 +51,7 @@ const More = ({ navigation }) => {
                             style={styles.card}
                             onPress={() => navigation.navigate(item.screenName)}
                         >
-                            <Image  source={item.icon} style={styles.icon} />
+                            <Image source={item.icon} style={styles.icon} />
                             <MyText style={styles.text}  >{item.type}</MyText>
 
                         </TouchableOpacity>

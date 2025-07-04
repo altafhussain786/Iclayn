@@ -22,6 +22,7 @@ import TaskDocuments from '../screens/tabs/tasks/screens/taskDocuments/TaskDocum
 import TaskFiles from '../screens/tabs/tasks/screens/taskDocuments/TaskFiles';
 import Activities from '../screens/tabs/activities/Activities';
 import Bills from '../screens/tabs/bills/Bills';
+import Clients from '../screens/clients/Clients';
 
 
 
@@ -56,6 +57,7 @@ const RootNavigation = () => {
         <Stack.Screen name="Settings" component={Settings} />
         <Stack.Screen name="Activities" component={Activities} />
         <Stack.Screen name="Bills" component={Bills} />
+        <Stack.Screen name="Clients" component={Clients} />
 
         
         {/* //Matters  */}

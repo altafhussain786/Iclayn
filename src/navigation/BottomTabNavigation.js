@@ -1,4 +1,4 @@
-import { StyleSheet, Image, Alert, BackHandler } from 'react-native';
+import { StyleSheet, Image, Alert, BackHandler, TouchableNativeFeedback, View } from 'react-native';
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -55,7 +55,7 @@ const BottomTabNavigation = () => {
       case "Calender":
         return IconUri?.Calender;
       case "Matters":
-        return IconUri?.clock;
+        return IconUri?.matter;
       case "Tasks":
         return IconUri?.task;
       default:
@@ -70,21 +70,28 @@ const BottomTabNavigation = () => {
         screenOptions={({ route }) => ({
           headerShown: false,
           tabBarStyle: styles.tabBar,
+          tabBarButton: (props) => <CustomTabBarButton {...props} />, // ✅ here
+
           tabBarIcon: ({ focused }) => {
             const iconSource = getTabIcon(route.name, focused);
             return (
               <Image
                 source={iconSource}
                 style={{
-                  width: 25,
-                  height: 25,
-                  opacity: focused ? 1 : 0.5,
+                  width: 30,
+                  height: 30,
+                  opacity: focused ? 1 : 0.4,
                   // tintColor: focused ? COLORS.PRIMARY_COLOR_LIGHT : '#a1a1a1',
                 }}
                 resizeMode="contain"
               />
             );
           },
+          tabBarLabelStyle: {
+            top: 5,
+            fontWeight: "bold"
+          },
+
           tabBarActiveTintColor: COLORS.PRIMARY_COLOR_LIGHT,
           tabBarInactiveTintColor: '#a1a1a1',
         })}
@@ -99,6 +106,41 @@ const BottomTabNavigation = () => {
     </>
   );
 };
+
+
+const CustomTabBarButton = (props) => {
+  const { children, onPress } = props;
+
+  if (Platform.OS === 'android') {
+    return (
+      <TouchableNativeFeedback
+
+        onPress={onPress}
+        background={TouchableNativeFeedback.Ripple('rgba(255,255,255,0.15)', false)} // light ripple
+      >
+        <View style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center', // ✅ this aligns icon + label center
+        }}>{children}</View>
+      </TouchableNativeFeedback>
+    );
+  }
+
+  // iOS fallback
+  return (
+    <TouchableOpacity
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center', // ✅ iOS alignment fix too
+      }}
+      onPress={onPress} activeOpacity={0.7}>
+      {children}
+    </TouchableOpacity>
+  );
+};
+
 
 export default BottomTabNavigation;
 
