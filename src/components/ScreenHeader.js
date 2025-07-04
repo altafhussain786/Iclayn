@@ -7,6 +7,7 @@ import { calculatefontSize } from '../helper/responsiveHelper';
 import { useSelector } from 'react-redux';
 
 import LoaderKit from 'react-native-loader-kit'
+import LinearGradient from 'react-native-linear-gradient';
 
 const ScreenHeader = ({
   isShowTitle = false,
@@ -24,7 +25,15 @@ const ScreenHeader = ({
   
 
   return (
-    <View style={styles.container1}>
+    <>
+     <LinearGradient
+        colors={[ COLORS?.PRIMARY_COLOR,COLORS?.PRIMARY_COLOR_LIGHT,]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+       style={styles.container1}
+
+      >
+    <View >
       <View style={styles.container}>
         <TouchableOpacity onPress={onPress} style={styles.iconWrapper}>
           <Feather name={isGoBack ? 'arrow-left' : 'settings'} size={20} color={COLORS?.whiteColors} />
@@ -61,6 +70,8 @@ const ScreenHeader = ({
         </View>
       </View>
     </View>
+    </LinearGradient>
+    </>
   );
 };
 
@@ -68,7 +79,7 @@ export default ScreenHeader;
 
 const styles = StyleSheet.create({
   container1: {
-    backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT,
+    // backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT,
     paddingHorizontal: 20,
     paddingVertical: 30,
   },
@@ -77,7 +88,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     top: 10,
-    backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT,
+    // backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT,
   },
   iconWrapper: {
     width: 30,

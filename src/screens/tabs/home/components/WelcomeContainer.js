@@ -5,6 +5,7 @@ import { COLORS } from '../../../../constants'
 import { calculatefontSize } from '../../../../helper/responsiveHelper'
 import { useSelector } from 'react-redux'
 import httpRequest from '../../../../api/apiHandler'
+import LinearGradient from 'react-native-linear-gradient'
 
 const WelcomeContainer = ({ navigation }) => {
   const [personalData, setPersonalData] = React.useState({});
@@ -33,16 +34,26 @@ const WelcomeContainer = ({ navigation }) => {
   }, [userDetails])
   return (
     <>
-      <View style={styles.container}>
-        <View>
-          {/* <Image source={{ uri: imageURL }} style={{ height: 30, width: 30, borderRadius: 50 ,resizeMode:"contain"}}/> */}
-          <MyText style={styles.nameStyle}>Hi, {userProfileDTO?.firstName}</MyText>
+      <LinearGradient
+        colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT,]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.container}
+
+      >
+        <View
+
+        >
+          <View>
+            {/* <Image source={{ uri: imageURL }} style={{ height: 30, width: 30, borderRadius: 50 ,resizeMode:"contain"}}/> */}
+            <MyText style={styles.nameStyle}>Hi, {userProfileDTO?.firstName}</MyText>
+          </View>
+          <View>
+            <MyText style={styles.messageStyle}>You have <Text style={{ color: COLORS?.yellow, fontWeight: "bold" }}>{personalData?.todayEventDTOList?.length} Event{personalData?.todayEventDTOList?.length > 1 && "s"} </Text> </MyText>
+            <MyText style={styles.messageStyle}>and <Text style={{ color: COLORS?.yellow, fontWeight: "bold" }}> {personalData?.todayTaskDTOList?.length}  task{personalData?.todayTaskDTOList?.length > 1 && "s"} </Text> schedule today</MyText>
+          </View>
         </View>
-        <View>
-          <MyText style={styles.messageStyle}>You have <Text style={{ color: COLORS?.yellow, fontWeight: "bold" }}>{personalData?.todayEventDTOList?.length} Event{personalData?.todayEventDTOList?.length > 1 && "s"} </Text> </MyText>
-          <MyText style={styles.messageStyle}>and <Text style={{ color: COLORS?.yellow, fontWeight: "bold" }}> {personalData?.todayTaskDTOList?.length}  task{personalData?.todayTaskDTOList?.length > 1 && "s"} </Text> schedule today</MyText>
-        </View>
-      </View>
+      </LinearGradient>
     </>
   )
 }

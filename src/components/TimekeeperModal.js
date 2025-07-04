@@ -1,239 +1,3 @@
-// import React, { useState, useEffect, useRef } from 'react';
-// import {
-//     Modal,
-//     View,
-//     Text,
-//     TouchableOpacity,
-//     StyleSheet,
-//     Animated,
-//     FlatList,
-//     StatusBar,
-// } from 'react-native';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-// import FontAwesome from 'react-native-vector-icons/FontAwesome'; // for pause icon
-// import { COLORS } from '../constants';
-// import { calculatefontSize } from '../helper/responsiveHelper';
-
-// const TIMER_KEY = 'TIMEKEEPER_STATE';
-
-// const options = [
-//     { label: 'Matter', icon: 'briefcase' },
-//     { label: 'Event', icon: 'calendar' },
-//     { label: 'Time entry', icon: 'clock-o' },
-//     { label: 'Expense', icon: 'file-text' },
-//     { label: 'Task', icon: 'check-square' },
-// ];
-
-// const TimekeeperModal = ({ visible, onClose }) => {
-//     const [description, setDescription] = useState('No description');
-//     const [matter, setMatter] = useState('No matter');
-//     const [duration, setDuration] = useState(0); // in seconds
-//     const [isRunning, setIsRunning] = useState(false);
-//     const intervalRef = useRef(null);
-
-//     useEffect(() => {
-//         if (visible) loadTimer();
-//         else stopTimer();
-//     }, [visible]);
-
-//     const loadTimer = async () => {
-//         const json = await AsyncStorage.getItem(TIMER_KEY);
-//         if (json) {
-//             const data = JSON.parse(json);
-//             setDescription(data.description || 'No description');
-//             setMatter(data.matter || 'No matter');
-//             setDuration(data.duration || 0);
-//             setIsRunning(data.isRunning || false);
-
-//             if (data.isRunning && data.startTime) {
-//                 const elapsed =
-//                     Math.floor((Date.now() - new Date(data.startTime).getTime()) / 1000) +
-//                     (data.duration || 0);
-//                 setDuration(elapsed);
-//                 startTimer(true);
-//             }
-//         }
-//     };
-
-//     const saveTimerState = async (extra = {}) => {
-//         const data = {
-//             description,
-//             matter,
-//             duration,
-//             isRunning,
-//             ...extra,
-//         };
-//         await AsyncStorage.setItem(TIMER_KEY, JSON.stringify(data));
-//     };
-
-//     const startTimer = async (resume = false) => {
-//         if (!resume) {
-//             await saveTimerState({ startTime: new Date().toISOString(), isRunning: true });
-//         }
-//         setIsRunning(true);
-//         intervalRef.current = setInterval(() => {
-//             setDuration((prev) => prev + 1);
-//         }, 1000);
-//     };
-
-//     const stopTimer = async () => {
-//         if (intervalRef.current) clearInterval(intervalRef.current);
-//         setIsRunning(false);
-//         await saveTimerState({ isRunning: false, duration });
-//     };
-
-//     const toggleTimer = () => {
-//         isRunning ? stopTimer() : startTimer();
-//     };
-
-//     const formatTime = (sec) => {
-//         const h = String(Math.floor(sec / 3600)).padStart(2, '0');
-//         const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
-//         const s = String(sec % 60).padStart(2, '0');
-//         return `${h}:${m}:${s}`;
-//     };
-
-//     return (
-//         <>
-//         {/* <StatusBar translucent backgroundColor="transparent" /> */}
-//         <Modal
-//             statusBarTranslucent={false}
-//             visible={visible} animationType="slide" transparent>
-//             <View style={styles.overlay}>
-//                 <View style={styles.modalContainer}>
-//                     <View style={styles.modalHeader}>
-//                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-//                             <FontAwesome name="close" size={20} color={COLORS?.RED_COLOR} />
-//                         </TouchableOpacity>
-//                     </View>
-//                     {/* Top Info */}
-//                     <View style={styles.header}>
-//                         <View>
-//                             <Text style={styles.timekeeperTitle}>Timekeeper</Text>
-//                             <Text style={styles.subtext}>
-//                                 ● {description} ({matter})
-//                             </Text>
-//                         </View>
-//                         <TouchableOpacity>
-//                             <Text style={styles.addDetails}>Add details</Text>
-//                         </TouchableOpacity>
-//                     </View>
-
-//                     {/* Timer Bar */}
-//                     <TouchableOpacity onPress={toggleTimer} style={styles.timerBar}>
-//                         <FontAwesome name={isRunning ? 'pause' : 'play'} size={16} color="white" />
-//                         <Text style={styles.timerText}>{formatTime(duration)}</Text>
-//                     </TouchableOpacity>
-
-//                     {/* Create new icons */}
-//                     <Text style={styles.sectionTitle}>Create new</Text>
-//                     <Text style={styles.swipeHint}>Swipe left to see all options</Text>
-//                     <FlatList
-//                         contentContainerStyle={styles.containerStyle}
-//                         horizontal
-//                         data={options}
-//                         keyExtractor={(item) => item.label}
-//                         renderItem={({ item }) => (
-//                             <>
-//                                 <View style={{ justifyContent: "center", alignItems: "center" }}>
-//                                     <TouchableOpacity style={styles.optionItem}>
-//                                         <FontAwesome name={item.icon} size={30} color='#B6F0E2' />
-//                                     </TouchableOpacity>
-//                                     <Text style={styles.optionLabel}>{item.label}</Text>
-//                                 </View>
-//                             </>
-//                         )}
-//                         showsHorizontalScrollIndicator={false}
-//                     />
-//                 </View>
-//             </View>
-//         </Modal>
-//         </>
-//     );
-// };
-
-// const styles = StyleSheet.create({
-//     modalHeader: {
-//         alignItems: "flex-end"
-//     },
-//     containerStyle: {
-//         justifyContent: 'center',
-//         alignItems: 'center'
-//     },
-//     overlay: {
-
-//         flex: 1,
-//         justifyContent: 'flex-end',
-//         backgroundColor: '#00000066',
-//     },
-//     modalContainer: {
-//         backgroundColor: 'white',
-//         borderTopRightRadius: 20,
-//         borderTopLeftRadius: 20,
-//         padding: 16,
-//     },
-//     header: {
-//         flexDirection: 'row',
-//         justifyContent: 'space-between',
-//         alignItems: 'flex-end',
-//     },
-//     timekeeperTitle: {
-//         fontWeight: 'bold',
-//         fontSize: 16,
-//     },
-//     subtext: {
-//         fontSize: 13,
-//         color: '#666',
-//         marginTop: 2,
-//     },
-//     addDetails: {
-//         color: COLORS?.PRIMARY_COLOR_LIGHT,
-//         fontSize: calculatefontSize(1.9),
-//         fontWeight: "bold"
-//     },
-//     timerBar: {
-//         backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT,
-//         marginTop: 15,
-//         paddingVertical: 12,
-//         borderRadius: 10,
-//         flexDirection: 'row',
-//         justifyContent: 'center',
-//         alignItems: 'center',
-//         gap: 10,
-//     },
-//     timerText: {
-//         color: 'white',
-//         fontSize: 16,
-//         fontWeight: 'bold',
-//         marginLeft: 8,
-//     },
-//     sectionTitle: {
-//         marginTop: 20,
-//         fontWeight: '600',
-//         fontSize: 14,
-//     },
-//     swipeHint: {
-//         color: '#777',
-//         fontSize: 12,
-//         marginBottom: 10,
-//     },
-//     optionItem: {
-//         backgroundColor: '#007E7B',
-//         padding: 15,
-//         borderRadius: 8,
-//         // height: 80,
-//         width: 80,
-//         alignItems: 'center',
-//         marginRight: 10,
-//     },
-//     optionLabel: {
-//         fontSize: 12,
-//         marginTop: 4,
-//         color: COLORS?.BLACK_COLOR,
-//     },
-// });
-// export default TimekeeperModal;
-
 import React, { useState, useEffect, useRef } from 'react';
 import {
     Modal,
@@ -243,12 +7,14 @@ import {
     StyleSheet,
     FlatList,
     AppState,
+    Image,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { COLORS } from '../constants';
+import { COLORS, IconUri } from '../constants';
 import { calculatefontSize } from '../helper/responsiveHelper';
 import { useIsFocused } from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
 
 const TIMER_KEY = 'TIMEKEEPER_STATE';
 
@@ -264,11 +30,11 @@ const TimekeeperModal = ({ visible, onClose, navigation }) => {
     const [startTime, setStartTime] = useState(null);
     const intervalRef = useRef(null);
     const options = [
-        { label: 'Matter', icon: 'briefcase', onPress: () => navigation.navigate("CreateMatter") },
-        { label: 'Task', icon: 'check-square', onPress: () => navigation.navigate("CreateTask") },
-        { label: 'Event', icon: 'calendar', onPress: () => navigation.navigate("Event") },
-        { label: 'Time entry', icon: 'clock-o', onPress: () => navigation.navigate("") },
-        { label: 'Expense', icon: 'file-text', onPress: () => navigation.navigate("") },
+        { label: 'Matter', icon: 'briefcase', onPress: () => navigation.navigate("CreateMatter"),iconName: IconUri?.matter },
+        { label: 'Task', icon: 'check-square', onPress: () => navigation.navigate("CreateTask"),iconName: IconUri?.task  },
+        { label: 'Event', icon: 'calendar', onPress: () => navigation.navigate("Event"),iconName: IconUri?.Calender  },
+        { label: 'Time entry', icon: 'clock-o', onPress: () => navigation.navigate(""),iconName: IconUri?.clock  },
+        { label: 'Expense', icon: 'file-text', onPress: () => navigation.navigate(""),iconName: IconUri?.matter  },
     ];
 
         
@@ -400,9 +166,17 @@ const TimekeeperModal = ({ visible, onClose, navigation }) => {
                         keyExtractor={(item) => item.label}
                         renderItem={({ item }) => (
                             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                                <TouchableOpacity onPress={() => { onClose(), item.onPress() }} style={styles.optionItem}>
-                                    <FontAwesome name={item.icon} size={30} color="#B6F0E2" />
+                                {/* <LinearGradient
+                                    start={{ x: 1, y: 0 }}
+                                    end={{ x: 0, y: 1 }}
+                                    colors={[ '#fff','#fff']}
+                                    style={styles.optionItem}
+                                    > */}
+                                <TouchableOpacity style={styles.optionItem} onPress={() => { onClose(), item.onPress() }} >
+                                    <Image source={item.iconName} style={{ height: 40, width: 50,resizeMode:"contain" }} />
+                                    {/* <FontAwesome name={item.icon} size={30} color="#B6F0E2" /> */}
                                 </TouchableOpacity>
+                            {/* </LinearGradient> */}
                                 <Text style={styles.optionLabel}>{item.label}</Text>
                             </View>
                         )}
@@ -479,15 +253,18 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     optionItem: {
-        backgroundColor: '#007E7B',
-        padding: 15,
+        // backgroundColor: '#007E7B',
+        // padding: 15,
+        // paddingTop: 20,
+        
         borderRadius: 8,
         width: 80,
         alignItems: 'center',
-        marginRight: 10,
+        // marginRight: 10,
     },
     optionLabel: {
-        fontSize: 12,
+        fontSize: calculatefontSize(1.5),
+        fontWeight: 'bold',
         marginTop: 4,
         color: COLORS?.BLACK_COLOR,
     },

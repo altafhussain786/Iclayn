@@ -18,6 +18,7 @@ import { adduserDetails } from '../../../store/slices/userDetails';
 import { useDispatch } from 'react-redux';
 import moment from 'moment';
 import Loader from '../../../components/Loader';
+import LinearGradient from 'react-native-linear-gradient';
 
 const Home = ({ navigation }) => {
   const [tabs, setTabs] = React.useState("Events");
@@ -164,7 +165,13 @@ const Home = ({ navigation }) => {
       <WelcomeContainer />
 
       {/* Tabs */}
-      <View style={styles.tabContainer1}>
+      <LinearGradient
+        colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT,]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.tabContainer1}
+      >
+        {/* <View style={styles.tabContainer1}> */}
         {["Events", "Tasks"].map((item) => (
           <TouchableOpacity
             key={item}
@@ -174,16 +181,16 @@ const Home = ({ navigation }) => {
                 borderBottomWidth: tabs === item ? 3 : 0,
                 borderColor: tabs === item ? COLORS.PRIMARY_COLOR : "transparent",
                 backgroundColor:
-                  tabs === item ? COLORS.PRIMARY_COLOR_LIGHT : COLORS.PRIMARY_COLOR_LIGHT,
+                  tabs === item ? COLORS.PRIMARY_COLOR : COLORS.PRIMARY_COLOR,
               },
             ]}
             onPress={() => setTabs(item)}
           >
             {tabs === item && <Entypo name={'check'} size={20} color={tabs === item ? "#fff" : "#000"} />}
-            <MyText style={{ color: tabs === item ? COLORS?.whiteColors : COLORS?.whiteColors, fontSize: calculatefontSize(2),fontWeight:'600', }}>{item}</MyText>
+            <MyText style={{ color: tabs === item ? COLORS?.whiteColors : COLORS?.whiteColors, fontSize: calculatefontSize(2), fontWeight: '600', }}>{item}</MyText>
           </TouchableOpacity>
         ))}
-      </View>
+      </LinearGradient>
 
       {/* Tab Content */}
       {tabs === "Events" ? (

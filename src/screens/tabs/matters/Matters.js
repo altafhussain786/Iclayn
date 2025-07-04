@@ -21,6 +21,7 @@ import FloatingButton from '../../../components/FloatingButton';
 import httpRequest from '../../../api/apiHandler';
 import moment from 'moment';
 import TimekeeperModal from '../../../components/TimekeeperModal';
+import LinearGradient from 'react-native-linear-gradient';
 
 const Matters = ({ navigation }) => {
     const [tabs, setTabs] = React.useState('All');
@@ -77,7 +78,16 @@ const Matters = ({ navigation }) => {
             <ScreenHeader onPress={() => { navigation.navigate("Settings") }} isShowTitle={true} title="Matters" />
 
             {/* Scrollable Tabs */}
-            <View style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}>
+             <LinearGradient
+                    colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT,]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}
+
+                  >
+            <View
+            //  style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}
+             >
                 <FlatList
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -103,7 +113,7 @@ const Matters = ({ navigation }) => {
                                         style={{
 
                                             color: '#fff',
-                                            fontWeight:'600',
+                                            fontWeight: '600',
                                             fontSize: calculatefontSize(1.7),
                                         }}
                                         numberOfLines={1}
@@ -116,6 +126,7 @@ const Matters = ({ navigation }) => {
                     }}
                 />
             </View>
+            </LinearGradient>
             <Wrapper>
                 {/* Search Row */}
                 <View
@@ -133,7 +144,7 @@ const Matters = ({ navigation }) => {
                     />
                     <Image
                         source={IconUri?.CalenderSearch}
-                        style={{height: 30, width: 30,  resizeMode: 'contain' }}
+                        style={{ height: 30, width: 30, resizeMode: 'contain' }}
                     />
                 </View>
 
@@ -197,7 +208,7 @@ const Matters = ({ navigation }) => {
                 />
                     :
                     <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 10 }}>
-                        <Image  source={IconUri?.task} style={{ height: 50, width: 50, resizeMode: "contain" }} />
+                        <Image source={IconUri?.task} style={{ height: 50, width: 50, resizeMode: "contain" }} />
                         <MyText style={{ fontSize: calculatefontSize(1.5), color: COLORS.PRIMARY_COLOR }}>No Data Found</MyText>
                     </View>
                 }
@@ -206,7 +217,7 @@ const Matters = ({ navigation }) => {
 
                 {/* Floating Button */}
                 <FloatingButton
-                onPress={() => setModalVisible(true)}
+                    onPress={() => setModalVisible(true)}
                     icon="plus"
                     navigateTo="CreateScreen"
                     backgroundColor={COLORS.PRIMARY_COLOR_LIGHT}

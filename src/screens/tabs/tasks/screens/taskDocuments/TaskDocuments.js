@@ -54,7 +54,6 @@ const TaskDocuments = ({ navigation, route }) => {
                 isGoBack={true}
                 onPress={() => { navigation.goBack() }}
                 isShowTitle={true}
-
                 title="Documents"
             />
             <Wrapper>
