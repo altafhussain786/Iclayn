@@ -26,6 +26,7 @@ import httpRequest from '../../../api/apiHandler';
 import moment from 'moment';
 import Loader from '../../../components/Loader';
 import TimekeeperModal from '../../../components/TimekeeperModal';
+import LinearGradient from 'react-native-linear-gradient';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -158,41 +159,49 @@ const Calender = ({ navigation }) => {
         <TouchableOpacity onPress={() => setShowMonthPicker(true)}>
           <Image
             source={IconUri?.CalenderSearch}
-            style={{ height: 35, width: 35,  resizeMode: 'contain' }}
+            style={{ height: 35, width: 35, resizeMode: 'contain' }}
           />
         </TouchableOpacity>
       </View>
 
       {/* Animated Week Strip */}
       <View style={{ backgroundColor: COLORS?.whiteColors }}>
-        <View style={styles.tabContainer} {...panResponder.panHandlers}>
-          <Animated.View style={{ flexDirection: 'row', transform: [{ translateX }] }}>
-            {currentWeek.map((item) => (
-              <TouchableOpacity
-                key={item.dateStr}
-                style={styles.dayButton}
-                onPress={() => setSelectedDate(item.date)}
-              >
-                <Text style={styles.dayText}>{item.day}</Text>
-                <Text
-                  style={{
-                    ...styles.dateText,
-                    backgroundColor:
-                      selectedDate.toISOString().split('T')[0] === item.dateStr
-                        ? COLORS.whiteColors
-                        : COLORS.PRIMARY_COLOR,
-                    color:
-                      selectedDate.toISOString().split('T')[0] === item.dateStr
-                        ? COLORS.PRIMARY_COLOR
-                        : COLORS.whiteColors,
-                  }}
+        <LinearGradient
+          colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT,]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.tabContainer} {...panResponder.panHandlers}
+
+        >
+          <View >
+            <Animated.View style={{ flexDirection: 'row', transform: [{ translateX }] }}>
+              {currentWeek.map((item) => (
+                <TouchableOpacity
+                  key={item.dateStr}
+                  style={styles.dayButton}
+                  onPress={() => setSelectedDate(item.date)}
                 >
-                  {item.num}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </Animated.View>
-        </View>
+                  <Text style={styles.dayText}>{item.day}</Text>
+                  <Text
+                    style={{
+                      ...styles.dateText,
+                      backgroundColor:
+                        selectedDate.toISOString().split('T')[0] === item.dateStr
+                          ? COLORS.whiteColors
+                          : COLORS.PRIMARY_COLOR,
+                      color:
+                        selectedDate.toISOString().split('T')[0] === item.dateStr
+                          ? COLORS.PRIMARY_COLOR
+                          : COLORS.whiteColors,
+                    }}
+                  >
+                    {item.num}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </Animated.View>
+          </View>
+        </LinearGradient>
       </View>
 
       <Wrapper>
@@ -246,7 +255,7 @@ const Calender = ({ navigation }) => {
           />
         ) : (
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 10 }}>
-            <Image  source={IconUri?.Calender} style={{ height: 30, width: 30, resizeMode: 'contain' }} />
+            <Image source={IconUri?.Calender} style={{ height: 30, width: 30, resizeMode: 'contain' }} />
             <MyText style={{ fontSize: calculatefontSize(1.5), color: COLORS.PRIMARY_COLOR }}>No Data Found</MyText>
           </View>
         )}

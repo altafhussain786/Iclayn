@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { useToast } from 'react-native-toast-notifications'
 import { removeToken } from '../../helper/Helpers'
@@ -6,7 +6,7 @@ import ScreenHeader from '../../components/ScreenHeader'
 import Wrapper from '../../components/Wrapper'
 import MyText from '../../components/MyText'
 import { calculatefontSize } from '../../helper/responsiveHelper'
-import { COLORS, fontFamily } from '../../constants'
+import { COLORS, fontFamily, IconUri } from '../../constants'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
 
@@ -51,7 +51,7 @@ const Settings = ({ navigation }) => {
         {
             id: 1,
             title: "Profile",
-            icon: "person-circle-outline",
+            icon: IconUri?.profile,
             screen: "Profile",
             onPress: () => navigation.navigate("Profile")
         },
@@ -65,7 +65,9 @@ const Settings = ({ navigation }) => {
         {
             id: 3,
             title: 'Logout',
-            icon: "log-out-outline",
+            icon: IconUri?.logout,
+
+            // icon: "log-out-outline",
             screen: "Logout",
             onPress: logoutApp
         }
@@ -85,12 +87,13 @@ const Settings = ({ navigation }) => {
                             justifyContent: "space-between",
                             marginVertical: 10,
                             borderBottomWidth: 1,
-                            paddingVertical: 15,
+                            paddingVertical: 5,
                             borderColor: COLORS?.BORDER_LIGHT_COLOR
                         }}>
                             <TouchableOpacity onPress={item.onPress} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-                                <Ionicons name={item.icon} size={25} />
-                                <MyText style={{ fontFamily: fontFamily.regulaer, fontSize: calculatefontSize(2.3) }}>{item.title}</MyText>
+                                <Image source={item.icon} style={{ height: 25, width: 25 }} />
+                                {/* <Ionicons name={item.icon} size={25} /> */}
+                                <MyText style={{ fontFamily: fontFamily.regulaer, fontSize: calculatefontSize(1.9) }}>{item.title}</MyText>
                             </TouchableOpacity>
                         </View>
                     )}

@@ -23,6 +23,7 @@ import httpRequest from '../../../api/apiHandler';
 import moment from 'moment';
 import { Swipeable } from 'react-native-gesture-handler';
 import TimekeeperModal from '../../../components/TimekeeperModal';
+import LinearGradient from 'react-native-linear-gradient';
 
 const Tasks = ({ navigation }) => {
   const [tabs, setTabs] = React.useState('All');
@@ -126,7 +127,14 @@ const Tasks = ({ navigation }) => {
       <ScreenHeader onPress={() => { navigation.navigate("Settings") }} isShowTitle={true} title="Tasks" />
 
       {/* Scrollable Tabs */}
-      <View style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}>
+      <LinearGradient
+                          colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT,]}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 0 }}
+                          style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}
+      
+                        >
+      <View >
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -165,6 +173,7 @@ const Tasks = ({ navigation }) => {
           }}
         />
       </View>
+      </LinearGradient>
       <Wrapper>
         {/* Search Row */}
         <View
