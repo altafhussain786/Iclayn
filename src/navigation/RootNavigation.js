@@ -20,6 +20,8 @@ import CreateMatter from '../screens/tabs/matters/screens/CreateMatter';
 import CreateTask from '../screens/tabs/tasks/screens/CreateTask';
 import TaskDocuments from '../screens/tabs/tasks/screens/taskDocuments/TaskDocuments';
 import TaskFiles from '../screens/tabs/tasks/screens/taskDocuments/TaskFiles';
+import Activities from '../screens/tabs/activities/Activities';
+import Bills from '../screens/tabs/bills/Bills';
 
 
 
@@ -52,7 +54,10 @@ const RootNavigation = () => {
         <Stack.Screen name="ForgetPassword" component={ForgetPassword} />
         <Stack.Screen name="BottomTabNavigation" component={BottomTabNavigation} />
         <Stack.Screen name="Settings" component={Settings} />
+        <Stack.Screen name="Activities" component={Activities} />
+        <Stack.Screen name="Bills" component={Bills} />
 
+        
         {/* //Matters  */}
         <Stack.Screen name="Event" component={Event} />
         <Stack.Screen name="CreateMatter" component={CreateMatter} />

@@ -1,9 +1,11 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Feather from 'react-native-vector-icons/Feather';
+import { IconUri } from '../constants';
 
 const FloatingButton = ({
+
   icon = 'plus',                // Default icon
   onPress,                    // Optional custom onPress
   navigateTo,                 // Optional: name of screen to navigate
@@ -18,7 +20,7 @@ const FloatingButton = ({
 
   const handlePress = () => {
     console.log("pressed");
-    
+
     // if (onPress) {
     //   onPress();
     // } else if (navigateTo && navigation?.navigate) {
@@ -33,14 +35,17 @@ const FloatingButton = ({
         styles.fab,
         {
           backgroundColor,
-          width: size,
-          height: size,
+
           borderRadius: size / 2,
         },
         style,
       ]}
     >
-      <Feather name={icon} size={iconSize} color={iconColor} />
+      <Image source={IconUri?.add} style={{
+        width: size,
+        height: size,
+      }} />
+      {/* <Feather name={icon} size={iconSize} color={iconColor} /> */}
     </TouchableOpacity>
   );
 };

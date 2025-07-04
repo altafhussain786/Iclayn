@@ -1,4 +1,4 @@
-import {  StyleSheet, Image, Alert, BackHandler } from 'react-native';
+import { StyleSheet, Image, Alert, BackHandler } from 'react-native';
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -15,6 +15,7 @@ import { responsiveHeight as hp } from "react-native-responsive-dimensions";
 import Tasks from '../screens/tabs/tasks/Tasks';
 import { useFocusEffect } from '@react-navigation/native';
 import Matters from '../screens/tabs/matters/Matters';
+import More from '../screens/tabs/more/More';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -23,40 +24,40 @@ const BottomTabNavigation = () => {
 
   useFocusEffect(
     React.useCallback(() => {
-        const backAction = () => {
-            Alert.alert('Hold on!', 'Are you sure you want to exit the app?', [
-                {
-                    text: 'Cancel',
-                    onPress: () => null,
-                    style: 'cancel',
-                },
-                { text: 'YES', onPress: () => BackHandler.exitApp() },
-            ]);
-            return true;
-        };
+      const backAction = () => {
+        Alert.alert('Hold on!', 'Are you sure you want to exit the app?', [
+          {
+            text: 'Cancel',
+            onPress: () => null,
+            style: 'cancel',
+          },
+          { text: 'YES', onPress: () => BackHandler.exitApp() },
+        ]);
+        return true;
+      };
 
-        const backHandler = BackHandler.addEventListener(
-            'hardwareBackPress',
-            backAction
-        );
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        backAction
+      );
 
-        return () => backHandler.remove();
+      return () => backHandler.remove();
     }, [])
-);
+  );
 
 
   const getTabIcon = (routeName, focused) => {
     switch (routeName) {
       case "Home":
         return IconUri?.Home;
-      case "Bills":
-        return IconUri?.Bills;
+      case "More":
+        return IconUri?.more;
       case "Calender":
         return IconUri?.Calender;
       case "Matters":
-        return IconUri?.Activities;
+        return IconUri?.clock;
       case "Tasks":
-        return IconUri?.Tasks;
+        return IconUri?.task;
       default:
         return null;
     }
@@ -75,9 +76,10 @@ const BottomTabNavigation = () => {
               <Image
                 source={iconSource}
                 style={{
-                  width: 20,
-                  height: 20,
-                  tintColor: focused ? COLORS.PRIMARY_COLOR_LIGHT : '#a1a1a1',
+                  width: 25,
+                  height: 25,
+                  opacity: focused ? 1 : 0.5,
+                  // tintColor: focused ? COLORS.PRIMARY_COLOR_LIGHT : '#a1a1a1',
                 }}
                 resizeMode="contain"
               />
@@ -92,7 +94,7 @@ const BottomTabNavigation = () => {
         {/* <Tab.Screen name="Activities" component={Activities} /> */}
         <Tab.Screen name="Matters" component={Matters} />
         <Tab.Screen name="Tasks" component={Tasks} />
-        <Tab.Screen name="Bills" component={Bills} />
+        <Tab.Screen name="More" component={More} />
       </Tab.Navigator>
     </>
   );

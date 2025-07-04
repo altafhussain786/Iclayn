@@ -14,6 +14,7 @@ import httpRequest from '../../../api/apiHandler';
 import Loader from '../../../components/Loader';
 import { formatNumber } from '../../../helper/Helpers';
 import moment from 'moment';
+import TimekeeperModal from '../../../components/TimekeeperModal';
 
 const Activities = ({ navigation }) => {
   const [tabs, setTabs] = React.useState("Time entries");
@@ -21,13 +22,15 @@ const Activities = ({ navigation }) => {
   const [filteredData, setFilteredData] = React.useState([]);
   const [searchText, setSearchText] = useState(''); // ✅ for search
   const [loader, setLoader] = React.useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+
 
 
   const getActivityData = async () => {
     setLoader(true)
     const { res, err } = await httpRequest({
       method: 'get',
-           navigation:navigation,
+      navigation: navigation,
       path: tabs === "Time entries" ? `/ic/matter/time-entry/` : `/ic/matter/exp-entry/`
     })
     if (res) {
@@ -64,7 +67,7 @@ const Activities = ({ navigation }) => {
   return (
     <>
 
-      <ScreenHeader onPress={() => { navigation.navigate("Settings") }} isShowTitle={true} title='Activities' />
+      <ScreenHeader isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title='Activities' />
       <View style={styles.tabContainer}>
         {["Time entries", "Expenses"].map((item) => (
           <TouchableOpacity
@@ -96,7 +99,7 @@ const Activities = ({ navigation }) => {
           />
           <Image
             source={IconUri?.CalenderSearch}
-            style={{ height: 25, width: 25, resizeMode: "contain" }}
+            style={{ height: 30, width: 30, resizeMode: "contain" }}
           />
         </View>
         {/* ///RENDER ITEM =====================> */}
@@ -142,17 +145,21 @@ const Activities = ({ navigation }) => {
             />
             :
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 10 }}>
-              <Image tintColor={COLORS.PRIMARY_COLOR} source={IconUri?.Activities} style={{ height: 30, width: 30, resizeMode: "contain" }} />
+              <Image source={IconUri?.Activitie} style={{ height: 30, width: 30, resizeMode: "contain" }} />
               <MyText style={{ fontSize: calculatefontSize(1.5), color: COLORS.PRIMARY_COLOR }}>No Data Found</MyText>
             </View>
         }
+        {/* Floating Button */}
         <FloatingButton
+          style={{ marginBottom: 40 }}
+          onPress={() => setModalVisible(true)}
           icon="plus"
           navigateTo="CreateScreen"
           backgroundColor={COLORS.PRIMARY_COLOR_LIGHT}
           size={50}
           iconSize={25}
         />
+        <TimekeeperModal navigation={navigation} visible={modalVisible} onClose={() => setModalVisible(false)} />
       </Wrapper>
     </>
   )

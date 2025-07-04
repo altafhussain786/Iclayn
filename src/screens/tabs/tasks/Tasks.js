@@ -182,7 +182,7 @@ const Tasks = ({ navigation }) => {
           />
           <Image
             source={IconUri?.CalenderSearch}
-            style={{ height: 25, width: 25, resizeMode: 'contain' }}
+            style={{ height: 30, width: 30, resizeMode: 'contain' }}
           />
         </View>
 

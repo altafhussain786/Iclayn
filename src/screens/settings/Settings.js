@@ -12,6 +12,34 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 
 const Settings = ({ navigation }) => {
     const toast = useToast()
+    // const logoutApp = async () => {
+    //     setLoader(true)
+    //     const { res, err } = await httpRequest({
+    //         method: "get",
+    //         path: `/ic/auth/logout`,
+    //         navigation: navigation,
+
+    //     })
+    //     if (res) {
+    //         console.log(res, "=========================LOGOUT APP");
+
+    //         const remove = await removeToken();
+    //         if (remove === "SUCCESS") {
+    //             setLoader(false)
+
+    //             toast.show("Logout successfully", { type: "success" })
+    //             navigation.reset({ index: 0, routes: [{ name: "Login" }] })
+    //         }
+    //         setLoader(false)
+
+    //     }
+    //     else {
+    //         setLoader(false)
+
+    //         console.log(err, "err");
+
+    //     }
+    // }
     const logoutApp = async () => {
         const remove = await removeToken();
         if (remove === "SUCCESS") {
@@ -44,7 +72,7 @@ const Settings = ({ navigation }) => {
     ]
     return (
         <>
-            <ScreenHeader isGoBack={true} leftIcon="left" onPress={() => navigation.goBack()} title='Settings' />
+            <ScreenHeader isShowTitle={true} isGoBack={true} leftIcon="left" onPress={() => navigation.goBack()} title='Settings' />
             <Wrapper>
                 <FlatList
                     removeClippedSubviews={false}

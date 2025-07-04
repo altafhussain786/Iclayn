@@ -217,7 +217,7 @@ const Bills = ({ navigation }) => {
 
   return (
     <>
-      <ScreenHeader onPress={() => { navigation.navigate("Settings") }} isShowTitle={true} title="Bills" />
+      <ScreenHeader isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="Bills" />
 
       {/* Scrollable Tabs */}
       <View style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}>
@@ -244,7 +244,7 @@ const Bills = ({ navigation }) => {
           />
           <Image
             source={IconUri?.CalenderSearch}
-            style={{ height: 25, width: 25, resizeMode: 'contain' }}
+            style={{ height: 30, width: 30, resizeMode: 'contain' }}
           />
         </View>
 
@@ -317,6 +317,7 @@ const Bills = ({ navigation }) => {
 
         {/* Floating Button */}
         <FloatingButton
+         style={{ marginBottom: 40 }}
           onPress={() => setModalVisible(true)}
           icon="plus"
           navigateTo="CreateScreen"

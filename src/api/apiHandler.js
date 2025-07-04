@@ -64,7 +64,7 @@ const httpRequest = async ({
     params = null,
     baseUrl = API_URL,
 }) => {
-    const token = await AsyncStorage.getItem("access_token");
+    let token = await AsyncStorage.getItem("access_token");
     // console.log(token,"==");
 
     const headers = {
@@ -75,7 +75,7 @@ const httpRequest = async ({
     try {
         let response;
         const endPoint = `${baseUrl}${path}`;
-        console.log(endPoint, "BASEL URL ====================>");
+        console.log(endPoint, "BASEL URL ====================>",token);
 
 
         if (["post", "put", "patch", "delete"].includes(method)) {

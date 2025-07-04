@@ -5,8 +5,8 @@ import {
     responsiveFontSize
 } from "react-native-responsive-dimensions";
 //
-// export const API_URL = 'http://149.107.116.212:8000'; // local
-export const API_URL = 'https://api.iclayn.com:8443'; // Live
+export const API_URL = 'http://149.107.116.212:8000'; // local
+// export const API_URL = 'https://api.iclayn.com:8443'; // Live
 export const BASE_URL = 'https://api.iclayn.com';
 export const X_TENANT_ID = "5024000001";
 
@@ -84,8 +84,8 @@ export const ImageUri = {
     logo: require('../assets/Images/bgimage.png'),
 }
 export const IconUri = {
-    Home: require('../assets/Icons/Home.png'),
-    Calender: require('../assets/Icons/Calender.png'),
+    Home: require('../assets/Icons/home1.png'),
+    // clock: require('../assets/Icons/Calender.png'),
     Activities: require('../assets/Icons/Activities.png'),
     Bills: require('../assets/Icons/Bills.png'),
     Tasks: require('../assets/Icons/Tasks.png'),
@@ -95,6 +95,21 @@ export const IconUri = {
     //New
     CalenderColor: require('../assets/Icons/CalenderColor.png'),
     CalenderSearch: require('../assets/Icons/CalenderSearch.png'),
+
+    //3d icons
+    bill: require('../assets/Icons/bill.png'),
+    Calender: require('../assets/Icons/calendarN.png'),
+    clock: require('../assets/Icons/clock.png'),
+    task: require('../assets/Icons/task.png'),
+    more: require('../assets/Icons/more.png'),
+    add: require('../assets/Icons/add.png'),
+
+    communication: require('../assets/Icons/communication.png'),
+    documents: require('../assets/Icons/documents.png'),
+    parties: require('../assets/Icons/parties.png'),
+    report: require('../assets/Icons/report.png'),
+    Activitie: require('../assets/Icons/Activitie.png'),
+    settings: require('../assets/Icons/settings.png'),
 }
 
 
