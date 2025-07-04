@@ -103,6 +103,7 @@ export const IconUri = {
     task: require('../assets/Icons/task.png'),
     more: require('../assets/Icons/more.png'),
     add: require('../assets/Icons/add.png'),
+    search: require('../assets/Icons/search.png'),
 
     communication: require('../assets/Icons/communication.png'),
     documents: require('../assets/Icons/documents.png'),

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import { COLORS, fontFamily } from '../constants';
+import { COLORS, fontFamily, IconUri } from '../constants';
 import { calculatefontSize } from '../helper/responsiveHelper';
 
 
@@ -31,7 +31,7 @@ const SearchBar = ({
             onChangeText(text);
         }
     };
-       const handleClear = () => {
+    const handleClear = () => {
         setInternalValue('');
         if (onChangeText) {
             onChangeText('');
@@ -42,7 +42,8 @@ const SearchBar = ({
     };
     return (
         <View style={[styles.container, containerStyle]}>
-            <AntDesign name="search1" size={iconSize} color={iconColor} style={styles.icon} />
+            <Image source={IconUri?.search} style={{ height: 20, width: 20, resizeMode: 'contain' }} />
+            {/* <AntDesign name="search1" size={iconSize} color={iconColor} style={styles.icon} /> */}
             <TextInput
                 value={value}
                 onChangeText={onChangeText}
