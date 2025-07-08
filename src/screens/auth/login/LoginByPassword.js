@@ -3,7 +3,7 @@ import React from 'react'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import MyText from '../../../components/MyText'
-import { API_URL, BASE_URL, COLORS, X_TENANT_ID } from '../../../constants'
+import { API_URL, BASE_URL, COLORS, IconUri, X_TENANT_ID } from '../../../constants'
 import { calculatefontSize } from '../../../helper/responsiveHelper'
 import InputText from '../../../components/InputText'
 import TouchableButton from '../../../components/TouchableButton'
@@ -83,6 +83,7 @@ const LoginByPassword = ({ navigation, route }) => {
                         <View style={{ marginVertical: 20, flexDirection: 'row', alignItems: "center", justifyContent: 'space-between' }}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                                 <Icon name={'email'} size={22} color={COLORS.LIGHT_COLOR} />
+                                {/* <Image style={{ height: 22, width: 22 }} source={IconUri?.mail} /> */}
                                 <MyText style={{ color: COLORS?.whiteColors, fontSize: calculatefontSize(1.9) }}>{email}</MyText>
 
                             </View>

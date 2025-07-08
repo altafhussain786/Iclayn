@@ -5,8 +5,8 @@ import {
     responsiveFontSize
 } from "react-native-responsive-dimensions";
 //
-// export const API_URL = 'http://149.107.116.212:8000'; // local
-export const API_URL = 'https://api.iclayn.com:8443'; // Live
+export const API_URL = 'http://149.107.116.212:8000'; // local
+// export const API_URL = 'https://api.iclayn.com:8443'; // Live
 export const BASE_URL = 'https://api.iclayn.com';
 export const X_TENANT_ID = "5024000001";
 
@@ -109,6 +109,7 @@ export const IconUri = {
     logout: require('../assets/Icons/logout.png'),
     checkmark: require('../assets/Icons/checkmark.png'),
     client: require('../assets/Icons/client.png'),
+    mail: require('../assets/Icons/mail.png'),
 
     communication: require('../assets/Icons/communication.png'),
     documents: require('../assets/Icons/documents.png'),

@@ -30,25 +30,25 @@ const TimekeeperModal = ({ visible, onClose, navigation }) => {
     const [startTime, setStartTime] = useState(null);
     const intervalRef = useRef(null);
     const options = [
-        { label: 'Matter', icon: 'briefcase', onPress: () => navigation.navigate("CreateMatter"),iconName: IconUri?.matter },
-        { label: 'Task', icon: 'check-square', onPress: () => navigation.navigate("CreateTask"),iconName: IconUri?.task  },
-        { label: 'Event', icon: 'calendar', onPress: () => navigation.navigate("Event"),iconName: IconUri?.Calender  },
-        { label: 'Time entry', icon: 'clock-o', onPress: () => navigation.navigate(""),iconName: IconUri?.clock  },
-        { label: 'Expense', icon: 'file-text', onPress: () => navigation.navigate(""),iconName: IconUri?.matter  },
+        { label: 'Matter', icon: 'briefcase', onPress: () => navigation.navigate("CreateMatter"), iconName: IconUri?.matter },
+        { label: 'Task', icon: 'check-square', onPress: () => navigation.navigate("CreateTask"), iconName: IconUri?.task },
+        { label: 'Event', icon: 'calendar', onPress: () => navigation.navigate("Event"), iconName: IconUri?.Calender },
+        { label: 'Time entry', icon: 'clock-o', onPress: () => navigation.navigate(""), iconName: IconUri?.clock },
+        { label: 'Expense', icon: 'file-text', onPress: () => navigation.navigate(""), iconName: IconUri?.matter },
     ];
 
-        
- 
-    
-        useEffect(() => {
-            loadTimer();
-        }, []);
+
+
+
+    useEffect(() => {
+        loadTimer();
+    }, []);
 
     // useEffect(() => {
     //     if (visible) {
     //         loadTimer();
     //     }
-       
+
     // }, [visible]);
 
     useEffect(() => {
@@ -93,8 +93,8 @@ const TimekeeperModal = ({ visible, onClose, navigation }) => {
             startTime,
             ...extra,
         };
-        console.log(data,"Timmer modal");
-        
+        console.log(data, "Timmer modal");
+
         await AsyncStorage.setItem(TIMER_KEY, JSON.stringify(data));
     };
 
@@ -147,14 +147,22 @@ const TimekeeperModal = ({ visible, onClose, navigation }) => {
                                 ● {description} ({matter})
                             </Text>
                         </View>
+
                         <TouchableOpacity onPress={() => { onClose(), navigation.navigate("TimmerDetails") }}>
                             <Text style={styles.addDetails}>Add details</Text>
                         </TouchableOpacity>
                     </View>
+                    <TouchableOpacity onPress={toggleTimer} >
+                        <LinearGradient
+                            start={{ x: 1, y: 0 }}
+                            end={{ x: 0, y: 1 }}
+                            colors={[COLORS?.PRIMARY_COLOR_LIGHT, COLORS?.PRIMARY_COLOR]}
+                            style={styles.timerBar}
+                        >
 
-                    <TouchableOpacity onPress={toggleTimer} style={styles.timerBar}>
-                        <FontAwesome name={isRunning ? 'pause' : 'play'} size={16} color="white" />
-                        <Text style={styles.timerText}>{formatTime(duration)}</Text>
+                            <FontAwesome name={isRunning ? 'pause' : 'play'} size={16} color="white" />
+                            <Text style={styles.timerText}>{formatTime(duration)}</Text>
+                        </LinearGradient>
                     </TouchableOpacity>
 
                     <Text style={styles.sectionTitle}>Create new</Text>
@@ -173,10 +181,10 @@ const TimekeeperModal = ({ visible, onClose, navigation }) => {
                                     style={styles.optionItem}
                                     > */}
                                 <TouchableOpacity style={styles.optionItem} onPress={() => { onClose(), item.onPress() }} >
-                                    <Image source={item.iconName} style={{ height: 40, width: 50,resizeMode:"contain" }} />
+                                    <Image source={item.iconName} style={{ height: 40, width: 50, resizeMode: "contain" }} />
                                     {/* <FontAwesome name={item.icon} size={30} color="#B6F0E2" /> */}
                                 </TouchableOpacity>
-                            {/* </LinearGradient> */}
+                                {/* </LinearGradient> */}
                                 <Text style={styles.optionLabel}>{item.label}</Text>
                             </View>
                         )}
@@ -256,7 +264,7 @@ const styles = StyleSheet.create({
         // backgroundColor: '#007E7B',
         // padding: 15,
         // paddingTop: 20,
-        
+
         borderRadius: 8,
         width: 80,
         alignItems: 'center',

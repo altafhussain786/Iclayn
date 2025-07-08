@@ -15,210 +15,69 @@ import { calculatefontSize } from '../../../helper/responsiveHelper';
 import MyText from '../../../components/MyText';
 
 // Icons
-import Entypo from 'react-native-vector-icons/Entypo';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import Wrapper from '../../../components/Wrapper';
 import SearchBar from '../../../components/SearchBar';
 import FloatingButton from '../../../components/FloatingButton';
 import httpRequest from '../../../api/apiHandler';
-import { formatNumber } from '../../../helper/Helpers';
 import moment from 'moment';
-import { useToast } from 'react-native-toast-notifications';
-import Loader from '../../../components/Loader';
 import TimekeeperModal from '../../../components/TimekeeperModal';
 import LinearGradient from 'react-native-linear-gradient';
 
 const Bills = ({ navigation }) => {
-  const [tabs, setTabs] = React.useState('Upcoming');
+  const [tabs, setTabs] = React.useState('All');
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const tabList = ['Upcoming', 'Overdue', 'No due date', 'Completed', 'Archived', 'Delegated'];
+  const tabList = ['All', 'Open', 'Pending', 'Closed',];
+
   const [data, setData] = useState([])
   const [refreshing, setRefreshing] = useState(false); // ✅ for refresh
   const [searchText, setSearchText] = useState(''); // ✅ for search
   const [filteredData, setFilteredData] = useState([]);
-  const [clients, setClients] = useState([]);
-  const [isLoader, setIsLoader] = useState(false);
-      const [modalVisible, setModalVisible] = useState(false);
-  
-  const toast = useToast();
-
-  const [clientsStates, setClientsStates] = useState({
-    loader: false,
-    allClients: [],
-  });
-  const fetchClients = async () => {
-    setClientsStates(prev => ({ ...prev, loader: true }));
-
-    const { res, err } = await httpRequest({ path: "/ic/client/", method: "get", navigation: navigation, });
-    if (res) {
-      const data = res?.data?.map(v => ({
-        label: v.companyName || `${v?.firstName} ${v?.lastName}`,
-        value: v?.clientId,
-      }));
-      setClientsStates(prev => ({ ...prev, allClients: data }));
-    } else {
-      toast.show(err?.message, { type: 'danger' })
-    }
-    setClientsStates(prev => ({ ...prev, loader: false }));
-  };
-
-  useEffect(() => {
-    fetchClients();
-  }, []);
-
-  const fetchBills = async () => {
-    setIsLoader(true);
-    try {
-      let newRecords = [];
-      // Fetch bill data
-      const billResponse = await httpRequest({
-        path: "/ic/matter/bill/",
-        method: "get",
-        navigation: navigation,
-      });
-      if (billResponse.res) {
-        const billData = billResponse.res.data.map(v => ({
-          id: v.matterBillId,
-          issueDate: v.createdOn,
-          type: "Bill",
-          status: v.status,
-          dueDate: v.dueDate,
-          clientName: v.toFirstName + " " + v.toLastName,
-          paymentDate: v.paymentDate,
-          balance: v.balance,
-          clientIds: null,
-        }));
-        newRecords = [...newRecords, ...billData];
-      }
-      // Fetch funds data
-      const fundsResponse = await httpRequest({
-        path: "/ic/matter/client-fund/",
-        method: "get",
-        navigation: navigation,
-      });
-      if (fundsResponse.res) {
-        const fundsData = fundsResponse.res.data.map(v => {
-          const clientName = clientsStates.allClients
-            .filter(client => (v.clientIds || "").split(",").includes(String(client.value)))
-            .map(v => v.label)
-            .join(", ");
-          return {
-            id: v.matterClientFundId,
-            issueDate: v.createdOn,
-            type: "Client Funds",
-            status: v.status,
-            dueDate: v.dueDate,
-            clientName: clientName,
-            paymentDate: null,
-            balance: String(v.amount) || null,
-            clientIds: v.clientIds,
-          };
-        });
-        newRecords = [...newRecords, ...fundsData];
-      }
-      if (newRecords.length > 0) {
-        setFilteredData(newRecords);
-        setData(newRecords);
-        setIsLoader(false);
-
-
-      }
-      // Show errors if any
-
-      if (billResponse.err) toast.show(billResponse.err, { type: 'danger' });
-      if (fundsResponse.err) toast.show(fundsResponse.er, { type: 'danger' });
-    } catch (error) {
-      toast.show("Failed to fetch bildls", { type: 'danger' })
-    } finally {
-      setIsLoader(false);
-    }
-  };
-  useEffect(() => {
-
-    // setData([]);
-    fetchBills();
-  }, [clientsStates]);
   const getBills = async () => {
+    const { res, err } = await httpRequest({
+      method: 'get',
+      path: `/ic/matter/bill/`,
+      navigation: navigation,
+    })
+    if (res) {
+      console.log(res, "===============dd==d==============>");
+      setFilteredData(res?.data);
 
-    try {
-      const [billRes, clientRes, matterBill] = await Promise.all([
-        httpRequest({ method: 'get', path: `/ic/matter/client-fund/` }),
-        httpRequest({ method: 'get', path: `/ic/client/` }), // Replace with actual client endpoint
-        httpRequest({ method: 'get', path: `/ic/matter/bill/` }), // Replace with actual client endpoint
-      ]);
-
-      console.log(billRes, "BILL RESPO");
-      console.log(clientRes, "clientRes RESPO");
-      console.log(matterBill, "Matter bill RESPOd");
-
-      if (billRes?.res && clientRes?.res && matterBill?.res) {
-        const clientList = clientRes.res.data;
-
-        // Transform bill data
-        const mappedBillData = billRes.res.data.map(bill => {
-          const client = clientList.find(c => c.clientId?.toString() === bill.clientIds);
-          console.log();
-
-          return {
-            ...bill,
-            clientName: client?.firstName + ' ' + client?.lastName || 'Unknown',
-            type: "Client Funds"
-          };
-        });
-
-        // Transform matter bill data to match keys
-        const transformedMatterBillData = matterBill.res.data.map(m => {
-
-
-          const client = clientList.find(c => c.clientId?.toString() === m.clientIds);
-          return {
-            ...m,
-            clientName: (m?.toFirstName + ' ' + m?.toLastName) || (client?.firstName + ' ' + client?.lastName) || 'Unknown',
-            issueDate: m.issueDate || m.createdAt || new Date(),
-            dueDate: m.dueDate || new Date(),
-            amount: m.amount || 0,
-            status: m.status || 'Pending',
-            type: "Bill"
-
-          };
-        });
-
-        const mergedData = [...mappedBillData, ...transformedMatterBillData];
-
-        setData(mergedData);
-        setFilteredData(mergedData);
-      }
-    } catch (err) {
-      console.log('Fetching error:', err);
+      setData(res?.data)
     }
-  };
+    else {
+      console.log("err=================", err);
+    }
+  }
 
-  // useEffect(() => {
-  //   getBills()
-  // }, [])
+  useEffect(() => {
+    getBills()
+  }, [])
 
   // ✅ Search logic
   useEffect(() => {
-    setIsLoader(true);
-    if (searchText === '') {
-      setIsLoader(false);
-      setFilteredData(data);
-    } else {
-      const filtered = data.filter(item =>
-        (item?.type + item?.clientName)
+    let filtered = [...data];
+
+    // Filter based on tab
+    // if (tabs !== 'All') {
+    //     filtered = filtered.filter(item => item.status?.toLowerCase() === tabs.toLowerCase());
+    // }
+
+    // Filter based on search
+    if (searchText !== '') {
+      filtered = filtered.filter(item =>
+        (item?.name + item?.code + item?.matterName)
           .toLowerCase()
           .includes(searchText.toLowerCase())
       );
-      setFilteredData(filtered);
-      setIsLoader(false);
-
     }
-  }, [searchText, data]);
 
+    setFilteredData(filtered);
+  }, [searchText, data, tabs]);
 
   return (
     <>
-      <ScreenHeader isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="Bills" />
+      <ScreenHeader onPress={() => { navigation.navigate("Settings") }} isShowTitle={true} title="Bills" />
 
       {/* Scrollable Tabs */}
       <LinearGradient
@@ -228,17 +87,50 @@ const Bills = ({ navigation }) => {
         style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}
 
       >
-        <View >
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10, opacity: 0.8, backgroundColor: COLORS?.PRIMARY_COLOR, borderRadius: 10 }}>
-            <MyText style={{ color: COLORS?.whiteColors, fontWeight: '400', fontSize: calculatefontSize(1.7) }}>All matters</MyText>
-            <AntDesign name={'down'} size={20} color={COLORS?.whiteColors} />
-          </View>
+        <View
+        //  style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}
+        >
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={data}
+
+            renderItem={({ item, i }) => {
+              return (
+                <>
+                  <TouchableOpacity
+                    key={item}
+                    style={[
+                      styles.tab,
+
+                      {
+                        opacity: tabs === item ? 1 : 0.5,
+                        backgroundColor:
+                          COLORS.PRIMARY_COLOR
+                      },
+                    ]}
+                    onPress={() => setTabs(item)}
+                  >
+                    <MyText
+                      style={{
+
+                        color: '#fff',
+                        fontWeight: '600',
+                        fontSize: calculatefontSize(1.7),
+                      }}
+                      numberOfLines={1}
+                    >
+                      {item}
+                    </MyText>
+                  </TouchableOpacity>
+                </>
+              )
+            }}
+          />
         </View>
       </LinearGradient>
-
       <Wrapper>
         {/* Search Row */}
-        
         <View
           style={{
             flexDirection: 'row',
@@ -259,17 +151,14 @@ const Bills = ({ navigation }) => {
         </View>
 
         {/* Task List */}
-        {isLoader ? <Loader /> : filteredData?.length > 0 ? <FlatList
+        {filteredData?.length > 0 ? <FlatList
           showsVerticalScrollIndicator={false}
           data={filteredData}
           keyExtractor={(item, index) => index.toString()}
           contentContainerStyle={{ paddingBottom: 100 }}
           renderItem={({ item, index }) => {
-            console.log(item, 'billl itration ====d=======>');
-
             return (
-
-              <View
+              <TouchableOpacity onPress={() => navigation.navigate('MatterDetails', { matterData: item })}
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
@@ -281,18 +170,19 @@ const Bills = ({ navigation }) => {
                 }}
               >
                 <View style={{ gap: 5, width: "65%" }}>
-                  <MyText style={styles.timeColor}>Issue {moment(item?.issueDate).format('DD-MM-YYYY')}</MyText>
-                  {item?.clientName && <MyText style={[styles.txtStyle, { fontWeight: '300' }]}>
-                    {item?.clientName} - {item?.type}
-                  </MyText>}
-                  <MyText style={[styles.timeColor,]}>Overdue {moment(item?.dueDate).fromNow()}</MyText>
+                  <MyText style={styles.timeColor}>Open {moment(item?.openDate).format('DD-MM-YYYY')}</MyText>
+                  <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300', }]}>
+                    {item?.name}
+                  </MyText>
+                  <MyText style={styles.timeColor}>{item?.clientNames}</MyText>
                 </View>
                 <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
-                  <MyText style={[styles.txtStyle, { fontWeight: '300', }]}>
-                    {formatNumber(Number(item?.balance))}
-                  </MyText>                  <View
+
+                  <View
                     style={{
-                      backgroundColor: item?.status === 'PENDING' ? COLORS?.PRIMARY_COLOR : '#ffc2cd',
+                      backgroundColor: item?.status == "Open" ? '#EFE4FF' : '#ffc2cd',
+                      borderWidth: 1,
+                      borderColor: item?.status == "COMPLETED" ? '#7C4EC9' : '#6c0014',
                       // alignSelf: 'flex-end',
                       borderRadius: 5,
                       paddingHorizontal: 8,
@@ -303,7 +193,7 @@ const Bills = ({ navigation }) => {
                       style={{
                         // fontWeight: '600',
                         // textAlign: 'center',
-                        color: item?.status === 'PENDING' ? COLORS?.whiteColors : '#6c0014',
+                        color: item?.status == "COMPLETED" ? COLORS?.whiteColors : '#6c0014',
                         fontSize: calculatefontSize(1.4),
                       }}
                     >
@@ -311,24 +201,24 @@ const Bills = ({ navigation }) => {
                     </MyText>
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           }}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={fetchBills} />
+            <RefreshControl refreshing={refreshing} onRefresh={getBills} />
           }
-        /> :
-          <>
-            <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 10 }}>
-              <Image tintColor={COLORS.PRIMARY_COLOR} source={IconUri?.Bills} style={{ height: 30, width: 30, resizeMode: "contain" }} />
-              <MyText style={{ fontSize: calculatefontSize(1.5), color: COLORS.PRIMARY_COLOR }}>No Bill Found</MyText>
-            </View>
-          </>
+        />
+          :
+          <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 10 }}>
+            <Image source={IconUri?.task} style={{ height: 50, width: 50, resizeMode: "contain" }} />
+            <MyText style={{ fontSize: calculatefontSize(1.5), color: COLORS.PRIMARY_COLOR }}>No Data Found</MyText>
+          </View>
         }
+
+
 
         {/* Floating Button */}
         <FloatingButton
-         style={{ marginBottom: 40 }}
           onPress={() => setModalVisible(true)}
           icon="plus"
           navigateTo="CreateScreen"
