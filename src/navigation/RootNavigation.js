@@ -23,6 +23,11 @@ import TaskFiles from '../screens/tabs/tasks/screens/taskDocuments/TaskFiles';
 import Activities from '../screens/tabs/activities/Activities';
 import Bills from '../screens/tabs/bills/Bills';
 import Clients from '../screens/clients/Clients';
+import Parties from '../screens/more/parties/Parties';
+import Documents from '../screens/more/documents/Documents';
+import Communications from '../screens/more/communications/Communications';
+import AppSettings from '../screens/more/appSettings/AppSettings';
+import Reports from '../screens/more/reports/Reports';
 
 
 
@@ -70,6 +75,13 @@ const RootNavigation = () => {
         <Stack.Screen name="CreateTask" component={CreateTask} />
         <Stack.Screen name="TaskDocuments" component={TaskDocuments} />
         <Stack.Screen name="TaskFiles" component={TaskFiles} />
+
+        {/* //more  */}
+        <Stack.Screen name="Parties" component={Parties} />
+        <Stack.Screen name="Documents" component={Documents} />
+        <Stack.Screen name="Communications" component={Communications} />
+        <Stack.Screen name="AppSettings" component={AppSettings} />
+        <Stack.Screen name="Reports" component={Reports} />
 
 
 

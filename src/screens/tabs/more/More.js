@@ -22,7 +22,7 @@ const More = ({ navigation }) => {
         { type: "Documents", icon: IconUri?.documents, screenName: "Documents" },
         { type: "Communications", icon: IconUri?.communication, screenName: "Communications" },
         { type: "Reports", icon: IconUri?.report, screenName: "Reports" },
-        { type: "Settings", icon: IconUri?.settings, screenName: "Settings" },
+        { type: "Settings", icon: IconUri?.settings, screenName: "AppSettings" },
 
     ];
 

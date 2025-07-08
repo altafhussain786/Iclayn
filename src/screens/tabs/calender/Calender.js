@@ -88,6 +88,8 @@ const Calender = ({ navigation }) => {
     setLoader(false);
   };
 
+
+
   useEffect(() => {
     getCalenderData();
   }, [selectedDate]);
@@ -122,8 +124,22 @@ const Calender = ({ navigation }) => {
     new Date(new Date().setDate(new Date().getDate() + weekOffset * 7))
   );
 
+  // useEffect(() => {
+  //   setSelectedDate(currentWeek[3].date); // default center day
+  // }, [weekOffset]);
   useEffect(() => {
-    setSelectedDate(currentWeek[3].date); // default center day
+    const today = new Date();
+    const startOfWeek = getStartOfWeek(today);
+    const endOfWeek = getToDate(today);
+
+    const currentCenterDate = currentWeek[3].date;
+
+    // If we are in current week, set today's date
+    if (currentCenterDate >= startOfWeek && currentCenterDate <= endOfWeek) {
+      setSelectedDate(today);
+    } else {
+      setSelectedDate(currentCenterDate); // center date of week
+    }
   }, [weekOffset]);
 
   const handleSwipe = (direction) => {

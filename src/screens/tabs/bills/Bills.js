@@ -27,7 +27,7 @@ const Bills = ({ navigation }) => {
   const [tabs, setTabs] = React.useState('All');
   const [modalVisible, setModalVisible] = useState(false);
 
-  const tabList = ['All', 'Open', 'Pending', 'Closed',];
+  const tabList = ['All', 'Unpaid','Paid', 'Partal Paid', 'Cancelled',];
 
   const [data, setData] = useState([])
   const [refreshing, setRefreshing] = useState(false); // ✅ for refresh
@@ -40,7 +40,7 @@ const Bills = ({ navigation }) => {
       navigation: navigation,
     })
     if (res) {
-      console.log(res, "===============dd==d==============>");
+      console.log(res, "===============dd=d=d==============>");
       setFilteredData(res?.data);
 
       setData(res?.data)
@@ -59,14 +59,14 @@ const Bills = ({ navigation }) => {
     let filtered = [...data];
 
     // Filter based on tab
-    // if (tabs !== 'All') {
-    //     filtered = filtered.filter(item => item.status?.toLowerCase() === tabs.toLowerCase());
-    // }
+    if (tabs !== 'All') {
+        filtered = filtered.filter(item => item.status?.toLowerCase() === tabs.toLowerCase());
+    }
 
     // Filter based on search
     if (searchText !== '') {
       filtered = filtered.filter(item =>
-        (item?.name + item?.code + item?.matterName)
+        (item?.code + item?.matterName)
           .toLowerCase()
           .includes(searchText.toLowerCase())
       );
@@ -88,12 +88,12 @@ const Bills = ({ navigation }) => {
 
       >
         <View
-        //  style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}
+
         >
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
-            data={data}
+            data={tabList}
 
             renderItem={({ item, i }) => {
               return (
@@ -140,7 +140,7 @@ const Bills = ({ navigation }) => {
         >
           <SearchBar
             containerStyle={{ width: '90%' }}
-            placeholder="Search a task"
+            placeholder="Search Bills..."
             value={searchText}
             onChangeText={text => setSearchText(text)}
           />
@@ -172,9 +172,9 @@ const Bills = ({ navigation }) => {
                 <View style={{ gap: 5, width: "65%" }}>
                   <MyText style={styles.timeColor}>Open {moment(item?.openDate).format('DD-MM-YYYY')}</MyText>
                   <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300', }]}>
-                    {item?.name}
+                    {item?.matterName}
                   </MyText>
-                  <MyText style={styles.timeColor}>{item?.clientNames}</MyText>
+                  <MyText style={styles.timeColor}>{item?.code}</MyText>
                 </View>
                 <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
 

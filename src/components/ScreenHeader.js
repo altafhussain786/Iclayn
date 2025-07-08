@@ -14,63 +14,61 @@ const ScreenHeader = ({
   title = 'Inventory',
   onPress = () => { },
   isGoBack = false,
-  isLoading=false,
-  isShowSave=false,
-  isSHowSaveButton=false,
+  isLoading = false,
+  isShowSave = false,
+  isSHowSaveButton = false,
   onPressSave = () => { }, // ✅ Added
 }) => {
   const userDetails = useSelector(state => state?.userDetails?.userDetails);
   const { userProfileDTO } = userDetails
   const imageURL = `data:image/jpeg;base64,${userProfileDTO?.image}`;
-  
+
 
   return (
     <>
-     <LinearGradient
-        colors={[ COLORS?.PRIMARY_COLOR,COLORS?.PRIMARY_COLOR_LIGHT,]}
+      <LinearGradient
+        colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT,]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
-       style={styles.container1}
+        style={styles.container1}
 
       >
-    <View >
-      <View style={styles.container}>
-        <TouchableOpacity onPress={onPress} style={styles.iconWrapper}>
-          <Feather name={isGoBack ? 'arrow-left' : 'settings'} size={20} color={COLORS?.whiteColors} />
-        </TouchableOpacity>
-
-        <View style={styles.titleWrapper}>
-          {isShowTitle && (
-            <MyText style={styles.titleText}>{title}</MyText>
-          )}
-        </View>
-
-        {/* Right Side Icons */}
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-
-          <TouchableOpacity onPress={onPress} style={styles.iconWrapper}>
-            <Feather name={'bell'} size={20} color={COLORS?.whiteColors} />
-          </TouchableOpacity>
-          {isShowSave &&
-            isLoading ? <LoaderKit
-            style={{ width: 30, height: 30 }}
-            name={'BallSpinFadeLoader'} // Optional: see list of animations below
-            color={COLORS?.whiteColors} // Optional: color can be: 'red', 'green',... or '#ddd', '#ffffff',...
-          /> :
-            isShowSave &&
-            <TouchableOpacity onPress={onPressSave} style={styles.iconWrapper}>
-              <Feather name={'save'} size={20} color={COLORS?.whiteColors} />
+        <View >
+          <View style={styles.container}>
+            <TouchableOpacity onPress={onPress} style={styles.iconWrapper}>
+              <Feather name={isGoBack ? 'arrow-left' : 'settings'} size={20} color={COLORS?.whiteColors} />
             </TouchableOpacity>
 
-          }
-          <Image
-            source={{ uri:userProfileDTO?.image ? imageURL : 'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740' }}
-            style={{ height: 30, width: 30, borderRadius: 50, resizeMode: "contain", }}
-          />
+            <View style={styles.titleWrapper}>
+              {isShowTitle && (
+                <MyText style={styles.titleText}>{title}</MyText>
+              )}
+            </View>
+            {/* Right Side Icons */}
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+
+              <TouchableOpacity onPress={onPress} style={styles.iconWrapper}>
+                <Feather name={'bell'} size={20} color={COLORS?.whiteColors} />
+              </TouchableOpacity>
+              {isShowSave &&
+                isLoading ? <LoaderKit
+                style={{ width: 30, height: 30 }}
+                name={'BallSpinFadeLoader'} // Optional: see list of animations below
+                color={COLORS?.whiteColors} // Optional: color can be: 'red', 'green',... or '#ddd', '#ffffff',...
+              /> :
+                isShowSave &&
+                <TouchableOpacity onPress={onPressSave} style={styles.iconWrapper}>
+                  <Feather name={'save'} size={20} color={COLORS?.whiteColors} />
+                </TouchableOpacity>
+              }
+              <Image
+                source={{ uri: userProfileDTO?.image ? imageURL : 'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740' }}
+                style={{ height: 30, width: 30, borderRadius: 50, resizeMode: "contain", borderWidth: 2, borderColor: COLORS?.whiteColors }}
+              />
+            </View>
+          </View>
         </View>
-      </View>
-    </View>
-    </LinearGradient>
+      </LinearGradient>
     </>
   );
 };
