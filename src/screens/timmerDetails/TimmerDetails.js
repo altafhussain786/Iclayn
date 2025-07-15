@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useIsFocused } from '@react-navigation/native';
 import { ContentContainer } from '../tabs/calender/screens/CalenderDetails';
+import LinearGradient from 'react-native-linear-gradient';
 
 const TIMER_KEY = 'TIMEKEEPER_STATE';
 
@@ -112,7 +113,12 @@ const TimmerDetails = ({ navigation }) => {
                 isShowTitle={true}
                 title="Time entry"
             />
-            <View style={{ backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}>
+            <LinearGradient
+                colors={[ COLORS?.PRIMARY_COLOR,COLORS?.PRIMARY_COLOR_LIGHT,]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                >
+            {/* <View > */}
                 <TimmerComponent
                     isShowLoader={false}
                     title={formatTime(duration)}
@@ -122,7 +128,8 @@ const TimmerDetails = ({ navigation }) => {
                     <FontAwesome name={isRunning ? 'pause' : 'play'} size={16} color="white" />
                     <Text style={styles.timerText}>{isRunning ? 'stop timer' : 'start timer'}</Text>
                 </TouchableOpacity>
-            </View>
+            {/* </View> */}
+            </LinearGradient>
              <ContentContainer title='Duration' />
              <ContentContainer title='Matter' />
              <ContentContainer title='Activity category' />

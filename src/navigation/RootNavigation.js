@@ -28,6 +28,8 @@ import Documents from '../screens/more/documents/Documents';
 import Communications from '../screens/more/communications/Communications';
 import AppSettings from '../screens/more/appSettings/AppSettings';
 import Reports from '../screens/more/reports/Reports';
+import EditTimeEntry from '../screens/timeEntry/editTimeEntry/EditTimeEntry';
+import EditMatter from '../screens/tabs/matters/screens/EditMatter';
 
 
 
@@ -69,7 +71,9 @@ const RootNavigation = () => {
         <Stack.Screen name="Event" component={Event} />
         <Stack.Screen name="CreateMatter" component={CreateMatter} />
         <Stack.Screen name="TimmerDetails" component={TimmerDetails} />
+        <Stack.Screen name="EditTimeEntry" component={EditTimeEntry} />
         <Stack.Screen name="MatterDetails" component={MatterDetails} />
+        <Stack.Screen name="EditMatter" component={EditMatter} />
         <Stack.Screen name="CalenderDetails" component={CalenderDetails} />
         <Stack.Screen name="TaskDetails" component={TaskDetails} />
         <Stack.Screen name="CreateTask" component={CreateTask} />

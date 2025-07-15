@@ -614,7 +614,7 @@ const CreateMatter = ({ navigation }) => {
                                             </View>
                                         </View>
                                         {
-                                            values.userPermission == "specificusers" &&
+                                            values.userPermission == "specific" &&
                                             <>
                                                 <TextInputWithTitle
                                                     setFieldValue={setFieldValue}

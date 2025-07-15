@@ -16,6 +16,7 @@ import MyText from '../../../components/MyText';
 
 // Icons
 import Entypo from 'react-native-vector-icons/Entypo';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import Wrapper from '../../../components/Wrapper';
 import SearchBar from '../../../components/SearchBar';
 import FloatingButton from '../../../components/FloatingButton';
@@ -27,7 +28,7 @@ import LinearGradient from 'react-native-linear-gradient';
 
 const Tasks = ({ navigation }) => {
   const [tabs, setTabs] = React.useState('All');
-    const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const tabList = ['All', 'Pending', 'Completed'];
 
@@ -120,6 +121,18 @@ const Tasks = ({ navigation }) => {
       </View>
     );
   };
+  const renderRightActions = () => {
+    return (
+      <View style={{ flexDirection: 'row', }}> {/* <-- fixed width */}
+        <TouchableOpacity
+          onPress={() => console.log("Edit")}
+          style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+        >
+          <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
 
   return (
@@ -128,51 +141,51 @@ const Tasks = ({ navigation }) => {
 
       {/* Scrollable Tabs */}
       <LinearGradient
-                          colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT,]}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 1, y: 0 }}
-                          style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}
-      
-                        >
-      <View >
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={tabList}
+        colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT,]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}
 
-          renderItem={({ item, i }) => {
-            return (
-              <>
-                <TouchableOpacity
-                  key={item}
-                  style={[
-                    styles.tab,
+      >
+        <View >
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={tabList}
 
-                    {
-                      opacity: tabs === item ? 1 : 0.5,
-                      backgroundColor:
-                        COLORS.PRIMARY_COLOR
-                    },
-                  ]}
-                  onPress={() => setTabs(item)}
-                >
-                  <MyText
-                    style={{
+            renderItem={({ item, i }) => {
+              return (
+                <>
+                  <TouchableOpacity
+                    key={item}
+                    style={[
+                      styles.tab,
 
-                      color: '#fff',
-                      fontWeight:'600',
-                      fontSize: calculatefontSize(1.7),
-                    }}
-                    numberOfLines={1}
+                      {
+                        opacity: tabs === item ? 1 : 0.5,
+                        backgroundColor:
+                          COLORS.PRIMARY_COLOR
+                      },
+                    ]}
+                    onPress={() => setTabs(item)}
                   >
-                    {item}
-                  </MyText>
-                </TouchableOpacity>
-              </>
-            )
-          }}
-        />
-      </View>
+                    <MyText
+                      style={{
+
+                        color: '#fff',
+                        fontWeight: '600',
+                        fontSize: calculatefontSize(1.7),
+                      }}
+                      numberOfLines={1}
+                    >
+                      {item}
+                    </MyText>
+                  </TouchableOpacity>
+                </>
+              )
+            }}
+          />
+        </View>
       </LinearGradient>
       <Wrapper>
         {/* Search Row */}
@@ -203,7 +216,7 @@ const Tasks = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 100 }}
           renderItem={({ item, index }) => {
             return (
-              <Swipeable renderLeftActions={renderLeftActions}>
+              <Swipeable renderLeftActions={renderLeftActions} renderRightActions={renderRightActions} >
                 <View style={{ backgroundColor: '#fff' }}> {/* <-- needed so swipe action shows properly */}
                   <TouchableOpacity
                     activeOpacity={0.8}
@@ -263,17 +276,17 @@ const Tasks = ({ navigation }) => {
         }
 
         {/* Floating Button */}
-        
 
-         <FloatingButton
-                onPress={() => setModalVisible(true)}
-                    icon="plus"
-                    navigateTo="CreateScreen"
-                    backgroundColor={COLORS.PRIMARY_COLOR_LIGHT}
-                    size={50}
-                    iconSize={25}
-                />
-                <TimekeeperModal navigation={navigation} visible={modalVisible} onClose={() => setModalVisible(false)} />
+
+        <FloatingButton
+          onPress={() => setModalVisible(true)}
+          icon="plus"
+          navigateTo="CreateScreen"
+          backgroundColor={COLORS.PRIMARY_COLOR_LIGHT}
+          size={50}
+          iconSize={25}
+        />
+        <TimekeeperModal navigation={navigation} visible={modalVisible} onClose={() => setModalVisible(false)} />
       </Wrapper>
     </>
   );

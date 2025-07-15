@@ -110,6 +110,7 @@ export const IconUri = {
     checkmark: require('../assets/Icons/checkmark.png'),
     client: require('../assets/Icons/client.png'),
     mail: require('../assets/Icons/mail.png'),
+    delete: require('../assets/Icons/delete.png'),
 
     communication: require('../assets/Icons/communication.png'),
     documents: require('../assets/Icons/documents.png'),

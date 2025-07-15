@@ -11,8 +11,11 @@ import httpRequest from '../../../../api/apiHandler';
 import { calculatefontSize } from '../../../../helper/responsiveHelper';
 import TextInputWithTitle from '../../../../components/TextInputWithTitle';
 import { removeBillingRate, updateBillingRate, updateHourlyRate } from '../../../../store/slices/matterSlice/createItemForBillingRate';
+import { object } from 'yup';
 
 const BillingRateItem = ({ item, navigation }) => {
+    console.log(item?.firmUser?.length > 0 ? item?.firmUser : 'What is the contacts name ?', '??????????????????????????????');
+
     //Account name Selections
     const [selectFirmUser, setselectFirmUser] = useState(item?.firmUser || 'What is the contacts name ?');
     const [hourlyRate, sethourlyRate] = useState(item?.hourlyRate || null);
@@ -28,15 +31,30 @@ const BillingRateItem = ({ item, navigation }) => {
             path: `/ic/user/?status=Active`,
             navigation: navigation
         })
-        if (res) {
-            // console.log(res?.data, "==>BIILLLIND DATA");
+        // if (res) {
+        //     // console.log(res?.data, "==>BIILLLIND DATA");
 
+        //     setbillingData(res?.data);
+        //     if (Object.keys(item).length > 0) {
+        //           const selectedPartyName = res?.data?.find(pt => pt?.userId === item?.firmUserId);
+        //     //    console.log(selectedPartyName,"===============f============>");
+
+        //         setselectFirmUser(selectedPartyName?.roleNames || 'What is the contacts name ?');
+        //     }
+        // }
+        if (res) {
             setbillingData(res?.data);
+            if (Object.keys(item).length > 0) {
+                const selectedParty = res?.data?.find(pt => pt?.userId === item?.firmUserId);
+                setselectFirmUser(selectedParty?.userProfileDTO?.fullName || 'What is the contacts name ?'); // <-- Proper value
+            }
         }
         else {
             console.log(err, "GET CUSTOMER RESPONSE===>err");
         }
     }
+
+
 
 
     useEffect(() => {
@@ -68,7 +86,7 @@ const BillingRateItem = ({ item, navigation }) => {
                                         <AntDesign name="delete" size={20} color="red" />
                                     </TouchableOpacity>
                                     <TouchableOpacity onPress={() => setisOpenDropDown(true)} style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
-                                        <MyText style={{ color: selectFirmUser == "What is the contacts name ?" ? COLORS?.LIGHT_COLOR : COLORS?.PRIMARY_COLOR }}>{selectFirmUser}</MyText>
+                                        <MyText style={{ color: selectFirmUser === "What is the contacts name ?" ? COLORS?.LIGHT_COLOR : COLORS?.PRIMARY_COLOR }}>{selectFirmUser}</MyText>
                                     </TouchableOpacity>
                                 </View>
                                 <TextInputWithTitle
@@ -93,19 +111,31 @@ const BillingRateItem = ({ item, navigation }) => {
                             renderItem={({ item }) => (
 
                                 <TouchableOpacity
+                                    // onPress={() => {
+                                    //     // console.log(item, "item");
+                                    //     dispatch(updateBillingRate(
+                                    //         {
+                                    //             pId: PID,
+                                    //             firmUserObj: item,
+                                    //             firmUser: item.userProfileDTO?.fullName || '',
+                                    //             firmUserId: 9934,
+                                    //             hourlyRate: item.userProfileDTO?.billingRate
+                                    //         }
+                                    //     ));
+                                    //     sethourlyRate(item.userProfileDTO?.billingRate);
+                                    //     setselectFirmUser(item.userProfileDTO?.fullName);
+                                    //     setisOpenDropDown(false);
+                                    // }}
                                     onPress={() => {
-                                        // console.log(item, "item");
-                                        dispatch(updateBillingRate(
-                                            {
-                                                pId: PID,
-                                                firmUserObj: item,
-                                                firmUser: item.userProfileDTO?.fullName || '',
-                                                firmUserId: 9934,
-                                                hourlyRate: item.userProfileDTO?.billingRate
-                                            }
-                                        ));
-                                        sethourlyRate(item.userProfileDTO?.billingRate);
-                                        setselectFirmUser(item.userProfileDTO?.fullName);
+                                        dispatch(updateBillingRate({
+                                            pId: PID,
+                                            firmUserObj: item,
+                                            firmUser: item?.userProfileDTO?.fullName || '',
+                                            firmUserId: item?.userId, // <-- FIXED: Use dynamic ID
+                                            hourlyRate: item?.userProfileDTO?.billingRate || 0
+                                        }));
+                                        sethourlyRate(item?.userProfileDTO?.billingRate || 0);
+                                        setselectFirmUser(item?.userProfileDTO?.fullName || 'Unknown User'); // <-- fallback added
                                         setisOpenDropDown(false);
                                     }}
                                     style={{

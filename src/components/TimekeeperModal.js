@@ -44,13 +44,6 @@ const TimekeeperModal = ({ visible, onClose, navigation }) => {
         loadTimer();
     }, []);
 
-    // useEffect(() => {
-    //     if (visible) {
-    //         loadTimer();
-    //     }
-
-    // }, [visible]);
-
     useEffect(() => {
         const subscription = AppState.addEventListener('change', (state) => {
             if (state === 'active') {
@@ -93,7 +86,7 @@ const TimekeeperModal = ({ visible, onClose, navigation }) => {
             startTime,
             ...extra,
         };
-        console.log(data, "Timmer modal");
+        console.log(data, "Timmer details");
 
         await AsyncStorage.setItem(TIMER_KEY, JSON.stringify(data));
     };
@@ -105,6 +98,7 @@ const TimekeeperModal = ({ visible, onClose, navigation }) => {
             await saveTimerState({ isRunning: true, startTime: start });
         }
         setIsRunning(true);
+        console.log('⏱ Timer started');
 
         if (intervalRef.current) clearInterval(intervalRef.current);
         intervalRef.current = setInterval(() => {
@@ -115,9 +109,9 @@ const TimekeeperModal = ({ visible, onClose, navigation }) => {
     const stopTimer = async () => {
         if (intervalRef.current) clearInterval(intervalRef.current);
         setIsRunning(false);
+        console.log('⏸ Timer stopped');
         await saveTimerState({ isRunning: false, duration });
     };
-
 
     const toggleTimer = () => {
         isRunning ? stopTimer() : startTimer();
@@ -147,10 +141,14 @@ const TimekeeperModal = ({ visible, onClose, navigation }) => {
                                 ● {description} ({matter})
                             </Text>
                         </View>
-
-                        <TouchableOpacity onPress={() => { onClose(), navigation.navigate("TimmerDetails") }}>
-                            <Text style={styles.addDetails}>Add details</Text>
-                        </TouchableOpacity>
+                        <View style={{ justifyContent: "center", alignItems: "center" }}>
+                            <TouchableOpacity onPress={() => { onClose(), navigation.navigate("EditTimeEntry") }}>
+                                <Text style={styles.addDetails}>Edit Time Entry</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => { onClose(), navigation.navigate("TimmerDetails") }}>
+                                <Text style={styles.addDetails}>View</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                     <TouchableOpacity onPress={toggleTimer} >
                         <LinearGradient

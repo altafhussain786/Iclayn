@@ -32,6 +32,12 @@ const RelatedPartiesItems = ({ item, navigation }) => {
         })
         if (res) {
             setpartyTypeData(res?.data);
+            if (item?.partyTypeId) {
+               
+                const selectedPartyType = res?.data?.find(pt => pt?.partyTypeId === item?.partyTypeId);
+                setselectPartyType( selectedPartyType?.name);
+            }
+
         }
         else {
             console.log(err, "GET CUSTOMER RESPONSE===>err");
@@ -45,6 +51,12 @@ const RelatedPartiesItems = ({ item, navigation }) => {
         })
         if (res) {
             setPartyNameData(res?.data);
+            if (item?.partyId) {
+                const selectedPartyName = res?.data?.find(pt => pt?.partyId === item?.partyId);
+                console.log(selectedPartyName, "selectedPartyName======fffff============>");
+
+                setPartyName(selectedPartyName?.type === "Individual" ? `${selectedPartyName?.firstName} ${selectedPartyName?.lastName}` : selectedPartyName?.companyName);
+            }
         }
         else {
             console.log(err, "GET CUSTOMER RESPONSE===>err");
@@ -171,7 +183,7 @@ const RelatedPartiesItems = ({ item, navigation }) => {
                                             fontSize: calculatefontSize(1.9)
                                         }}
                                     >
-                                        {item?.companyName}
+                                        {item?.companyName} 
                                     </MyText>
                                 </TouchableOpacity>
                             )}

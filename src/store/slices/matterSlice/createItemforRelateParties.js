@@ -7,6 +7,7 @@ const initialState = {
 const createRelatedContact = (payload) => ({
   pId: payload.pId, // internal unique ID
   partyType: payload.partyType || '',
+  partyObj: payload.partyObj || {},
   partyTypeId: payload.partyTypeId || '',
   party: payload.party || '',
   partyId: payload.partyId || '',
@@ -28,6 +29,7 @@ const relatedContactSlice = createSlice({
       const item = state.items.find(item => item.pId === action.payload.pId);
       if (item) {
         item.partyType = action.payload.partyType;
+        item.partyObj = action.payload.partyObj || {};
         item.partyTypeId = action.payload.partyTypeId;
         item.party = action.payload.party;
         item.partyId = action.payload.partyId;

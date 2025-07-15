@@ -20,8 +20,11 @@ import SearchBar from '../../../components/SearchBar';
 import FloatingButton from '../../../components/FloatingButton';
 import httpRequest from '../../../api/apiHandler';
 import moment from 'moment';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import TimekeeperModal from '../../../components/TimekeeperModal';
 import LinearGradient from 'react-native-linear-gradient';
+import { Swipeable } from 'react-native-gesture-handler';
+import Loader from '../../../components/Loader';
 
 const Matters = ({ navigation }) => {
     const [tabs, setTabs] = React.useState('All');
@@ -32,18 +35,23 @@ const Matters = ({ navigation }) => {
     const [data, setData] = useState([])
     const [refreshing, setRefreshing] = useState(false); // ✅ for refresh
     const [searchText, setSearchText] = useState(''); // ✅ for search
+    const [isLoader, setIsLoader] = useState(false);
     const [filteredData, setFilteredData] = useState([]);
     const getMatters = async () => {
+        setIsLoader(true)
         const { res, err } = await httpRequest({
             method: 'get',
             path: `/ic/matter/listing`,
             navigation: navigation,
         })
         if (res) {
+            setIsLoader(false)
+
             setFilteredData(res?.data);
             setData(res?.data)
         }
         else {
+            setIsLoader(false)
             console.log("err", err);
         }
     }
@@ -73,59 +81,108 @@ const Matters = ({ navigation }) => {
         setFilteredData(filtered);
     }, [searchText, data, tabs]);
 
+    const deleteMatter = async (id) => {
+        const matterIds = [id]
+        const { res, err } = await httpRequest({
+            method: 'delete',
+            path: `/ic/matter/`,
+            navigation: navigation,
+            params: [4],
+        })
+        console.log(res, "===================>");
+
+        if (res) {
+            getMatters()
+        }
+        else {
+            console.log("err", err);
+        }
+    }
+
+
+    const renderLeftActions = (item) => {
+        console.log(item, "====================================>?");
+
+        return (
+            <View style={{ flexDirection: 'row', width: 200 }}> {/* <-- fixed width */}
+                <TouchableOpacity
+                    onPress={() => navigation.navigate("EditMatter", { matterDetails:item })}
+                    style={{ backgroundColor: '#0068D1', justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+                >
+                    <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
+                    {/* <Text style={{ color: COLORS?.whiteColors, textAlign: 'center', fontWeight: "bold" }}>
+                       Edit
+                    </Text> */}
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => deleteMatter(item?.matterId)}
+                    style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+                >
+                    <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
+                    {/* <Text style={{ color: COLORS?.whiteColors, textAlign: 'center' }}>
+                        Delete
+                    </Text> */}
+                </TouchableOpacity>
+            </View>
+        );
+    };
+
     return (
         <>
             <ScreenHeader onPress={() => { navigation.navigate("Settings") }} isShowTitle={true} title="Matters" />
 
             {/* Scrollable Tabs */}
-             <LinearGradient
-                    colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT,]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}
+            <LinearGradient
+                colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT,]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}
 
-                  >
-            <View
-            //  style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}
-             >
-                <FlatList
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    data={tabList}
+            >
+                <View
+                //  style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}
+                >
 
-                    renderItem={({ item, i }) => {
-                        return (
-                            <>
-                                <TouchableOpacity
-                                    key={item}
-                                    style={[
-                                        styles.tab,
+                    <FlatList
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        data={tabList}
 
-                                        {
-                                            opacity: tabs === item ? 1 : 0.5,
-                                            backgroundColor:
-                                                COLORS.PRIMARY_COLOR
-                                        },
-                                    ]}
-                                    onPress={() => setTabs(item)}
-                                >
-                                    <MyText
-                                        style={{
+                        renderItem={({ item, i }) => {
+                            return (
+                                <>
 
-                                            color: '#fff',
-                                            fontWeight: '600',
-                                            fontSize: calculatefontSize(1.7),
-                                        }}
-                                        numberOfLines={1}
+                                    <TouchableOpacity
+                                        key={item}
+                                        style={[
+                                            styles.tab,
+
+                                            {
+                                                opacity: tabs === item ? 1 : 0.5,
+                                                backgroundColor:
+                                                    COLORS.PRIMARY_COLOR
+                                            },
+                                        ]}
+                                        onPress={() => setTabs(item)}
                                     >
-                                        {item}
-                                    </MyText>
-                                </TouchableOpacity>
-                            </>
-                        )
-                    }}
-                />
-            </View>
+                                        <MyText
+                                            style={{
+
+                                                color: '#fff',
+                                                fontWeight: '600',
+                                                fontSize: calculatefontSize(1.7),
+                                            }}
+                                            numberOfLines={1}
+                                        >
+                                            {item}
+                                        </MyText>
+                                    </TouchableOpacity>
+
+                                </>
+                            )
+                        }}
+                    />
+                </View>
             </LinearGradient>
             <Wrapper>
                 {/* Search Row */}
@@ -149,57 +206,62 @@ const Matters = ({ navigation }) => {
                 </View>
 
                 {/* Task List */}
-                {filteredData?.length > 0 ? <FlatList
+                {
+                isLoader ? <Loader /> :
+                filteredData?.length > 0 ? <FlatList
                     showsVerticalScrollIndicator={false}
                     data={filteredData}
                     keyExtractor={(item, index) => index.toString()}
                     contentContainerStyle={{ paddingBottom: 100 }}
                     renderItem={({ item, index }) => {
                         return (
-                            <TouchableOpacity onPress={() => navigation.navigate('MatterDetails', { matterData: item })}
-                                style={{
-                                    flexDirection: 'row',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    gap: 10,
-                                    borderBottomWidth: 1,
-                                    paddingVertical: 15,
-                                    borderColor: COLORS?.BORDER_LIGHT_COLOR,
-                                }}
-                            >
-                                <View style={{ gap: 5, width: "65%" }}>
-                                    <MyText style={styles.timeColor}>Open {moment(item?.openDate).format('DD-MM-YYYY')}</MyText>
-                                    <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300', }]}>
-                                        {item?.name}
-                                    </MyText>
-                                    <MyText style={styles.timeColor}>{item?.clientNames}</MyText>
-                                </View>
-                                <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
+                            <Swipeable renderLeftActions={() => renderLeftActions(item)}>
+                                <TouchableOpacity onPress={() => navigation.navigate('MatterDetails', { matterData: item })}
+                                    style={{
+                                        flexDirection: 'row',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        paddingVertical: 15,
+                                        paddingHorizontal: 10,
+                                        borderBottomWidth: 1,
+                                        borderColor: COLORS?.BORDER_LIGHT_COLOR,
+                                        backgroundColor: '#fff',
+                                    }}
+                                >
+                                    <View style={{ gap: 5, width: "65%" }}>
+                                        <MyText style={styles.timeColor}>Open {moment(item?.openDate).format('DD-MM-YYYY')}</MyText>
+                                        <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300', }]}>
+                                            {item?.name}
+                                        </MyText>
+                                        <MyText style={styles.timeColor}>{item?.clientNames}</MyText>
+                                    </View>
+                                    <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
 
-                                    <View
-                                        style={{
-                                            backgroundColor: item?.status == "Open" ? '#EFE4FF' : '#ffc2cd',
-                                            borderWidth: 1,
-                                            borderColor: item?.status == "COMPLETED" ? '#7C4EC9' : '#6c0014',
-                                            // alignSelf: 'flex-end',
-                                            borderRadius: 5,
-                                            paddingHorizontal: 8,
-                                            paddingVertical: 2,
-                                        }}
-                                    >
-                                        <MyText
+                                        <View
                                             style={{
-                                                // fontWeight: '600',
-                                                // textAlign: 'center',
-                                                color: item?.status == "COMPLETED" ? COLORS?.whiteColors : '#6c0014',
-                                                fontSize: calculatefontSize(1.4),
+                                                backgroundColor: item?.status == "Open" ? '#EFE4FF' : '#ffc2cd',
+                                                borderWidth: 1,
+                                                borderColor: item?.status == "COMPLETED" ? '#7C4EC9' : '#6c0014',
+                                                // alignSelf: 'flex-end',
+                                                borderRadius: 5,
+                                                paddingHorizontal: 8,
+                                                paddingVertical: 2,
                                             }}
                                         >
-                                            {item?.status}
-                                        </MyText>
+                                            <MyText
+                                                style={{
+                                                    // fontWeight: '600',
+                                                    // textAlign: 'center',
+                                                    color: item?.status == "COMPLETED" ? COLORS?.whiteColors : '#6c0014',
+                                                    fontSize: calculatefontSize(1.4),
+                                                }}
+                                            >
+                                                {item?.status}
+                                            </MyText>
+                                        </View>
                                     </View>
-                                </View>
-                            </TouchableOpacity>
+                                </TouchableOpacity>
+                            </Swipeable>
                         );
                     }}
                     refreshControl={

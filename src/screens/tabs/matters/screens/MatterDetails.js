@@ -53,35 +53,35 @@ const MatterDetails = ({ navigation, route }) => {
             value: 'Event',
             title: 'Event',
             onPress: () => { },
-            iconUri: IconUri?.CalenderColor
+            iconUri: IconUri?.Calender
         },
         {
             id: 2,
             value: 'Time Entry',
             title: 'Time Entry',
             onPress: () => { },
-            iconUri: IconUri?.CalenderColor
+            iconUri: IconUri?.clock
         },
         {
             id: 3,
             value: 'Expense',
             title: 'Expense',
             onPress: () => { },
-            iconUri: IconUri?.CalenderColor
+            iconUri: IconUri?.bill
         },
         {
             id: 4,
             value: 'Task',
             title: 'Task',
             onPress: () => { },
-            iconUri: IconUri?.CalenderColor
+            iconUri: IconUri?.task
         },
         {
             id: 5,
             value: 'Note',
             title: 'Note',
             onPress: () => { },
-            iconUri: IconUri?.CalenderColor
+            iconUri: IconUri?.documents
         }
     ];
     //Matter content Data
@@ -92,7 +92,7 @@ const MatterDetails = ({ navigation, route }) => {
             value: "activities",
             description: "test description",
             onPress: () => { },
-            iconUri: IconUri?.Tasks
+            iconUri: IconUri?.Activitie
         },
         {
             id: 2,
@@ -100,7 +100,7 @@ const MatterDetails = ({ navigation, route }) => {
             value: "notes",
             description: "test description",
             onPress: () => { },
-            iconUri: IconUri?.CalenderColor
+            iconUri: IconUri?.documents
         },
         {
             id: 3,
@@ -108,7 +108,7 @@ const MatterDetails = ({ navigation, route }) => {
             value: "documents",
             description: "test description",
             onPress: () => { },
-            iconUri: IconUri?.CalenderColor
+            iconUri: IconUri?.documents
         },
         {
             id: 4,
@@ -116,7 +116,7 @@ const MatterDetails = ({ navigation, route }) => {
             value: "bills",
             description: "test description",
             onPress: () => { },
-            iconUri: IconUri?.CalenderColor
+            iconUri: IconUri?.bill
         },
         {
             id: 5,
@@ -124,7 +124,7 @@ const MatterDetails = ({ navigation, route }) => {
             value: "communicationLogs",
             description: "test description",
             onPress: () => { },
-            iconUri: IconUri?.CalenderColor
+            iconUri: IconUri?.communication
         },
         {
             id: 6,
@@ -132,7 +132,7 @@ const MatterDetails = ({ navigation, route }) => {
             value: "calenderEvent",
             description: "test description",
             onPress: () => { },
-            iconUri: IconUri?.CalenderColor
+            iconUri: IconUri?.Calender
         },
         {
             id: 7,
@@ -140,7 +140,7 @@ const MatterDetails = ({ navigation, route }) => {
             value: "task',",
             description: "test description",
             onPress: () => { },
-            iconUri: IconUri?.CalenderColor
+            iconUri: IconUri?.task
         }
     ]
 
@@ -229,7 +229,8 @@ const MatterDetails = ({ navigation, route }) => {
                     ListHeaderComponent={() => {
                         return (
                             <>
-                                <MyText style={{ marginBottom: 10 }}>Create New</MyText>
+
+                                <MyText style={{ marginBottom: 10 ,fontWeight: "bold"}}>Create New</MyText>
                                 <FlatList
                                     horizontal
                                     showsHorizontalScrollIndicator={false}
@@ -245,7 +246,7 @@ const MatterDetails = ({ navigation, route }) => {
                                                         ]}
                                                         onPress={() => setTabs(item?.value)}
                                                     >
-                                                        <Image tintColor={'#DEEBD5'} source={item?.iconUri} style={{ width: 25, height: 25, resizeMode: "contain" }} />
+                                                        <Image  source={item?.iconUri} style={{ width: 30, height: 30, resizeMode: "contain" }} />
                                                     </TouchableOpacity>
                                                     <MyText
                                                         style={styles.tabText}
@@ -268,7 +269,7 @@ const MatterDetails = ({ navigation, route }) => {
                                                 <View style={{ flexDirection: "row", justifyContent: 'space-between', borderBottomWidth: item?.id === 7 ? 0 : 0.5, borderColor: COLORS?.LIGHT_COLOR, alignItems: "center", paddingBottom: 10 }}>
                                                     <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
                                                         <View style={{ backgroundColor: "#A3DAFF", height: 30, width: 30, padding: 15, justifyContent: "center", alignItems: "center", borderRadius: 30 }}>
-                                                            <Image tintColor={COLORS?.PRIMARY_COLOR} source={item?.iconUri} style={{ width: 15, height: 15, resizeMode: "contain" }} />
+                                                            <Image  source={item?.iconUri} style={{ width: 15, height: 15, resizeMode: "contain" }} />
                                                         </View>
                                                         <View>
 
@@ -469,7 +470,10 @@ const styles = StyleSheet.create({
         // paddingVertical: 6,
         height: 60,
         width: 60,
-        backgroundColor: '#71A24B',
+        // backgroundColor: '#71A24B',
+        borderWidth:1,
+        borderColor:COLORS?.BORDER_LIGHT_COLOR,
+        // backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT,
         // paddingHorizontal: 10,
         borderRadius: 10,
         marginHorizontal: 5,
