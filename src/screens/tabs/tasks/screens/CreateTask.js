@@ -224,10 +224,8 @@ const CreateTask = ({ navigation }) => {
                         cod: null,
                         priority: values?.priorityStatus,
                         description: values?.description,
-
                         assignTo: values?.feeEarnerSolicitorObj?.userId,
                         taskPrivate: values.isPrivateTask,
-
                         typeId: values?.taskTypeObj?.taskTypeId,
                         status: "Pending",
                         document: String(itemsDocuments?.templateId),

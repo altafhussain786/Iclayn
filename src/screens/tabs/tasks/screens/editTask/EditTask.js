@@ -17,9 +17,9 @@ import { COLORS } from '../../../../../constants'
 import AddButton from '../../../../../components/AddButton'
 import httpRequest from '../../../../../api/apiHandler'
 import BottomModalListWithSearch from '../../../../../components/BottomModalListWithSearch'
-import { addReminderItem } from '../../../../../store/slices/taskSlice/createItemforReminder'
+import { addReminderItem, resetReminderItems } from '../../../../../store/slices/taskSlice/createItemforReminder'
 import ReminderItems from '../../components/ReminderItems'
-import { addDocument } from '../../../../../store/slices/taskSlice/createItemforDocuments'
+import { addDocument, removeDocument } from '../../../../../store/slices/taskSlice/createItemforDocuments'
 
 
 
@@ -168,7 +168,7 @@ const EditTask = ({ navigation, route }) => {
         feeEarnerSolicitor: Yup.string().required('Assign to is required'),
     })
 
-    console.log(tasktypeData, "tasktypeData=========f=====>");
+    console.log(tasktypeData, "tasktypeData=======d==f=====>");
 
     return (
         <>
@@ -205,6 +205,11 @@ const EditTask = ({ navigation, route }) => {
                         selectedDate: moment().format('MM/DD/YYYY'),
                         isdueDate: false,
 
+                        //Due time
+                        dueTime: moment(defaultData?.dueDate).format('HH:mm') || '',
+                        selectedDueTime: moment(defaultData?.dueDate).format('HH:mm'),
+                        isOpenDueTime: false,
+
                         //timeEstimatetype
                         timeEstimateType: defaultData?.timeEstimateType || '',
                         isOpenTimeEstimateType: false,
@@ -235,15 +240,16 @@ const EditTask = ({ navigation, route }) => {
                             mtReminderId: null
                         }
                     })
+
                     const paylod = {
-                        createdOn: "",
-                        updatedOn: null,
+                        createdOn: defaultData?.createdOn || "",
+                        updatedOn: defaultData?.updatedOn || null,
                         createdBy: userDetails?.userId,
-                        updatedBy: null,
+                        updatedBy: userDetails?.userId || null,
                         revision: null,
-                        taskId: null,
+                        taskId: taskTypeObj?.taskId || null,
                         name: values?.name,
-                        cod: null,
+                        cod: defaultData?.code || null,
                         priority: values?.priorityStatus,
                         description: values?.description,
 
@@ -253,13 +259,13 @@ const EditTask = ({ navigation, route }) => {
                         typeId: values?.taskTypeObj?.taskTypeId,
                         status: "Pending",
                         document: String(itemsDocuments?.templateId),
-                        documentName: itemsDocuments?.name,
+                        documentName: itemsDocuments?.name || null,
                         timeEstimate: values.timeEstimateValue,
                         timeEstimateType: values.timeEstimateType,
                         dueDateEnable: true,
                         dueDate: values.selectedDate,
                         dueTime: null,
-                        dueTimeType: "",
+                        dueTimeType: values.timeEstimateType || "",
                         afterBefore: "",
                         matterId: values?.matterSelectedObj?.matterId,
                         matterTaskReminderDTOList: mappedDataForTask,
@@ -291,7 +297,7 @@ const EditTask = ({ navigation, route }) => {
                 {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
 
                     <>
-                        <ScreenHeader isLoading={values?.loader} onPressSave={handleSubmit} isShowSave={true} extraStyle={{ backgroundColor: '#F5F6F8' }} isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="Edit Task" />
+                        <ScreenHeader isLoading={values?.loader} onPressSave={handleSubmit} isShowSave={true} extraStyle={{ backgroundColor: '#F5F6F8' }} isGoBack={true} onPress={() => { dispatch(resetReminderItems()), dispatch(removeDocument()), navigation.goBack() }} isShowTitle={true} title="Edit Task" />
                         <Wrapper>
                             <KeyboardAvoidingView
                                 style={{ flex: 1 }}
@@ -412,6 +418,12 @@ const EditTask = ({ navigation, route }) => {
                                         isButton={true}
                                         buttonText={values.dueDate ? values.dueDate : 'Select Open date'}
                                     />
+                                    {/* <TextInputWithTitle
+                                        onPressButton={() => setFieldValue('isOpenDueTime', true)}
+                                        title="Due Time"
+                                        isButton={true}
+                                        buttonText={values.dueTime ? values.dueTime : 'Select due time'}
+                                    /> */}
 
 
                                     {/* =============================Relatd Parties  */}
@@ -547,13 +559,30 @@ const EditTask = ({ navigation, route }) => {
                                         setFieldValue('isdueDate', false);
                                         setFieldValue(
                                             'dueDate',
-                                            moment(date).format('MM/DD/YYYY'),
+                                            moment(date).toISOString(),
                                         );
                                     }}
                                     onCancel={() => {
                                         setFieldValue('isdueDate', false);
                                     }}
                                 />
+                                {/* <DatePicker
+                                    modal
+                                    mode='time'
+                                    open={values.isOpenDueTime}
+                                    date={new Date()}
+                                    onConfirm={date => {
+                                        setFieldValue('selectedDueTime', date?.toISOString())
+                                        setFieldValue('isOpenDueTime', false);
+                                        setFieldValue(
+                                            'dueTime',
+                                            moment(date).format('hh:mm A'),
+                                        );
+                                    }}
+                                    onCancel={() => {
+                                        setFieldValue('isOpenDueTime', false);
+                                    }}
+                                /> */}
                                 {/* ==>TIME ESTIMATE  */}
                                 <BottomModalListWithSearch
                                     onClose={() => setFieldValue('isOpenTimeEstimateType', false)}

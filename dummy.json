@@ -1,4 +1,3 @@
-
 {
   "email": "testuseruser@yopmail.com",
   "roleCategory": "self managed",
@@ -8,4 +7,56 @@
   "lastName": "",
   "sessionId": "687621b171deac8542fbdb9d",
   "iat": 1752572338
+}
+{
+  "createdOn": "2025-07-22T10:38:38+01:00",
+  "updatedOn": "2025-07-10T23:32:24+01:00",
+  "createdBy": 1,
+  "updatedBy": 1,
+  "revision": null,
+  "taskId": 1,
+  "code": "TAS-5179",
+  "name": "Remortgage instruction received",
+  "priority": "High",
+  "description": "test descr fdd",
+  "document": "3",
+  "documentName": "Test_from_OUT_OF_DARKNESS.docx",
+  "timeEstimate": 19,
+  "timeEstimateType": "Hours",
+  "dueDateEnable": null,
+  "dueDate": "2025-07-23T21:15:00+01:00",
+  "dueTime": 0,
+  "dueTimeType": "Business Days",
+  "afterBefore": "",
+  "status": "Pending",
+  "matterId": 6,
+  "matterName": "Land Purchase",
+  "assignTo": 1,
+  "taskPrivate": true,
+  "typeId": 2,
+  "matterTaskReminderDTOList": [
+    {
+      "createdOn": "2025-07-22T09:03:44+01:00",
+      "updatedOn": "2025-07-22T09:03:44+01:00",
+      "createdBy": null,
+      "updatedBy": null,
+      "revision": null,
+      "mtReminderId": 5,
+      "type": "Call",
+      "remTime": 20,
+      "timeType": "days"
+    },
+    {
+      "createdOn": "2025-07-22T09:53:54+01:00",
+      "updatedOn": "2025-07-22T09:53:54+01:00",
+      "createdBy": null,
+      "updatedBy": null,
+      "revision": null,
+      "mtReminderId": 7,
+      "type": "Email",
+      "remTime": 20,
+      "timeType": "Minutes"
+    }
+  ],
+  "matterTimeEntryDTO": null
 }

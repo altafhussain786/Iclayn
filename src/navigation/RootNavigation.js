@@ -31,6 +31,7 @@ import Reports from '../screens/more/reports/Reports';
 import EditTimeEntry from '../screens/timeEntry/editTimeEntry/EditTimeEntry';
 import EditMatter from '../screens/tabs/matters/screens/EditMatter';
 import EditTask from '../screens/tabs/tasks/screens/editTask/EditTask';
+import CreateBilling from '../screens/tabs/bills/screens/CreateBilling';
 
 
 
@@ -65,9 +66,10 @@ const RootNavigation = () => {
         <Stack.Screen name="Settings" component={Settings} />
         <Stack.Screen name="Activities" component={Activities} />
         <Stack.Screen name="Bills" component={Bills} />
+        <Stack.Screen name="CreateBilling" component={CreateBilling} />
         <Stack.Screen name="Clients" component={Clients} />
 
-        
+
         {/* //Matters  */}
         <Stack.Screen name="Event" component={Event} />
         <Stack.Screen name="CreateMatter" component={CreateMatter} />
