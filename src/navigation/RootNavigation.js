@@ -30,6 +30,7 @@ import AppSettings from '../screens/more/appSettings/AppSettings';
 import Reports from '../screens/more/reports/Reports';
 import EditTimeEntry from '../screens/timeEntry/editTimeEntry/EditTimeEntry';
 import EditMatter from '../screens/tabs/matters/screens/EditMatter';
+import EditTask from '../screens/tabs/tasks/screens/editTask/EditTask';
 
 
 
@@ -77,6 +78,7 @@ const RootNavigation = () => {
         <Stack.Screen name="CalenderDetails" component={CalenderDetails} />
         <Stack.Screen name="TaskDetails" component={TaskDetails} />
         <Stack.Screen name="CreateTask" component={CreateTask} />
+        <Stack.Screen name="EditTask" component={EditTask} />
         <Stack.Screen name="TaskDocuments" component={TaskDocuments} />
         <Stack.Screen name="TaskFiles" component={TaskFiles} />
 

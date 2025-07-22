@@ -27,10 +27,10 @@ import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry'
 
 
 
-const EditMatter = ({ navigation,route }) => {
+const EditMatter = ({ navigation, route }) => {
   const matterDetails = route?.params?.matterDetails
   console.log(matterDetails, "MATTER DETAILS-------------->");
-  
+
   const dispatch = useDispatch()
   const toast = useToast();
   const items = useSelector(state => state.createItemforRelateParties.items);
@@ -299,7 +299,7 @@ const EditMatter = ({ navigation,route }) => {
   // console.log(billingData,"BILLING DATA",defaultData?.feeEarnerSolicitorId);
 
 
-  console.log(items, '===========itemsForBillindg===================================================TASK GROUD============>');
+  console.log(defaultData, '===========itemsForBillindg===================================================TASK GROUD============>');
 
 
 
@@ -367,7 +367,7 @@ const EditMatter = ({ navigation,route }) => {
                   userId: user?.userId,
                   email: user?.email,
                   createdOn: user?.createdOn,
-                  updatedOn: new Date()?.toISOString() || null,
+                  updatedOn: user?.updatedOn || null,
                   matterPerUserId: user?.matterPerUserId,
                   userProfileDTO: {
                     fullName: user?.fullName
@@ -388,7 +388,7 @@ const EditMatter = ({ navigation,route }) => {
                   matterPerNotifUserId: user?.matterPerNotifUserId,
                   createdBy: null,
                   createdOn: user?.createdOn,
-                  updatedOn: new Date()?.toISOString() || null,
+                  updatedOn: user?.updatedOn || null,
                   userProfileDTO: {
                     fullName: user?.fullName
                   }
@@ -417,7 +417,7 @@ const EditMatter = ({ navigation,route }) => {
               return (
                 {
                   createdOn: data?.createdOn || '',
-                  updatedOn: new Date()?.toISOString() || null,
+                  updatedOn: data?.updatedOn || null,
                   createdBy: null,
                   updatedBy: null,
                   revision: null,
@@ -447,7 +447,7 @@ const EditMatter = ({ navigation,route }) => {
               createdOn: item?.firmUserObj?.createdOn || "",
               updatedOn: item?.updatedOn || null,
               createdBy: null,
-              updatedBy: new Date()?.toISOString() || null,
+              updatedBy: null,
               revision: null,
               matterBillingItemId: item?.firmUserObj?.matterBillingItemId || null,
               userId: item?.firmUserObj?.userId || 0,
@@ -525,7 +525,7 @@ const EditMatter = ({ navigation,route }) => {
             clientRefNo: values?.clientRefNumber || "",
             code: defaultData?.code,
             createdBy: userDetails?.userId,
-            createdOn: new Date()?.toISOString(),
+            createdOn: defaultData?.createdOn || "",
             depositAmount: null,
             description: values?.description,
             docProcessed: false,
@@ -561,12 +561,12 @@ const EditMatter = ({ navigation,route }) => {
 
 
             updatedBy: userDetails?.userId,
-            updatedOn: new Date()?.toISOString()
+            updatedOn: defaultData?.updatedOn || null
           };
 
           // console.log(payload,"PAYLOAD EDIT ==================>");
 
-         setFieldValue('loader', true)
+          setFieldValue('loader', true)
           const { res, err, status } = await httpRequest({
             method: 'put',
             path: `/ic/matter/v1/`,

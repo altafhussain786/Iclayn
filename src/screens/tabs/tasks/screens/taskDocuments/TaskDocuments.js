@@ -83,6 +83,9 @@ const TaskDocuments = ({ navigation, route }) => {
                                                 if (routes[i].name === "CreateTask") {
                                                     break;
                                                 }
+                                                else if (routes[i].name === "EditTask") {
+                                                    break;
+                                                }
                                                 popCount++;
                                             }
 
