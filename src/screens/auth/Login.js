@@ -20,7 +20,7 @@ const validationSchema = Yup.object().shape({
 
 const Login = ({ navigation }) => {
     const [loader, setLoader] = React.useState(false)
-    const toast=useToast()
+    const toast = useToast()
 
     const login = async (values) => {
 
@@ -29,19 +29,19 @@ const Login = ({ navigation }) => {
         const { res, status, err } = await httpRequest({
             path: `/ic/un-auth/user/${values.email}`,
             header: { "X_TENANT_ID": X_TENANT_ID },
-             navigation:navigation
+            navigation: navigation
         });
         if (status === HttpStatusCode.NoContent) {
-            toast.show('No account associated with this email. Please try again or register.',{type:'danger'})
+            toast.show('No account associated with this email. Please try again or register.', { type: 'danger' })
             // console.log('No account associated with this email. Please try again or register.');
             setLoader(false);
             return;
         }
         if (res) {
-            console.log(res,"res data");
+            console.log(res, "res data");
             setLoader(false)
             // toast.show('Login successfully',{type:'success'})
-            navigation.navigate('LoginByPassword', { email: values.email,emailData:res?.data })
+            navigation.navigate('LoginByPassword', { email: values.email, emailData: res?.data })
 
         } else {
             console.log("err", err);
@@ -51,18 +51,18 @@ const Login = ({ navigation }) => {
     }
 
     return (
-        
+
         <ImageBackground blurRadius={2} source={require("../../assets/Images/bgimage.png")} style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
             <View >
                 <Image tintColor={COLORS?.whiteColors} source={{ uri: `${BASE_URL}/assets/logo-DuQxixZj.png` }} style={{ width: 150, height: 50, resizeMode: "contain", }} />
-           {/* <TouchableOpacity 
+                {/* <TouchableOpacity 
            onPress={()=>toast.show('Login successfully',{type:'danger'})}
            >
                                <MyText>PRees toast</MyText>
                            </TouchableOpacity> */}
             </View>
             <Formik
-                initialValues={{ email: 'altaf@yopmail.com', }}
+                initialValues={{ email: 'Sa@yopmail.com', }}
                 validationSchema={validationSchema}
                 onSubmit={login}
             >

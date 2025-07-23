@@ -27,7 +27,7 @@ const Bills = ({ navigation }) => {
   const [tabs, setTabs] = React.useState('All');
   const [modalVisible, setModalVisible] = useState(false);
 
-  const tabList = ['All', 'Unpaid','Paid', 'Partal Paid', 'Cancelled',];
+  const tabList = ['All', 'Unpaid', 'Paid', 'Partal Paid', 'Cancelled',];
 
   const [data, setData] = useState([])
   const [refreshing, setRefreshing] = useState(false); // ✅ for refresh
@@ -60,7 +60,7 @@ const Bills = ({ navigation }) => {
 
     // Filter based on tab
     if (tabs !== 'All') {
-        filtered = filtered.filter(item => item.status?.toLowerCase() === tabs.toLowerCase());
+      filtered = filtered.filter(item => item.status?.toLowerCase() === tabs.toLowerCase());
     }
 
     // Filter based on search
@@ -77,7 +77,7 @@ const Bills = ({ navigation }) => {
 
   return (
     <>
-      <ScreenHeader onPress={() => { navigation.navigate("Settings") }} isShowTitle={true} title="Bills" />
+      <ScreenHeader isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="Bills" />
 
       {/* Scrollable Tabs */}
       <LinearGradient

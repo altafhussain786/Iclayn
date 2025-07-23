@@ -231,7 +231,7 @@ const CreateBilling = ({ navigation }) => {
                                                                 </View>
 
                                                                 <View>
-                                                                    <MyText>{d?.companyName ? d?.companyName : d?.firstName + ' ' + d?.lastName}</MyText>
+                                                                    <MyText style={{ fontWeight: 'bold' }}>{d?.companyName ? d?.companyName : d?.firstName + ' ' + d?.lastName}</MyText>
                                                                     {d?.clientAddresseDTOList[0]?.city && d?.clientAddresseDTOList[0]?.country && <MyText>{d?.clientAddresseDTOList[0]?.city + ', ' + d?.clientAddresseDTOList[0]?.country}</MyText>}
                                                                     {d?.clientEmailAddressDTOList[0]?.email && <MyText>{d?.clientEmailAddressDTOList[0]?.email}</MyText>}
                                                                     {d?.clientPhoneNumberDTOList[0]?.phoneNo && <MyText>{d?.clientPhoneNumberDTOList[0]?.phoneNo}</MyText>}
@@ -308,7 +308,7 @@ const CreateBilling = ({ navigation }) => {
                                             }))} title='Add a time entry' />
                                         </View>
                                     </View>
-                                    <View style={{ alignItems: "flex-end", backgroundColor: COLORS?.BORDER_LIGHT_COLOR, paddingVertical: 10 }}>
+                                    <View style={{ alignItems: "flex-end", backgroundColor: COLORS?.BORDER_LIGHT_COLOR, padding: 10 }}>
                                         <View style={{ width: "40%", flexDirection: "row", justifyContent: "space-between", marginVertical: 5 }}>
                                             <MyText style={{ fontWeight: "bold" }}>Subtotal :</MyText>
                                             <MyText > {subtotal?.toFixed(2)}</MyText>

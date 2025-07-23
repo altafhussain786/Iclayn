@@ -32,6 +32,8 @@ import EditTimeEntry from '../screens/timeEntry/editTimeEntry/EditTimeEntry';
 import EditMatter from '../screens/tabs/matters/screens/EditMatter';
 import EditTask from '../screens/tabs/tasks/screens/editTask/EditTask';
 import CreateBilling from '../screens/tabs/bills/screens/CreateBilling';
+import CreateTimeEntry from '../screens/timeEntry/editTimeEntry/CreateTimeEntry';
+import CreateExpense from '../screens/more/expense/screens/CreateExpense';
 
 
 
@@ -75,6 +77,7 @@ const RootNavigation = () => {
         <Stack.Screen name="CreateMatter" component={CreateMatter} />
         <Stack.Screen name="TimmerDetails" component={TimmerDetails} />
         <Stack.Screen name="EditTimeEntry" component={EditTimeEntry} />
+        <Stack.Screen name="CreateTimeEntry" component={CreateTimeEntry} />
         <Stack.Screen name="MatterDetails" component={MatterDetails} />
         <Stack.Screen name="EditMatter" component={EditMatter} />
         <Stack.Screen name="CalenderDetails" component={CalenderDetails} />
@@ -83,6 +86,7 @@ const RootNavigation = () => {
         <Stack.Screen name="EditTask" component={EditTask} />
         <Stack.Screen name="TaskDocuments" component={TaskDocuments} />
         <Stack.Screen name="TaskFiles" component={TaskFiles} />
+        <Stack.Screen name="CreateExpense" component={CreateExpense} />
 
         {/* //more  */}
         <Stack.Screen name="Parties" component={Parties} />

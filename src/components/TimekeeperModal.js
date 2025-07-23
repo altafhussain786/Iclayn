@@ -34,8 +34,8 @@ const TimekeeperModal = ({ visible, onClose, navigation }) => {
         { label: 'Task', icon: 'check-square', onPress: () => navigation.navigate("CreateTask"), iconName: IconUri?.task },
         { label: 'Event', icon: 'calendar', onPress: () => navigation.navigate("Event"), iconName: IconUri?.Calender },
         { label: 'Billing', icon: 'Bill', onPress: () => navigation.navigate("CreateBilling"), iconName: IconUri?.bill },
-        { label: 'Time entry', icon: 'clock-o', onPress: () => navigation.navigate(""), iconName: IconUri?.clock },
-        { label: 'Expense', icon: 'file-text', onPress: () => navigation.navigate(""), iconName: IconUri?.matter },
+        { label: 'Time entry', icon: 'clock-o', onPress: () => navigation.navigate("CreateTimeEntry"), iconName: IconUri?.clock },
+        { label: 'Expense', icon: 'file-text', onPress: () => navigation.navigate("CreateExpense"), iconName: IconUri?.matter },
     ];
 
 
