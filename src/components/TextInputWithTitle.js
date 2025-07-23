@@ -47,47 +47,9 @@ const TextInputWithTitle = ({
                 {isButton ?
                     customView ? (
                         customView({ arrayValue, setFieldValue, onPressButton, buttonText })
-                        
+
                     )
-                        // arrayValue?.length > 0 ?
-                        //     <>
-                        //         <View style={{ marginTop: 10 }}>
-                        //             {arrayValue.map((item, index) => (
-                        //                 <View
-                        //                     key={item.clientId}
-                        //                     style={{
-                        //                         flexDirection: 'row',
-                        //                         justifyContent: 'space-between',
-                        //                         alignItems: 'center',
-                        //                         padding: 10,
-                        //                         marginBottom: 5,
-                        //                         backgroundColor: '#f0f0f0',
-                        //                         width: '100%',
-                        //                         borderRadius: 5,
-                        //                     }}
-                        //                 >
-                        //                     <MyText>
-                        //                         {item?.type === 'Individual'
-                        //                             ? `${item?.firstName} ${item?.lastName}`
-                        //                             : item?.companyName}
-                        //                     </MyText>
-                        //                     <TouchableOpacity
-                        //                         onPress={() => {
-                        //                             const updatedList = arrayValue.filter(
-                        //                                 (c) => c.clientId !== item.clientId
-                        //                             );
-                        //                             setFieldValue('clientItems', updatedList);
-                        //                         }}
-                        //                     >
-                        //                         <AntDesign name="delete" size={20} color="red" />
-                        //                     </TouchableOpacity>
-                        //                 </View>
-                        //             ))}
-                        //             <TouchableOpacity onPress={onPressButton} style={{ paddingVertical: 10 }}>
-                        //                 <MyText style={styles.btnTextStyle}>{buttonText}</MyText>
-                        //             </TouchableOpacity>
-                        //         </View>
-                        //     </>
+
                         :
                         <TouchableOpacity onPress={onPressButton} style={{ paddingVertical: 10 }}>
                             <MyText style={styles.btnTextStyle}>{buttonText}</MyText>

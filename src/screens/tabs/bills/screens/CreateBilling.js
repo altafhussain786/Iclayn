@@ -19,6 +19,12 @@ import httpRequest from '../../../../api/apiHandler'
 import BottomModalListWithSearch from '../../../../components/BottomModalListWithSearch'
 import ReminderItems from '../../tasks/components/ReminderItems'
 import { addReminderItem } from '../../../../store/slices/taskSlice/createItemforReminder'
+import Loader from '../../../../components/Loader'
+import LoaderKitView from 'react-native-loader-kit'
+import { addTimeEntry } from '../../../../store/slices/billingSlice/createBillingTimeEntryItem'
+import BillingTimeEntry from '../components/BillingTimeEntry'
+import BillingExpenseEntry from '../components/BillingExpenseEntry'
+import { addExpenseEntry } from '../../../../store/slices/billingSlice/createBillingExpenseEntryItem'
 
 
 
@@ -26,11 +32,15 @@ const CreateBilling = ({ navigation }) => {
     const dispatch = useDispatch()
     const toast = useToast();
     const [firmUserData, setFirmUserData] = useState([])
-    const items = useSelector(state => state.createItemforReminder.items);
+    const items = useSelector(state => state.createBillingTimeEntryItem.items);
+    const expenseEntryItem = useSelector(state => state.createBillingExpenseEntryItem.items);
 
     const [matterData, setmatterData] = React.useState([]);
     const [eventTypeData, seteventTypeData] = React.useState([]);
+    const [toClientData, setToClientData] = React.useState([]);
+    const [clientId, setClientId] = React.useState("");
     const [billingData, setBillingData] = React.useState([]);
+    const [toClientLoader, setToClientLoader] = React.useState(false);
 
 
     const getMatterData = async () => {
@@ -40,7 +50,7 @@ const CreateBilling = ({ navigation }) => {
             navigation: navigation
         })
         if (res) {
-            // console.log(res,"practive arae");
+            console.log(res, "Matter DATA =======================================>");
             setmatterData(res?.data);
         }
         else {
@@ -48,6 +58,30 @@ const CreateBilling = ({ navigation }) => {
 
         }
     }
+    const getToClientData = async () => {
+        setToClientLoader(true)
+        const { res, err } = await httpRequest({
+            method: `get`,
+            path: `/ic/matter/${clientId}/client`,
+            navigation: navigation
+        })
+        if (res) {
+
+            console.log(res, "GET TO CLEINT =======================================>");
+            setToClientData(res?.data);
+            setToClientLoader(false)
+        }
+        else {
+            setToClientLoader(false)
+
+            console.log(err, "GET CUSTOMER RESPONSE===>err");
+
+        }
+    }
+
+    useEffect(() => {
+        getToClientData()
+    }, [clientId])
 
 
 
@@ -60,7 +94,51 @@ const CreateBilling = ({ navigation }) => {
     }, [])
 
 
-    console.log(billingData);
+    // const calculateAmounts = () => {
+    //     let subtotal = 0
+    //     let totalTax = 0
+    //     let netTotal = 0
+
+
+    //     items?.forEach(item => {
+
+    //         subtotal += Number(item?.hourlyRate) * item?.totalDuration
+    //         totalTax += (Number(item?.hourlyRate) / 100) * item?.taxAmount
+    //         // netTotal += Number(subtotal) + Number(totalTax)
+
+    //     })
+    //     netTotal = subtotal + totalTax
+
+
+
+    //     return { subtotal, totalTax, netTotal };
+    // };
+
+    // const { subtotal, totalTax, netTotal, } = calculateAmounts();
+    const calculateAmounts = () => {
+        let subtotal = 0;
+        let totalTax = 0;
+        let netTotal = 0;
+
+        const allItems = [...(items || []), ...(expenseEntryItem || [])];
+
+        allItems.forEach(item => {
+            const duration = item?.totalDuration ?? 1; // If totalDuration not present (i.e., expense), assume 1
+
+            const rate = Number(item?.hourlyRate || 0);
+            const tax = Number(item?.taxAmount || 0);
+
+            subtotal += rate * duration;
+            totalTax += (rate / 100) * tax;
+        });
+
+        netTotal = subtotal + totalTax;
+
+        return { subtotal, totalTax, netTotal };
+    };
+
+    const { subtotal, totalTax, netTotal } = calculateAmounts();
+
 
 
     const validationSchema = Yup.object().shape({
@@ -70,6 +148,7 @@ const CreateBilling = ({ navigation }) => {
         <>
 
             <Formik
+                // enableReinitialize
                 initialValues={
                     {
 
@@ -124,7 +203,7 @@ const CreateBilling = ({ navigation }) => {
                                     <TextInputWithTitle
                                         title="Matter"
                                         isButton={true}
-                                        isRequired={true}
+                                        // isRequired={true}
                                         buttonText={values.matterSelected || 'Select Matter'}
                                         onPressButton={() => setFieldValue('isOpenMatterSelected', true)}
                                     />
@@ -133,12 +212,42 @@ const CreateBilling = ({ navigation }) => {
                                             <MyText style={{ color: 'red' }}>{errors.matterSelected}</MyText>
                                         )
                                     }
+                                    <View style={{ marginVertical: 10 }}>
+                                        <MyText style={styles.btnTextStyle}>To</MyText>
+                                        {
+                                            toClientLoader ? <LoaderKitView
+                                                style={{ width: 30, height: 30 }}
+                                                name={'BallPulse'}
+                                                animationSpeedMultiplier={1.0} // speed up/slow down animation, default: 1.0, larger is faster
+                                                color={COLORS?.LIGHT_COLOR} // Optional: color can be: 'red', 'green',... or '#ddd', '#ffffff',...
+                                            /> :
+                                                toClientData.map((d, i) => {
+                                                    return (
+                                                        <>
+                                                            <View style={{ marginVertical: 10, flexDirection: "row", gap: 10 }}>
+                                                                <View style={{ height: 35, width: 35, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT, justifyContent: "center", alignItems: "center", borderRadius: 30 }}>
+                                                                    {d?.companyName ?
+                                                                        <MyText style={{ color: COLORS?.whiteColors }}>{d?.companyName?.split('')[0]}</MyText> : <MyText style={{ color: COLORS?.whiteColors }}>{d?.firstName?.split('')[0] + '' + d?.lastName?.split('')[0]}</MyText>}
+                                                                </View>
+
+                                                                <View>
+                                                                    <MyText>{d?.companyName ? d?.companyName : d?.firstName + ' ' + d?.lastName}</MyText>
+                                                                    {d?.clientAddresseDTOList[0]?.city && d?.clientAddresseDTOList[0]?.country && <MyText>{d?.clientAddresseDTOList[0]?.city + ', ' + d?.clientAddresseDTOList[0]?.country}</MyText>}
+                                                                    {d?.clientEmailAddressDTOList[0]?.email && <MyText>{d?.clientEmailAddressDTOList[0]?.email}</MyText>}
+                                                                    {d?.clientPhoneNumberDTOList[0]?.phoneNo && <MyText>{d?.clientPhoneNumberDTOList[0]?.phoneNo}</MyText>}
+                                                                </View>
+                                                            </View>
+                                                        </>
+                                                    )
+                                                })
+                                        }
+                                    </View>
                                     <TextInputWithTitle title='Description' value={values.description} onChangeText={(txt) => setFieldValue('description', txt)} placeholder={'Description'} />
 
                                     <TextInputWithTitle
                                         title="Invoice Date "
                                         isButton={true}
-                                        isRequired={true}
+                                        // isRequired={true}
                                         buttonText={values.invDate || 'Select Invoice Date'}
                                         onPressButton={() => setFieldValue('isOpeninvDate', true)}
                                     />
@@ -149,6 +258,71 @@ const CreateBilling = ({ navigation }) => {
                                         buttonText={values.dueDate || 'Select Due Date'}
                                         onPressButton={() => setFieldValue('isOpendueDate', true)}
                                     />
+
+                                    {/* //item =====================================> */}
+                                    <View style={{ marginVertical: 10 }}>
+                                        <MyText style={[styles.btnTextStyle, { fontSize: calculatefontSize(2) }]}>Time Entries</MyText>
+                                        <MyText style={{ fontSize: calculatefontSize(1.4) }}>Any modifications made to the current time entries will be updated in the matter.
+                                        </MyText>
+                                        <View style={{ borderBottomWidth: 1, borderColor: COLORS?.LIGHT_COLOR, marginVertical: 10, }}>
+
+                                            {
+                                                items?.map((item, index) => {
+                                                    return (
+                                                        <>
+
+                                                            <BillingTimeEntry item={item} index={index} navigation={navigation} />
+
+                                                        </>
+                                                    )
+                                                })
+
+                                            }
+                                            <AddButton onPress={() => dispatch(addTimeEntry({
+                                                id: Math.floor(Math.random() * 1000),
+                                            }))} title='Add a time entry' />
+                                        </View>
+                                    </View>
+                                    {/* //item =====================================> */}
+                                    <View style={{ marginVertical: 10 }}>
+                                        <MyText style={[styles.btnTextStyle, { fontSize: calculatefontSize(2) }]}>Expense Entries</MyText>
+                                        <MyText style={{ fontSize: calculatefontSize(1.4) }}>Update to the existing expense entries will be applied to the matter.
+
+                                        </MyText>
+                                        <View style={{ borderBottomWidth: 1, borderColor: COLORS?.LIGHT_COLOR, marginVertical: 10, }}>
+
+                                            {
+                                                expenseEntryItem?.map((item, index) => {
+                                                    return (
+                                                        <>
+
+                                                            <BillingExpenseEntry item={item} index={index} navigation={navigation} />
+
+                                                        </>
+                                                    )
+                                                })
+
+                                            }
+                                            <AddButton onPress={() => dispatch(addExpenseEntry({
+                                                id: Math.floor(Math.random() * 1000),
+                                            }))} title='Add a time entry' />
+                                        </View>
+                                    </View>
+                                    <View style={{ alignItems: "flex-end", backgroundColor: COLORS?.BORDER_LIGHT_COLOR, paddingVertical: 10 }}>
+                                        <View style={{ width: "40%", flexDirection: "row", justifyContent: "space-between", marginVertical: 5 }}>
+                                            <MyText style={{ fontWeight: "bold" }}>Subtotal :</MyText>
+                                            <MyText > {subtotal?.toFixed(2)}</MyText>
+                                        </View>
+                                        <View style={{ width: "40%", flexDirection: "row", justifyContent: "space-between", marginVertical: 5 }}>
+                                            <MyText style={{ fontWeight: "bold" }}>Tax Amount :</MyText>
+                                            <MyText > {totalTax?.toFixed(2)}</MyText>
+                                        </View>
+                                        <View style={{ width: "40%", flexDirection: "row", justifyContent: "space-between", marginVertical: 5 }}>
+                                            <MyText style={{ fontWeight: "bold" }}>Net Total :</MyText>
+                                            <MyText >{netTotal?.toFixed(2)}</MyText>
+                                        </View>
+
+                                    </View>
                                     <View style={{ height: 20 }} />
                                 </ScrollView>
 
@@ -157,8 +331,11 @@ const CreateBilling = ({ navigation }) => {
                             <BottomModalListWithSearch
                                 onClose={() => setFieldValue('isOpenMatterSelected', false)}
                                 renderItem={({ item }) => (
+
+
                                     <TouchableOpacity
                                         onPress={() => {
+                                            setClientId(item?.matterId);
                                             setFieldValue('matterSelected', item?.name);
                                             setFieldValue('matterSelectedObj', item);
                                             setFieldValue('isOpenMatterSelected', false)

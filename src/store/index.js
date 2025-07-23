@@ -5,6 +5,9 @@ import createItemforRelatePartiesReducer from "./slices/matterSlice/createItemfo
 import createItemForBillingRateReducer from "./slices/matterSlice/createItemForBillingRate";
 import createItemforReminderReducer from "./slices/taskSlice/createItemforReminder";
 import createItemforDocumentsReducer from "./slices/taskSlice/createItemforDocuments";
+import createBillingTimeEntryItemReducer from "./slices/billingSlice/createBillingTimeEntryItem";
+import createBillingExpenseEntryItemReducer from "./slices/billingSlice/createBillingExpenseEntryItem";
+
 const store = configureStore({
   reducer: {
     userDetails: userDetailsReducer,
@@ -12,8 +15,10 @@ const store = configureStore({
     createItemForBillingRate: createItemForBillingRateReducer,
     //tasks
     createItemforReminder: createItemforReminderReducer,
-    createItemforDocuments: createItemforDocumentsReducer
-
+    createItemforDocuments: createItemforDocumentsReducer,
+    //billing
+    createBillingTimeEntryItem: createBillingTimeEntryItemReducer,
+    createBillingExpenseEntryItem: createBillingExpenseEntryItemReducer
   },
 });
 

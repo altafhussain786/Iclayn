@@ -33,6 +33,7 @@ const Event = ({ navigation }) => {
   const [matterData, setmatterData] = React.useState([]);
   const [eventTypeData, seteventTypeData] = React.useState([]);
   const [billingData, setBillingData] = React.useState([]);
+  const [partyData, setPartyData] = React.useState([]);
 
 
   const getMatterData = async () => {
@@ -68,17 +69,48 @@ const Event = ({ navigation }) => {
 
 
   const getBillingData = async () => {
-    const { res, err } = await httpRequest({
-      method: `get`,
-      path: `/ic/user/?status=Active`,
-      navigation: navigation
-    })
-    if (res) {
-      setBillingData(res?.data);
+
+    try {
+      const [customerResponse, anotherResponse] = await Promise.all([
+        httpRequest({
+          method: 'get',
+          path: '/ic/user/?status=Active',
+          navigation: navigation
+        }),
+        httpRequest({
+          method: 'get',
+          path: '/ic/another-api/?status=Pending', // yeh second API ka actual path daalna hoga
+          navigation: navigation
+        })
+      ]);
+
+      if (customerResponse?.res) {
+        setBillingData(customerResponse.res.data);
+      } else {
+        console.log(customerResponse?.err, 'GET CUSTOMER RESPONSE===>err');
+      }
+
+      if (anotherResponse?.res) {
+        setPartyData(anotherResponse.res.data); // is function ko aapko useState se define karna hoga
+      } else {
+        console.log(anotherResponse?.err, 'SECOND API RESPONSE===>err');
+      }
+
+    } catch (error) {
+      console.log('Unexpected error in Promise.all =>', error);
     }
-    else {
-      console.log(err, "GET CUSTOMER RESPONSE===>err");
-    }
+
+    // const { res, err } = await httpRequest({
+    //   method: `get`,
+    //   path: `/ic/user/?status=Active`,
+    //   navigation: navigation
+    // })
+    // if (res) {
+    //   setBillingData(res?.data);
+    // }
+    // else {
+    //   console.log(err, "GET CUSTOMER RESPONSE===>err");
+    // }
   }
 
   //get users 
@@ -122,6 +154,7 @@ const Event = ({ navigation }) => {
 
             //firm User
             firmUser: '',
+            firmItems: [],
             firmUserObj: {},
             isOpenFirmUser: false,
 
@@ -369,6 +402,40 @@ const Event = ({ navigation }) => {
                 )}
                 visible={values?.isOpenClient}
                 data={billingData}
+                searchKey={"email"}
+              />
+
+              {/* ====>//FIrm user list */}
+              <BottomModalListWithSearch
+                onClose={() => setFieldValue('isOpenFirmUser', false)}
+                renderItem={({ item }) => (
+                  console.log(item, "ITEMS====>"),
+
+                  <TouchableOpacity
+                    onPress={() => {
+                      const alreadyExists = values.firmItems.find(
+                        (i) => i.userId === item.userId
+                      );
+                      if (!alreadyExists) {
+                        setFieldValue('firmItems', [...values.firmItems, item]);
+                      }
+                      else {
+                        Alert.alert('Client already added');
+                      }
+                      setFieldValue('firmUserObj', item);
+                      setFieldValue('firmUser', item?.userProfileDTO?.fullName || '');
+                      setFieldValue('isOpenFirmUser', false);
+                    }}
+                    style={styles.itemStyle}
+                  >
+
+                    <MyText style={{ fontSize: calculatefontSize(1.9) }}>
+                      {item?.companyName || item?.userProfileDTO?.fullName}
+                    </MyText>
+                  </TouchableOpacity>
+                )}
+                visible={values?.isOpenFirmUser}
+                data={[...billingData, ...partyData]}
                 searchKey={"email"}
               />
 
