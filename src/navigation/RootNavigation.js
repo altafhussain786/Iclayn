@@ -34,6 +34,7 @@ import EditTask from '../screens/tabs/tasks/screens/editTask/EditTask';
 import CreateBilling from '../screens/tabs/bills/screens/CreateBilling';
 import CreateTimeEntry from '../screens/timeEntry/editTimeEntry/CreateTimeEntry';
 import CreateExpense from '../screens/more/expense/screens/CreateExpense';
+import CreateClients from '../screens/clients/screens/CreateClients';
 
 
 
@@ -70,6 +71,7 @@ const RootNavigation = () => {
         <Stack.Screen name="Bills" component={Bills} />
         <Stack.Screen name="CreateBilling" component={CreateBilling} />
         <Stack.Screen name="Clients" component={Clients} />
+        <Stack.Screen name="CreateClients" component={CreateClients} />
 
 
         {/* //Matters  */}
