@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useToast } from 'react-native-toast-notifications'
 import { pick } from '@react-native-documents/picker'
 import { calculatefontSize } from '../../../helper/responsiveHelper'
-import { COLORS } from '../../../constants'
+import { COLORS, prefixList } from '../../../constants'
 import ScreenHeader from '../../../components/ScreenHeader'
 import TextInputWithTitle from '../../../components/TextInputWithTitle'
 import Wrapper from '../../../components/Wrapper'
@@ -22,20 +22,23 @@ import MyText from '../../../components/MyText'
 import BottomModalListWithSearch from '../../../components/BottomModalListWithSearch'
 import AddButton from '../../../components/AddButton'
 import AddEmailAddress from '../components/AddEmailAddress'
+import { addEmail } from '../../../store/slices/clientSlice/createItemForAddEmail'
+import AddPhoneNumber from '../components/AddPhoneNumber'
+import { addPhoneNumber } from '../../../store/slices/clientSlice/createItemForAddPhone'
 
 
 const TIMER_KEY = 'TIMEKEEPER_STATE';
 
 const CreateClients = ({ navigation }) => {
     const dispatch = useDispatch();
+    const items = useSelector(state => state.createItemForAddEmail.items);
+    const itemsForPhoneNumber = useSelector(state => state.createItemForAddPhone.items);
+
 
     useEffect(() => {
-
     }, [])
 
     const validationSchema = Yup.object().shape({
-
-
     })
 
     return (
@@ -117,10 +120,10 @@ const CreateClients = ({ navigation }) => {
                                     values?.isYourType === "Individual" ?
                                         <>
                                             <TextInputWithTitle
-                                                onPressButton={() => setFieldValue('isOpencompany', true)}
+                                                onPressButton={() => setFieldValue('isOpenPrefix', true)}
                                                 title="Prefix"
                                                 isButton={true}
-                                                buttonText={values.company ? values.company : 'Select Prefix'}
+                                                buttonText={values.prefix ? values.prefix : 'Select Prefix'}
                                             />
                                             <TextInputWithTitle
                                                 placeholder={"First Name"}
@@ -159,7 +162,7 @@ const CreateClients = ({ navigation }) => {
                                             <View style={{ borderBottomWidth: 1, borderColor: COLORS?.LIGHT_COLOR, marginVertical: 10, }}>
 
                                                 {
-                                                    [1]?.map((item, index) => {
+                                                    items.map((item, index) => {
                                                         return (
                                                             <>
                                                                 <AddEmailAddress item={item} index={index} navigation={navigation} />
@@ -168,9 +171,25 @@ const CreateClients = ({ navigation }) => {
                                                     })
 
                                                 }
-                                                <AddButton onPress={() => dispatch(addTimeEntry({
+                                                <AddButton onPress={() => dispatch(addEmail({
                                                     id: Math.floor(Math.random() * 1000),
                                                 }))} title='Add email address' />
+                                            </View>
+                                            <View style={{ borderBottomWidth: 1, borderColor: COLORS?.LIGHT_COLOR, marginVertical: 10, }}>
+
+                                                {
+                                                    itemsForPhoneNumber.map((item, index) => {
+                                                        return (
+                                                            <>
+                                                                <AddPhoneNumber item={item} index={index} navigation={navigation} />
+                                                            </>
+                                                        )
+                                                    })
+
+                                                }
+                                                <AddButton onPress={() => dispatch(addPhoneNumber({
+                                                    id: Math.floor(Math.random() * 1000),
+                                                }))} title='Add phone number' />
                                             </View>
                                         </>
                                         :
@@ -184,25 +203,25 @@ const CreateClients = ({ navigation }) => {
                                         </>
                                 }
                                 {/* ====================================> DROP DOWN MODAL <================================================= */}
-                                {/* <BottomModalListWithSearch
+                                <BottomModalListWithSearch
                                     onClose={() => setFieldValue('isOpenPrefix', false)}
                                     renderItem={({ item }) => (
                                         <TouchableOpacity
                                             onPress={() => {
-                                                setFieldValue('prefix', item?.name || '');
+                                                setFieldValue('prefix', item?.value || '');
                                                 setFieldValue('isOpenPrefix', false);
                                             }}
                                             style={styles.itemStyle}
                                         >
                                             <MyText style={{ fontSize: calculatefontSize(1.9), }}>
-                                                {item?.name}
+                                                {item?.value}
                                             </MyText>
                                         </TouchableOpacity>
                                     )}
                                     visible={values?.isOpenPrefix}
-                                    data={matterData}
-                                    searchKey="name"
-                                /> */}
+                                    data={prefixList}
+                                    searchKey="value"
+                                />
 
                                 <DatePicker
                                     modal

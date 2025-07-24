@@ -15,7 +15,7 @@ export const X_TENANT_ID = "5024000001";
 export const COLORS = {
     PRIMARY_COLOR: '#003C83',
     PRIMARY_COLOR_LIGHT: '#0069d1',
-    yellow:"#fdcc39",
+    yellow: "#fdcc39",
     SECONDARY_COLOR: '#ffffff',
 
 
@@ -36,9 +36,9 @@ export const COLORS = {
 
     //STATUS COLOR:
     COMPLETE_BG: '#E6FAEB',
-    COMPLETD_TXT:"#007E17",
-    PENDING_BG:"#D2F6FF",
-    PENDING_TXT:"#3391A4",
+    COMPLETD_TXT: "#007E17",
+    PENDING_BG: "#D2F6FF",
+    PENDING_TXT: "#3391A4",
 }
 export const RANDOM_COLOR = ["#6aabed", "#49ac96", "#f28195", "#e7b15f", "#8a7fe6"];
 
@@ -91,7 +91,7 @@ export const IconUri = {
     Tasks: require('../assets/Icons/Tasks.png'),
     folder: require('../assets/Icons/folder.png'),
     word: require('../assets/Icons/word.png'),
-    
+
     //New
     CalenderColor: require('../assets/Icons/CalenderColor.png'),
     CalenderSearch: require('../assets/Icons/CalenderSearch.png'),
@@ -196,3 +196,44 @@ export const SALUTATIONS = [
     },
 
 ]
+
+//Create client 
+export const accountTypes = [
+    { label: "Personal", value: "Personal" },
+    { label: "Company", value: "Company" },
+    { label: "Trust", value: "Trust" },
+];
+
+export const typeOfEmail = ["Personal", "Work", "Home", "Other"];
+export const typeOfPhone = ["Personal", "Work", "Home", "Mobile", "Fax", "Pager", "Other"];
+export const typeOfWebAddress = ["Personal", "Work", "Website", "Facebook", "Linkedin", "X", "Other"];
+export const typeOfAddressess = ["Work", "Home", "Warehouse", "Billing", "Other"];
+
+export const predefinedColors = ["#6d95fd", "#fab1c9", "#c1c245", "#bde37b", "#95a0cc", "#bd986d", "#9ac7e9", "#ff6e6f", "#ff803a", "#ff7629", "#a8cee7", "#38b433"];
+
+export const prefixList = [
+    { value: "Mr.", label: "Mr." },
+    { value: "Mrs.", label: "Mrs." },
+    { value: "Miss.", label: "Miss" },
+    { value: "Ms.", label: "Ms." },
+    { value: "Dr.", label: "Dr." },
+    { value: "Prof.", label: "Prof." },
+    { value: "Sir.", label: "Sir." },
+];
+
+export const dateFormat = [
+    { value: "DD/MM/YYYY" },
+    { value: "MM/DD/YYYY" },
+    { value: "YYYY/MM/DD" },
+];
+
+export const timeFormat = [
+    { value: "11:59 PM" },
+    { value: "23:59" },
+];
+
+export const dateType = [
+    "Day",
+    "Month",
+    "Year"
+];

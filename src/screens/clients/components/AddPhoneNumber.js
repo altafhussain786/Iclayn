@@ -9,10 +9,10 @@ import { COLORS, fontFamily } from '../../../constants';
 import BottomModalListWithSearch from '../../../components/BottomModalListWithSearch';
 import { calculatefontSize } from '../../../helper/responsiveHelper';
 import { removeTimeEntry, updateTimeEntryField } from '../../../store/slices/billingSlice/createBillingTimeEntryItem';
-import { removeEmail, updateEmailField } from '../../../store/slices/clientSlice/createItemForAddEmail';
+import { removePhoneNumber, updatePhoneNumberField } from '../../../store/slices/clientSlice/createItemForAddPhone';
 
 
-const AddEmailAddress = ({ item, navigation }) => {
+const AddPhoneNumber = ({ item, navigation }) => {
     const [isOpenUser, setisOpenUser] = useState(false);
     const [isOpenType, setisOpenType] = useState(false);
     const [isSwitchOn, setSwitchOn] = useState(false);
@@ -42,7 +42,7 @@ const AddEmailAddress = ({ item, navigation }) => {
         },]
 
     const handleRemoveItem = () => {
-        dispatch(removeEmail({ id: id }));
+        dispatch(removePhoneNumber({ id: id }));
     };
 
     return (
@@ -66,9 +66,9 @@ const AddEmailAddress = ({ item, navigation }) => {
             <View style={{ marginTop: 10 }}>
                 <TextInput
                     value={item?.email}
-                    placeholder="Email address"
+                    placeholder="Phone Number"
                     placeholderTextColor={COLORS?.LIGHT_COLOR}
-                    onChangeText={(txt) => dispatch(updateEmailField({ id: id, field: 'email', value: txt }))}
+                    onChangeText={(txt) => dispatch(updatePhoneNumberField({ id: id, field: 'phoneNumber', value: txt }))}
                     style={{
                         borderWidth: 1,
                         borderRadius: 5,
@@ -83,7 +83,7 @@ const AddEmailAddress = ({ item, navigation }) => {
                 <MyText style={styles.title}>Is Primary</MyText>
                 <Switch
                     value={item?.isEmailPrimary}
-                    onValueChange={(val) => { setSwitchOn(val), dispatch(updateEmailField({ id: id, field: 'isEmailPrimary', value: val })) }}
+                    onValueChange={(val) => { setSwitchOn(val), dispatch(updatePhoneNumberField({ id: id, field: 'isPhoneNumberPrimary', value: val })) }}
                     thumbColor={isSwitchOn ? "#ffffff" : "#ffffff"}
                     trackColor={{ false: "gray", true: COLORS?.PRIMARY_COLOR_LIGHT }}
                 />
@@ -96,7 +96,7 @@ const AddEmailAddress = ({ item, navigation }) => {
                 renderItem={({ item: option }) => (
                     <TouchableOpacity
                         onPress={() => {
-                            dispatch(updateEmailField({ id: id, field: 'emailType', value: option.name }));
+                            dispatch(updatePhoneNumberField({ id: id, field: 'phoneNumberType', value: option.name }));
                             setisOpenType(false);
                         }}
                         style={{ paddingVertical: 10, borderBottomWidth: 1, borderColor: COLORS.BORDER_LIGHT_COLOR }}
@@ -109,7 +109,7 @@ const AddEmailAddress = ({ item, navigation }) => {
     );
 };
 
-export default AddEmailAddress;
+export default AddPhoneNumber;
 
 const styles = StyleSheet.create({
     totalTaxt: {

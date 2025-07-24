@@ -7,6 +7,8 @@ import createItemforReminderReducer from "./slices/taskSlice/createItemforRemind
 import createItemforDocumentsReducer from "./slices/taskSlice/createItemforDocuments";
 import createBillingTimeEntryItemReducer from "./slices/billingSlice/createBillingTimeEntryItem";
 import createBillingExpenseEntryItemReducer from "./slices/billingSlice/createBillingExpenseEntryItem";
+import createItemForAddEmailReducer from "./slices/clientSlice/createItemForAddEmail";
+import createItemForAddPhoneReducer from "./slices/clientSlice/createItemForAddPhone";
 
 const store = configureStore({
   reducer: {
@@ -18,7 +20,10 @@ const store = configureStore({
     createItemforDocuments: createItemforDocumentsReducer,
     //billing
     createBillingTimeEntryItem: createBillingTimeEntryItemReducer,
-    createBillingExpenseEntryItem: createBillingExpenseEntryItemReducer
+    createBillingExpenseEntryItem: createBillingExpenseEntryItemReducer,
+    //Client
+    createItemForAddEmail: createItemForAddEmailReducer,
+    createItemForAddPhone: createItemForAddPhoneReducer
   },
 });
 
