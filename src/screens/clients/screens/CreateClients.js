@@ -25,6 +25,13 @@ import AddEmailAddress from '../components/AddEmailAddress'
 import { addEmail } from '../../../store/slices/clientSlice/createItemForAddEmail'
 import AddPhoneNumber from '../components/AddPhoneNumber'
 import { addPhoneNumber } from '../../../store/slices/clientSlice/createItemForAddPhone'
+import AddWebAddress from '../components/AddWebAddress'
+import { addWebAddress } from '../../../store/slices/clientSlice/createItemForWebAddress'
+import AddAddress from '../components/AddAddress'
+import { addAddress } from '../../../store/slices/clientSlice/createItemForAddAddress'
+import AddContactPerson from '../components/AddContactPerson'
+import { addContactPerson } from '../../../store/slices/clientSlice/createItemForContactPerson'
+// import { pick } from '@react-native-documents/picker'
 
 
 const TIMER_KEY = 'TIMEKEEPER_STATE';
@@ -33,6 +40,9 @@ const CreateClients = ({ navigation }) => {
     const dispatch = useDispatch();
     const items = useSelector(state => state.createItemForAddEmail.items);
     const itemsForPhoneNumber = useSelector(state => state.createItemForAddPhone.items);
+    const itemsForWebAddress = useSelector(state => state.createItemForWebAddress.items);
+    const itemsForAddAddress = useSelector(state => state.createItemForAddAddress.items);
+    const itemsForContactPerson = useSelector(state => state.createItemForContactPerson.items);
 
 
     useEffect(() => {
@@ -49,7 +59,7 @@ const CreateClients = ({ navigation }) => {
                     {
                         isYourType: "Individual",
 
-                        //individual
+                        //individual===========================>
                         // prefix  ============>
                         prefix: "",
                         isOpenPrefix: false,
@@ -66,6 +76,13 @@ const CreateClients = ({ navigation }) => {
                         dateOfBirth: moment().format('DD/MM/YYYY'),
                         selectedDateOfBirth: moment(new Date()).toISOString(),
                         isdateOfBirthOpen: false,
+
+                        // ========================>COMPANY ===>
+                        companyName: "",
+                        companyNumber: "",
+
+                        //
+                        documentFile: '',
 
                         //loader
                         loader: false
@@ -84,81 +101,145 @@ const CreateClients = ({ navigation }) => {
                     <>
                         <ScreenHeader isLoading={values?.loader} onPressSave={handleSubmit} isShowSave={true} extraStyle={{ backgroundColor: '#F5F6F8' }} isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="Create Client" />
 
-                        <Wrapper>
+                        <KeyboardAvoidingView
+                            style={{ flex: 1 }}
+                            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                            keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} // adjust as needed
+                        >
+                            <Wrapper>
 
-                            <ScrollView
-                                contentContainerStyle={{ paddingBottom: 50 }}
-                                keyboardShouldPersistTaps="handled"
-                                showsVerticalScrollIndicator={false}
-                            >
-                                <MyText style={{ marginVertical: 10 }}>Is the client an individual or a company?</MyText>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                                <ScrollView
+                                    contentContainerStyle={{ paddingBottom: 100 }} // extra space for keyboard
+                                    keyboardShouldPersistTaps="handled"
+                                    showsVerticalScrollIndicator={false}
+                                >
+                                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginVertical: 10 }}>
+                                        <MyText style={{ width: "70%" }}>Is the client an individual or a company?</MyText>
+                                        <View style={{ alignItems: "center", gap: 10 }}>
+                                            <TouchableOpacity
+                                                onPress={async () => {
+                                                    try {
+                                                        const [pickResult] = await pick();
+
+                                                        if (pickResult) {
+                                                            setFieldValue('documentFile', [...(values?.documentFile || []), pickResult]);
+                                                        }
+                                                    } catch (err) {
+                                                        console.log(err);
+                                                    }
+                                                }}
+                                                style={{
+                                                    flexDirection: "row",
+                                                    alignItems: "center",
+                                                    backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
+                                                    gap: 10,
+                                                    borderStyle: "dashed",
+                                                    borderWidth: 1,
+                                                    padding: 10,
+                                                    borderRadius: 30,
+                                                }}
+                                            >
+                                                <AntDesign name="camera" size={20} color={COLORS?.PRIMARY_COLOR} />
+
+                                            </TouchableOpacity>
+
+                                            <MyText style={{ flex: 1, fontSize: calculatefontSize(1.4) }}>
+                                                Upload photo
+                                            </MyText>
+                                        </View>
+                                    </View>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                                        {
+                                            ["Individual", "Company"].map((item, index) => {
+                                                const isSelected = values.isYourType === item;
+                                                return (
+                                                    <>
+                                                        <TouchableOpacity style={{ width: "45%", }} onPress={() => setFieldValue('isYourType', item)}>
+                                                            <LinearGradient
+                                                                colors={isSelected ? [COLORS?.PRIMARY_COLOR_LIGHT, COLORS?.PRIMARY_COLOR,] : [COLORS?.LIGHT_COLOR, COLORS?.BORDER_LIGHT_COLOR,]}
+                                                                start={{ x: 0, y: 0 }}
+                                                                end={{ x: 1, y: 0 }}
+                                                                style={{ padding: 10, borderRadius: 5, flexDirection: "row", alignItems: "center", gap: 10 }}
+                                                            >
+                                                                {item === "Individual" ? <AntDesign name={"user"} size={20} color={isSelected ? COLORS?.whiteColors : COLORS?.BLACK_COLOR} />
+                                                                    :
+                                                                    <Octicons name={"organization"} size={20} color={isSelected ? COLORS?.whiteColors : COLORS?.BLACK_COLOR} />}
+                                                                <MyText style={{ textAlign: "center", color: isSelected ? COLORS?.whiteColors : COLORS?.BLACK_COLOR }}>{item}</MyText>
+                                                            </LinearGradient>
+                                                        </TouchableOpacity>
+                                                    </>
+                                                )
+                                            })
+                                        }
+
+                                    </View>
                                     {
-                                        ["Individual", "Company"].map((item, index) => {
-                                            const isSelected = values.isYourType === item;
-                                            return (
-                                                <>
-                                                    <TouchableOpacity style={{ width: "45%", }} onPress={() => setFieldValue('isYourType', item)}>
-                                                        <LinearGradient
-                                                            colors={isSelected ? [COLORS?.PRIMARY_COLOR_LIGHT, COLORS?.PRIMARY_COLOR,] : [COLORS?.LIGHT_COLOR, COLORS?.BORDER_LIGHT_COLOR,]}
-                                                            start={{ x: 0, y: 0 }}
-                                                            end={{ x: 1, y: 0 }}
-                                                            style={{ padding: 10, borderRadius: 5, flexDirection: "row", alignItems: "center", gap: 10 }}
-                                                        >
-                                                            {item === "Individual" ? <AntDesign name={"user"} size={20} color={isSelected ? COLORS?.whiteColors : COLORS?.BLACK_COLOR} />
-                                                                :
-                                                                <Octicons name={"organization"} size={20} color={isSelected ? COLORS?.whiteColors : COLORS?.BLACK_COLOR} />}
-                                                            <MyText style={{ textAlign: "center", color: isSelected ? COLORS?.whiteColors : COLORS?.BLACK_COLOR }}>{item}</MyText>
-                                                        </LinearGradient>
-                                                    </TouchableOpacity>
-                                                </>
-                                            )
-                                        })
-                                    }
-                                </View>
-                                {
-                                    values?.isYourType === "Individual" ?
+
                                         <>
-                                            <TextInputWithTitle
-                                                onPressButton={() => setFieldValue('isOpenPrefix', true)}
-                                                title="Prefix"
-                                                isButton={true}
-                                                buttonText={values.prefix ? values.prefix : 'Select Prefix'}
-                                            />
-                                            <TextInputWithTitle
-                                                placeholder={"First Name"}
-                                                value={values.firstName}
-                                                onChangeText={(txt) => setFieldValue('firstName', txt)}
-                                                title="FirstName"
+                                            {
+                                                values?.isYourType === "Individual" ?
+                                                    <>
+                                                        <TextInputWithTitle
+                                                            onPressButton={() => setFieldValue('isOpenPrefix', true)}
+                                                            title="Prefix"
+                                                            isButton={true}
+                                                            buttonText={values.prefix ? values.prefix : 'Select Prefix'}
+                                                        />
+                                                        <TextInputWithTitle
+                                                            placeholder={"First Name"}
+                                                            value={values.firstName}
+                                                            onChangeText={(txt) => setFieldValue('firstName', txt)}
+                                                            title="FirstName"
 
-                                            />
-                                            <TextInputWithTitle
-                                                placeholder={"Middle Name"}
-                                                value={values.middleName}
-                                                onChangeText={(txt) => setFieldValue('middleName', txt)}
-                                                title="Middle Name"
+                                                        />
+                                                        <TextInputWithTitle
+                                                            placeholder={"Middle Name"}
+                                                            value={values.middleName}
+                                                            onChangeText={(txt) => setFieldValue('middleName', txt)}
+                                                            title="Middle Name"
 
-                                            />
-                                            <TextInputWithTitle
-                                                placeholder={"Last Name"}
-                                                value={values.lastName}
-                                                onChangeText={(txt) => setFieldValue('lastName', txt)}
-                                                title="Last Name"
+                                                        />
+                                                        <TextInputWithTitle
+                                                            placeholder={"Last Name"}
+                                                            value={values.lastName}
+                                                            onChangeText={(txt) => setFieldValue('lastName', txt)}
+                                                            title="Last Name"
 
-                                            />
-                                            <TextInputWithTitle
-                                                placeholder={"Title"}
-                                                value={values.title}
-                                                onChangeText={(txt) => setFieldValue('title', txt)}
-                                                title="Title"
+                                                        />
+                                                        <TextInputWithTitle
+                                                            placeholder={"Title"}
+                                                            value={values.title}
+                                                            onChangeText={(txt) => setFieldValue('title', txt)}
+                                                            title="Title"
 
-                                            />
-                                            <TextInputWithTitle
-                                                onPressButton={() => setFieldValue('isdateOfBirthOpen', true)}
-                                                title="Date of Birth"
-                                                isButton={true}
-                                                buttonText={values.dateOfBirth ? values.dateOfBirth : 'DD/MM/YYYY'}
-                                            />
+                                                        />
+                                                        <TextInputWithTitle
+                                                            onPressButton={() => setFieldValue('isdateOfBirthOpen', true)}
+                                                            title="Date of Birth"
+                                                            isButton={true}
+                                                            buttonText={values.dateOfBirth ? values.dateOfBirth : 'DD/MM/YYYY'}
+                                                        />
+                                                    </>
+                                                    :
+                                                    <>
+                                                        <TextInputWithTitle
+                                                            placeholder={"Company name"}
+                                                            isRequired={true}
+                                                            value={values.companyName}
+                                                            onChangeText={(txt) => setFieldValue('companyName', txt)}
+                                                            title="Company Name"
+
+                                                        />
+                                                        <TextInputWithTitle
+                                                            placeholder={"Company Number"}
+                                                            isRequired={true}
+                                                            value={values.companyNumber}
+                                                            onChangeText={(txt) => setFieldValue('companyNumber', txt)}
+                                                            title="Company Number"
+
+                                                        />
+                                                    </>
+                                            }
                                             <View style={{ borderBottomWidth: 1, borderColor: COLORS?.LIGHT_COLOR, marginVertical: 10, }}>
 
                                                 {
@@ -191,58 +272,97 @@ const CreateClients = ({ navigation }) => {
                                                     id: Math.floor(Math.random() * 1000),
                                                 }))} title='Add phone number' />
                                             </View>
-                                        </>
-                                        :
-                                        <>
-                                            <TextInputWithTitle
-                                                onPressButton={() => setFieldValue('isOpenindividual', true)}
-                                                title="Company"
-                                                isButton={true}
-                                                buttonText={values.individual ? values.individual : 'Select Individual'}
-                                            />
-                                        </>
-                                }
-                                {/* ====================================> DROP DOWN MODAL <================================================= */}
-                                <BottomModalListWithSearch
-                                    onClose={() => setFieldValue('isOpenPrefix', false)}
-                                    renderItem={({ item }) => (
-                                        <TouchableOpacity
-                                            onPress={() => {
-                                                setFieldValue('prefix', item?.value || '');
-                                                setFieldValue('isOpenPrefix', false);
-                                            }}
-                                            style={styles.itemStyle}
-                                        >
-                                            <MyText style={{ fontSize: calculatefontSize(1.9), }}>
-                                                {item?.value}
-                                            </MyText>
-                                        </TouchableOpacity>
-                                    )}
-                                    visible={values?.isOpenPrefix}
-                                    data={prefixList}
-                                    searchKey="value"
-                                />
+                                            <View style={{ borderBottomWidth: 1, borderColor: COLORS?.LIGHT_COLOR, marginVertical: 10, }}>
+                                                {
+                                                    itemsForWebAddress.map((item, index) => {
+                                                        return (
+                                                            <>
+                                                                <AddWebAddress item={item} index={index} navigation={navigation} />
+                                                            </>
+                                                        )
+                                                    })
+                                                }
+                                                <AddButton onPress={() => dispatch(addWebAddress({
+                                                    id: Math.floor(Math.random() * 1000),
+                                                }))} title='Add Web Address' />
+                                            </View>
+                                            <View style={{ borderBottomWidth: 1, borderColor: COLORS?.LIGHT_COLOR, marginVertical: 10, }}>
+                                                {
+                                                    itemsForAddAddress.map((item, index) => {
+                                                        return (
+                                                            <>
+                                                                <AddAddress item={item} index={index} navigation={navigation} />
+                                                            </>
+                                                        )
+                                                    })
+                                                }
+                                                <AddButton onPress={() => dispatch(addAddress({
+                                                    id: Math.floor(Math.random() * 1000),
+                                                }))} title='Add address' />
+                                            </View>
+                                            {
+                                                values?.isYourType !== "Individual" &&
 
-                                <DatePicker
-                                    modal
-                                    mode='date'
-                                    open={values.isdateOfBirthOpen}
-                                    date={new Date()}
-                                    onConfirm={date => {
-                                        setFieldValue('selectedDateOfBirth', date?.toISOString())
-                                        setFieldValue('isdateOfBirthOpen', false);
-                                        setFieldValue(
-                                            'dateOfBirth',
-                                            moment(date).format('MM/DD/YYYY'),
-                                        );
-                                    }}
-                                    onCancel={() => {
-                                        setFieldValue('isdateOfBirthOpen', false);
-                                    }}
-                                />
-                            </ScrollView>
+                                                <View style={{ borderBottomWidth: 1, borderColor: COLORS?.LIGHT_COLOR, marginVertical: 10, }}>
+                                                    {
+                                                        itemsForContactPerson.map((item, index) => {
+                                                            return (
+                                                                <>
+                                                                    <AddContactPerson item={item} index={index} navigation={navigation} />
+                                                                </>
+                                                            )
+                                                        })
+                                                    }
+                                                    <AddButton onPress={() => dispatch(addContactPerson({
+                                                        id: Math.floor(Math.random() * 1000),
+                                                    }))} title='Add contact person' />
+                                                </View>
+                                            }
+                                        </>
 
-                        </Wrapper>
+                                    }
+                                    {/* ====================================> DROP DOWN MODAL <================================================= */}
+                                    <BottomModalListWithSearch
+                                        onClose={() => setFieldValue('isOpenPrefix', false)}
+                                        renderItem={({ item }) => (
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    setFieldValue('prefix', item?.value || '');
+                                                    setFieldValue('isOpenPrefix', false);
+                                                }}
+                                                style={styles.itemStyle}
+                                            >
+                                                <MyText style={{ fontSize: calculatefontSize(1.9), }}>
+                                                    {item?.value}
+                                                </MyText>
+                                            </TouchableOpacity>
+                                        )}
+                                        visible={values?.isOpenPrefix}
+                                        data={prefixList}
+                                        searchKey="value"
+                                    />
+
+                                    <DatePicker
+                                        modal
+                                        mode='date'
+                                        open={values.isdateOfBirthOpen}
+                                        date={new Date()}
+                                        onConfirm={date => {
+                                            setFieldValue('selectedDateOfBirth', date?.toISOString())
+                                            setFieldValue('isdateOfBirthOpen', false);
+                                            setFieldValue(
+                                                'dateOfBirth',
+                                                moment(date).format('MM/DD/YYYY'),
+                                            );
+                                        }}
+                                        onCancel={() => {
+                                            setFieldValue('isdateOfBirthOpen', false);
+                                        }}
+                                    />
+                                </ScrollView>
+
+                            </Wrapper>
+                        </KeyboardAvoidingView>
                     </>
 
                 )}

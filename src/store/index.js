@@ -9,7 +9,9 @@ import createBillingTimeEntryItemReducer from "./slices/billingSlice/createBilli
 import createBillingExpenseEntryItemReducer from "./slices/billingSlice/createBillingExpenseEntryItem";
 import createItemForAddEmailReducer from "./slices/clientSlice/createItemForAddEmail";
 import createItemForAddPhoneReducer from "./slices/clientSlice/createItemForAddPhone";
-
+import createItemForWebAddressReducer from "./slices/clientSlice/createItemForWebAddress";
+import createItemForAddAddressReducer from "./slices/clientSlice/createItemForAddAddress";
+import createItemForContactPerson from "./slices/clientSlice/createItemForContactPerson";
 const store = configureStore({
   reducer: {
     userDetails: userDetailsReducer,
@@ -23,7 +25,10 @@ const store = configureStore({
     createBillingExpenseEntryItem: createBillingExpenseEntryItemReducer,
     //Client
     createItemForAddEmail: createItemForAddEmailReducer,
-    createItemForAddPhone: createItemForAddPhoneReducer
+    createItemForAddPhone: createItemForAddPhoneReducer,
+    createItemForWebAddress: createItemForWebAddressReducer,
+    createItemForAddAddress: createItemForAddAddressReducer,
+    createItemForContactPerson: createItemForContactPerson
   },
 });
 

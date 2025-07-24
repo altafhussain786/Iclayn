@@ -8,6 +8,7 @@ const createPhoneNumberEntry = (payload) => ({
     id: payload.id,
     phoneNumber: payload.phoneNumber || '',
     phoneNumberType: payload.phoneNumberType || '',
+    pickerDetails: payload.pickerDetails || '',
     isPhoneNumberPrimary: payload.isPhoneNumberPrimary || false,
 });
 

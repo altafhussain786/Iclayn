@@ -35,6 +35,7 @@ import CreateBilling from '../screens/tabs/bills/screens/CreateBilling';
 import CreateTimeEntry from '../screens/timeEntry/editTimeEntry/CreateTimeEntry';
 import CreateExpense from '../screens/more/expense/screens/CreateExpense';
 import CreateClients from '../screens/clients/screens/CreateClients';
+import CreateParties from '../screens/more/parties/screens/CreateParties';
 
 
 
@@ -92,6 +93,7 @@ const RootNavigation = () => {
 
         {/* //more  */}
         <Stack.Screen name="Parties" component={Parties} />
+        <Stack.Screen name="CreateParties" component={CreateParties} />
         <Stack.Screen name="Documents" component={Documents} />
         <Stack.Screen name="Communications" component={Communications} />
         <Stack.Screen name="AppSettings" component={AppSettings} />

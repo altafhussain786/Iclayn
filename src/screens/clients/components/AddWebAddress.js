@@ -9,16 +9,13 @@ import { COLORS, fontFamily } from '../../../constants';
 import BottomModalListWithSearch from '../../../components/BottomModalListWithSearch';
 import { calculatefontSize } from '../../../helper/responsiveHelper';
 import { removeTimeEntry, updateTimeEntryField } from '../../../store/slices/billingSlice/createBillingTimeEntryItem';
-import { removePhoneNumber, updatePhoneNumberField } from '../../../store/slices/clientSlice/createItemForAddPhone';
-import { CountryPicker } from "react-native-country-codes-picker";
+import { removeWebAddress, updateWebAddressField } from '../../../store/slices/clientSlice/createItemForWebAddress';
 
-const AddPhoneNumber = ({ item, navigation }) => {
+
+const AddWebAddress = ({ item, navigation }) => {
     const [isOpenUser, setisOpenUser] = useState(false);
     const [isOpenType, setisOpenType] = useState(false);
     const [isSwitchOn, setSwitchOn] = useState(false);
-    const [show, setShow] = useState(false);
-    const [dialCode, setDialCode] = useState('+44');
-    const [flagEmoji, setFlagEmoji] = useState('🇬🇧'); // default flag
     const dispatch = useDispatch();
     const id = item?.id;
 
@@ -45,7 +42,7 @@ const AddPhoneNumber = ({ item, navigation }) => {
         },]
 
     const handleRemoveItem = () => {
-        dispatch(removePhoneNumber({ id: id }));
+        dispatch(removeWebAddress({ id: id }));
     };
 
     return (
@@ -55,8 +52,8 @@ const AddPhoneNumber = ({ item, navigation }) => {
 
 
                 <TouchableOpacity style={{ width: '85%' }} onPress={() => setisOpenType(true)}>
-                    <MyText style={{ color: item.phoneNumberType ? COLORS?.PRIMARY_COLOR : COLORS?.LIGHT_COLOR }}>
-                        {item?.phoneNumberType || 'Type'}
+                    <MyText style={{ color: item.webAddressType ? COLORS?.PRIMARY_COLOR : COLORS?.LIGHT_COLOR }}>
+                        {item?.webAddressType || 'Type'}
                     </MyText>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleRemoveItem}>
@@ -67,56 +64,26 @@ const AddPhoneNumber = ({ item, navigation }) => {
             {/* Reminder Type Dropdown */}
 
             <View style={{ marginTop: 10 }}>
-                <CountryPicker
-                    onBackdropPress={() => setShow(false)}
-                    show={show}
+                <TextInput
+                    value={item?.webAddress}
+                    placeholder="Web Address"
+                    placeholderTextColor={COLORS?.LIGHT_COLOR}
+                    onChangeText={(txt) => dispatch(updateWebAddressField({ id: id, field: 'webAddress', value: txt }))}
                     style={{
-                        modal: {
-                            height: 500,
-                        },
-                    }}
-                    pickerButtonOnPress={(item) => {
-                        console.log(item, "item");
-
-                        dispatch(updatePhoneNumberField({ id: id, field: 'pickerDetails', value: item }));
-                        setDialCode(item.dial_code);
-                        setFlagEmoji(item.flag); // ✅ Set flag emoji
-                        setShow(false);
-                    }}
-                />
-
-                <View
-                    style={{
-                        flexDirection: "row",
-                        alignItems: "center",
                         borderWidth: 1,
                         borderRadius: 5,
-                        padding: 5,
-                        paddingHorizontal: 10,
+                        padding: 10,
                         borderColor: '#ddd',
+                        fontSize: calculatefontSize(1.8),
+                        color: COLORS.PRIMARY_COLOR
                     }}
-                >
-                    <TouchableOpacity onPress={() => setShow(true)}>
-                        <MyText>{flagEmoji} {dialCode}</MyText> {/* ✅ flag + code */}
-                    </TouchableOpacity>
-
-                    <TextInput
-                        keyboardType='phone-pad'
-                        style={{ marginLeft: 10, flex: 1 }}
-                        value={item?.phoneNumber}
-                        placeholder="Phone Number"
-                        placeholderTextColor={COLORS?.LIGHT_COLOR}
-                        onChangeText={(txt) =>
-                            dispatch(updatePhoneNumberField({ id: id, field: 'phoneNumber', value: txt }))
-                        }
-                    />
-                </View>
+                />
             </View>
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderBottomWidth: 1, paddingVertical: 10, borderColor: '#ddd', }}>
                 <MyText style={styles.title}>Is Primary</MyText>
                 <Switch
-                    value={item?.isEmailPrimary}
-                    onValueChange={(val) => { setSwitchOn(val), dispatch(updatePhoneNumberField({ id: id, field: 'isPhoneNumberPrimary', value: val })) }}
+                    value={item?.isWebAddressPrimary}
+                    onValueChange={(val) => { setSwitchOn(val), dispatch(updateWebAddressField({ id: id, field: 'isWebAddressPrimary', value: val })) }}
                     thumbColor={isSwitchOn ? "#ffffff" : "#ffffff"}
                     trackColor={{ false: "gray", true: COLORS?.PRIMARY_COLOR_LIGHT }}
                 />
@@ -129,7 +96,7 @@ const AddPhoneNumber = ({ item, navigation }) => {
                 renderItem={({ item: option }) => (
                     <TouchableOpacity
                         onPress={() => {
-                            dispatch(updatePhoneNumberField({ id: id, field: 'phoneNumberType', value: option.name }));
+                            dispatch(updateWebAddressField({ id: id, field: 'webAddressType', value: option.name }));
                             setisOpenType(false);
                         }}
                         style={{ paddingVertical: 10, borderBottomWidth: 1, borderColor: COLORS.BORDER_LIGHT_COLOR }}
@@ -142,7 +109,7 @@ const AddPhoneNumber = ({ item, navigation }) => {
     );
 };
 
-export default AddPhoneNumber;
+export default AddWebAddress;
 
 const styles = StyleSheet.create({
     totalTaxt: {
