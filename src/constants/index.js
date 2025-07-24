@@ -111,6 +111,8 @@ export const IconUri = {
     client: require('../assets/Icons/client.png'),
     mail: require('../assets/Icons/mail.png'),
     delete: require('../assets/Icons/delete.png'),
+    transaction: require('../assets/Icons/transaction.png'),
+    hamBurger: require('../assets/Icons/hamBurger.png'),
 
     communication: require('../assets/Icons/communication.png'),
     documents: require('../assets/Icons/documents.png'),

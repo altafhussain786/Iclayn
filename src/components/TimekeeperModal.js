@@ -38,6 +38,8 @@ const TimekeeperModal = ({ visible, onClose, navigation }) => {
         { label: 'Expense', icon: 'file-text', onPress: () => navigation.navigate("CreateExpense"), iconName: IconUri?.matter },
         { label: 'Client', icon: 'file-text', onPress: () => navigation.navigate("CreateClients"), iconName: IconUri?.client },
         { label: 'Parties', icon: 'file-text', onPress: () => navigation.navigate("CreateParties"), iconName: IconUri?.parties },
+        { label: 'Transaction', icon: 'file-text', onPress: () => navigation.navigate("CreateTransaction"), iconName: IconUri?.transaction },
+        { label: 'Communications', icon: 'file-text', onPress: () => navigation.navigate("Communications"), iconName: IconUri?.communication },
     ];
 
 

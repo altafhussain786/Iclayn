@@ -36,6 +36,10 @@ import CreateTimeEntry from '../screens/timeEntry/editTimeEntry/CreateTimeEntry'
 import CreateExpense from '../screens/more/expense/screens/CreateExpense';
 import CreateClients from '../screens/clients/screens/CreateClients';
 import CreateParties from '../screens/more/parties/screens/CreateParties';
+import Transaction from '../screens/more/transaction/Transaction';
+import CreateTransaction from '../screens/more/transaction/screens/CreateTransaction';
+import CreatePhoneLog from '../screens/more/communications/screens/CreatePhoneLog';
+import CreateInternalLogs from '../screens/more/communications/screens/CreateInternalLogs';
 
 
 
@@ -96,8 +100,12 @@ const RootNavigation = () => {
         <Stack.Screen name="CreateParties" component={CreateParties} />
         <Stack.Screen name="Documents" component={Documents} />
         <Stack.Screen name="Communications" component={Communications} />
+        <Stack.Screen name="CreatePhoneLog" component={CreatePhoneLog} />
+        <Stack.Screen name="CreateInternalLogs" component={CreateInternalLogs} />
         <Stack.Screen name="AppSettings" component={AppSettings} />
         <Stack.Screen name="Reports" component={Reports} />
+        <Stack.Screen name="Transaction" component={Transaction} />
+        <Stack.Screen name="CreateTransaction" component={CreateTransaction} />
 
 
 

@@ -24,6 +24,26 @@ const Communications = ({ navigation }) => {
     const [searchText, setSearchText] = useState(''); // ✅ for search
     const [loader, setLoader] = React.useState(false);
     const [modalVisible, setModalVisible] = useState(false);
+    const [isShowCreate, setIsShowCreate] = useState(false);
+
+
+    const CreateItem = [
+        {
+            id: 1,
+            name: 'Phone Log',
+            image: IconUri?.Calender,
+            screenName: "CreatePhoneLog",
+            color: COLORS?.PRIMARY_COLOR_LIGHT
+        },
+        {
+            id: 2,
+            name: 'Internal Log',
+            screenName: "CreateInternalLogs",
+            image: IconUri?.All,
+            color: COLORS?.PRIMARY_COLOR_LIGHT
+        },
+
+    ]
 
     const getCommunicationData = async () => {
         setLoader(true)
@@ -117,10 +137,27 @@ const Communications = ({ navigation }) => {
                         placeholder="Search a parties..."
                         value={searchText} onChangeText={text => setSearchText(text)}
                     />
-                    <Image
-                        source={IconUri?.CalenderSearch}
-                        style={{ height: 30, width: 30, resizeMode: "contain" }}
-                    />
+                    <View>
+                        <TouchableOpacity onPress={() => setIsShowCreate(!isShowCreate)}>
+                            <Image
+                                source={IconUri?.hamBurger}
+                                style={{ height: 30, width: 30, resizeMode: "contain", }}
+                            />
+                        </TouchableOpacity>
+                        {isShowCreate && <View style={{ backgroundColor: COLORS?.whiteColors, padding: 10, position: "absolute", width: 100, top: 30, right: 10, borderWidth: 0.5, borderRadius: 5, zIndex: 1 }}>
+                            {
+                                CreateItem?.map((item, index) => {
+                                    return (
+                                        <>
+                                            <TouchableOpacity onPress={() => { navigation.navigate(item?.screenName) }}>
+                                                <MyText style={{ color: COLORS?.BLACK_COLOR, fontSize: calculatefontSize(1.8) }}>{item?.name}</MyText>
+                                            </TouchableOpacity>
+                                        </>
+                                    )
+                                })
+                            }
+                        </View>}
+                    </View>
                 </View>
                 {/* ///RENDER ITEM =====================> */}
                 {loader ? <Loader /> :
