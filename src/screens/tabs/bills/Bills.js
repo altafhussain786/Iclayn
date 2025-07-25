@@ -15,6 +15,7 @@ import { calculatefontSize } from '../../../helper/responsiveHelper';
 import MyText from '../../../components/MyText';
 
 // Icons
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import Wrapper from '../../../components/Wrapper';
 import SearchBar from '../../../components/SearchBar';
 import FloatingButton from '../../../components/FloatingButton';
@@ -22,6 +23,7 @@ import httpRequest from '../../../api/apiHandler';
 import moment from 'moment';
 import TimekeeperModal from '../../../components/TimekeeperModal';
 import LinearGradient from 'react-native-linear-gradient';
+import { Swipeable } from 'react-native-gesture-handler';
 
 const Bills = ({ navigation }) => {
   const [tabs, setTabs] = React.useState('All');
@@ -74,6 +76,17 @@ const Bills = ({ navigation }) => {
 
     setFilteredData(filtered);
   }, [searchText, data, tabs]);
+
+  const renderLeftActions = (item) => (
+    <View style={{ flexDirection: 'row' }}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("EditBilling", { billingDetails: item })}
+        style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+      >
+        <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
     <>
@@ -158,50 +171,52 @@ const Bills = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 100 }}
           renderItem={({ item, index }) => {
             return (
-              <TouchableOpacity onPress={() => navigation.navigate('MatterDetails', { matterData: item })}
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: 10,
-                  borderBottomWidth: 1,
-                  paddingVertical: 15,
-                  borderColor: COLORS?.BORDER_LIGHT_COLOR,
-                }}
-              >
-                <View style={{ gap: 5, width: "65%" }}>
-                  <MyText style={styles.timeColor}>Open {moment(item?.openDate).format('DD-MM-YYYY')}</MyText>
-                  <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300', }]}>
-                    {item?.matterName}
-                  </MyText>
-                  <MyText style={styles.timeColor}>{item?.code}</MyText>
-                </View>
-                <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
+              <Swipeable renderLeftActions={() => renderLeftActions(item)}>
+                <TouchableOpacity onPress={() => navigation.navigate('MatterDetails', { matterData: item })}
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: 10,
+                    borderBottomWidth: 1,
+                    paddingVertical: 15,
+                    borderColor: COLORS?.BORDER_LIGHT_COLOR,
+                  }}
+                >
+                  <View style={{ gap: 5, width: "65%" }}>
+                    <MyText style={styles.timeColor}>Open {moment(item?.openDate).format('DD-MM-YYYY')}</MyText>
+                    <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300', }]}>
+                      {item?.matterName}
+                    </MyText>
+                    <MyText style={styles.timeColor}>{item?.code}</MyText>
+                  </View>
+                  <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
 
-                  <View
-                    style={{
-                      backgroundColor: item?.status == "Open" ? '#EFE4FF' : '#ffc2cd',
-                      borderWidth: 1,
-                      borderColor: item?.status == "COMPLETED" ? '#7C4EC9' : '#6c0014',
-                      // alignSelf: 'flex-end',
-                      borderRadius: 5,
-                      paddingHorizontal: 8,
-                      paddingVertical: 2,
-                    }}
-                  >
-                    <MyText
+                    <View
                       style={{
-                        // fontWeight: '600',
-                        // textAlign: 'center',
-                        color: item?.status == "COMPLETED" ? COLORS?.whiteColors : '#6c0014',
-                        fontSize: calculatefontSize(1.4),
+                        backgroundColor: item?.status == "Open" ? '#EFE4FF' : '#ffc2cd',
+                        borderWidth: 1,
+                        borderColor: item?.status == "COMPLETED" ? '#7C4EC9' : '#6c0014',
+                        // alignSelf: 'flex-end',
+                        borderRadius: 5,
+                        paddingHorizontal: 8,
+                        paddingVertical: 2,
                       }}
                     >
-                      {item?.status}
-                    </MyText>
+                      <MyText
+                        style={{
+                          // fontWeight: '600',
+                          // textAlign: 'center',
+                          color: item?.status == "COMPLETED" ? COLORS?.whiteColors : '#6c0014',
+                          fontSize: calculatefontSize(1.4),
+                        }}
+                      >
+                        {item?.status}
+                      </MyText>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              </Swipeable>
             );
           }}
           refreshControl={

@@ -67,6 +67,26 @@ export const formatNumber = (num) => {
     return num?.toFixed(2)?.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
+export const getTotalDuration = (durationStr) => {
+    // HH (2+ digits), MM (00–59), SS (00–59)
+    const durationRegex = /^(\d{2,}):([0-5][0-9]):([0-5][0-9])$/;
+
+    const match = durationStr.match(durationRegex);
+
+    if (!match) {
+        Alert.alert('Invalid Format', 'Please enter duration in HH:MM:SS format (e.g. 01:30:00, 100:59:59)');
+        return null;
+    }
+
+    const [, hhStr, mmStr, ssStr] = match;
+    const hh = parseInt(hhStr, 10);
+    const mm = parseInt(mmStr, 10);
+    const ss = parseInt(ssStr, 10);
+
+    const totalHours = hh + mm / 60 + ss / 3600;
+    return totalHours;
+}
+
 
 
 // export const calculateDateRange = (option) => {
