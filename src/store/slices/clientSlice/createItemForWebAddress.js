@@ -9,6 +9,7 @@ const createWebAddressEntry = (payload) => ({
     webAddress: payload.webAddress || '',
     webAddressType: payload.webAddressType || '',
     isWebAddressPrimary: payload.isWebAddressPrimary || false,
+    webAddressObj: payload.webAddressObj || {},
 });
 
 const createWebAddressSlice = createSlice({

@@ -148,8 +148,8 @@ const CreateInternalLogs = ({ navigation }) => {
                         companyName: "",
                         companyNumber: "",
 
-                        //
-                        documentFile: '',
+                        //Document
+                        documentFile: [],
 
                         //loader
                         loader: false
@@ -249,6 +249,89 @@ const CreateInternalLogs = ({ navigation }) => {
                                         buttonText={values.time ? values.time : 'hh:mm A'}
                                     />
 
+                                    <View style={{ gap: 10, marginVertical: 10, padding: 15, backgroundColor: COLORS?.BORDER_LIGHT_COLOR }}>
+                                        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                                            <TouchableOpacity
+                                                onPress={async () => {
+                                                    try {
+                                                        const [pickResult] = await pick();
+                                                        console.log(pickResult, "PICK RESULT");
+
+                                                        if (pickResult) {
+                                                            if (values?.documentFile?.find(doc => doc?.name === pickResult?.name)) {
+                                                                Alert.alert('Alert', 'This file is already uploaded');
+                                                                return
+                                                            }
+                                                            if (values?.documentFile?.length >= 5) {
+                                                                Alert.alert('Alert', 'You can upload a maximum of 5 files');
+                                                                return
+                                                            }
+                                                            else if (pickResult?.size > 5242880) {
+                                                                Alert.alert('Alert', 'You can upload a maximum of 5MB each');
+                                                                return
+                                                            }
+                                                            else {
+                                                                setFieldValue('documentFile', [...(values?.documentFile || []), pickResult]);
+
+                                                            }
+
+                                                        }
+                                                    } catch (err) {
+                                                        console.log(err);
+                                                    }
+                                                }}
+                                                style={{
+                                                    flexDirection: "row",
+                                                    alignItems: "center",
+                                                    backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
+                                                    gap: 10,
+                                                    borderStyle: "dashed",
+                                                    borderWidth: 1,
+                                                    padding: 10,
+                                                    borderRadius: 5,
+                                                }}
+                                            >
+                                                <AntDesign name="upload" size={15} color={COLORS?.BLACK_COLOR} />
+                                                <MyText>Upload File</MyText>
+                                            </TouchableOpacity>
+
+                                            <MyText style={{ flex: 1, fontSize: calculatefontSize(1.4) }}>
+                                                You can upload a maximum of 5 files, 5MB each
+                                            </MyText>
+                                        </View>
+
+                                        {/* Uploaded Files List */}
+                                        {values?.documentFile?.length > 0 && (
+                                            <View style={{ gap: 10, }}>
+                                                {values?.documentFile?.map((d, i) => (
+                                                    <View
+                                                        key={i}
+                                                        style={{
+                                                            flexDirection: "row",
+                                                            justifyContent: "space-between",
+                                                            alignItems: "center",
+                                                            padding: 10,
+                                                            backgroundColor: '#fffcfcff',
+                                                            borderRadius: 5,
+                                                        }}
+                                                    >
+                                                        <MyText style={{ width: "70%" }}>{d?.name || 'Unnamed File'}</MyText>
+                                                        <TouchableOpacity
+                                                            onPress={() =>
+                                                                setFieldValue(
+                                                                    'documentFile',
+                                                                    values?.documentFile?.filter((_, index) => index !== i)
+                                                                )
+                                                            }
+                                                        >
+                                                            <Entypo name="circle-with-cross" size={20} color="red" />
+                                                        </TouchableOpacity>
+                                                    </View>
+                                                ))}
+                                            </View>
+                                        )}
+                                    </View>
+
                                     <TextInputWithTitle
                                         onPressButton={() => setFieldValue('isOpenCategory', true)}
                                         title="Category"
@@ -257,13 +340,7 @@ const CreateInternalLogs = ({ navigation }) => {
                                     />
 
 
-                                    {/* <TextInputWithTitle
-                                        placeholder={"00h 00m 00s"}
-                                        value={values.recordedTime}
-                                        onChangeText={(txt) => setFieldValue('recordedTime', txt)}
-                                        title="Recorded time"
 
-                                    /> */}
 
 
 

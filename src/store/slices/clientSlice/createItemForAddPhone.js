@@ -10,6 +10,7 @@ const createPhoneNumberEntry = (payload) => ({
     phoneNumberType: payload.phoneNumberType || '',
     pickerDetails: payload.pickerDetails || '',
     isPhoneNumberPrimary: payload.isPhoneNumberPrimary || false,
+    phoneNumberObj: payload.phoneNumberObj || {},
 });
 
 const addPhoneNumberSlice = createSlice({

@@ -15,6 +15,7 @@ const createAddressEntry = (payload) => ({
     postCode: payload.postCode || '',
     streetAddress: payload.streetAddress || '',
     isAddressPrimary: payload.isAddressPrimary || false,
+    addressObj: payload.addressObj || {},
 });
 
 const createAddressSlice = createSlice({

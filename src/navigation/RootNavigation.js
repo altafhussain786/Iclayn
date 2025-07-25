@@ -40,6 +40,7 @@ import Transaction from '../screens/more/transaction/Transaction';
 import CreateTransaction from '../screens/more/transaction/screens/CreateTransaction';
 import CreatePhoneLog from '../screens/more/communications/screens/CreatePhoneLog';
 import CreateInternalLogs from '../screens/more/communications/screens/CreateInternalLogs';
+import EditClient from '../screens/clients/screens/EditClient';
 
 
 
@@ -77,6 +78,7 @@ const RootNavigation = () => {
         <Stack.Screen name="CreateBilling" component={CreateBilling} />
         <Stack.Screen name="Clients" component={Clients} />
         <Stack.Screen name="CreateClients" component={CreateClients} />
+        <Stack.Screen name="EditClient" component={EditClient} />
 
 
         {/* //Matters  */}

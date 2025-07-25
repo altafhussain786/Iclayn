@@ -1,19 +1,122 @@
 {
-  "createdOn": "",
-  "updatedOn": null,
+  "createdOn": "2025-07-25T09:07:52+01:00",
+  "updatedOn": "2025-07-25T08:38:44+01:00",
   "createdBy": 1,
-  "updatedBy": null,
+  "updatedBy": 1,
   "revision": null,
-  "matterComLogId": null,
-  "logDate": "2025-07-25T00:00:00+05:00",
-  "logTime": "2025-07-24T16:45:00.589Z",
-  "fromId": 1,
-  "toId": 1,
-  "subject": "fdsfds",
-  "body": "dfsdsfds",
-  "timer": null,
-  "matterId": 5,
-  "type": "Phone",
-  "attachmentDTOList": null,
-  "status": "Active"
+  "clientId": 4,
+  "code": "CLI-5008",
+  "prefix": "Mr.",
+  "companyName": null,
+  "companyNumber": null,
+  "firstName": "firstName",
+  "middleName": "middle name",
+  "lastName": "last name",
+  "company": "company",
+  "title": "title",
+  "dob": "2025-08-13T00:00:00+01:00",
+  "status": "Active",
+  "type": "Individual",
+  "photo": null,
+  "clientEmailAddressDTOList": [
+    {
+      "createdOn": "2025-07-25T08:38:44+01:00",
+      "updatedOn": "2025-07-25T08:38:44+01:00",
+      "createdBy": null,
+      "updatedBy": null,
+      "revision": null,
+      "clientEmailAddressId": 4,
+      "email": "testaddress@gmail.com",
+      "type": "Personal",
+      "primary": true,
+      "clientId": 4
+    },
+    {
+      "createdOn": "2025-07-25T08:38:44+01:00",
+      "updatedOn": "2025-07-25T08:38:44+01:00",
+      "createdBy": null,
+      "updatedBy": null,
+      "revision": null,
+      "clientEmailAddressId": 5,
+      "email": "test2@yopmail.com",
+      "type": "Work",
+      "primary": false,
+      "clientId": 4
+    }
+  ],
+  "clientPhoneNumberDTOList": [
+    {
+      "createdOn": "2025-07-25T08:38:44+01:00",
+      "updatedOn": "2025-07-25T08:38:44+01:00",
+      "createdBy": null,
+      "updatedBy": null,
+      "revision": null,
+      "clientPhoneNumberId": 4,
+      "phoneNo": "+445454545454",
+      "type": "Personal",
+      "primary": true,
+      "clientId": 4
+    },
+    {
+      "createdOn": "2025-07-25T08:38:44+01:00",
+      "updatedOn": "2025-07-25T08:38:44+01:00",
+      "createdBy": null,
+      "updatedBy": null,
+      "revision": null,
+      "clientPhoneNumberId": 5,
+      "phoneNo": "+92454-5454545",
+      "type": "Home",
+      "primary": false,
+      "clientId": 4
+    }
+  ],
+  "clientWebAddresseDTOList": [
+    {
+      "createdOn": "2025-07-25T08:38:44+01:00",
+      "updatedOn": "2025-07-25T08:38:44+01:00",
+      "createdBy": null,
+      "updatedBy": null,
+      "revision": null,
+      "clientWebAddressId": 4,
+      "webAddress": "https://www.test.com",
+      "type": "Personal",
+      "primary": true,
+      "clientId": 4
+    }
+  ],
+  "clientAddresseDTOList": [
+    {
+      "createdOn": "2025-07-25T08:38:44+01:00",
+      "updatedOn": "2025-07-25T08:38:44+01:00",
+      "createdBy": null,
+      "updatedBy": null,
+      "revision": null,
+      "clientAddressId": 4,
+      "street": "tsdfs",
+      "city": "Bashkia Klos",
+      "state": "fsdf",
+      "postCode": "7900",
+      "country": "Albania",
+      "type": "Work",
+      "primary": true,
+      "clientId": 4
+    },
+    {
+      "createdOn": "2025-07-25T08:38:44+01:00",
+      "updatedOn": "2025-07-25T08:38:44+01:00",
+      "createdBy": null,
+      "updatedBy": null,
+      "revision": null,
+      "clientAddressId": 5,
+      "street": "fsfsd",
+      "city": "Attock Tehsil",
+      "state": "ffsd",
+      "postCode": "5674",
+      "country": "Pakistan",
+      "type": "Home",
+      "primary": false,
+      "clientId": 4
+    }
+  ],
+  "clientContactPersonDTOList": []
 }

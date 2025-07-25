@@ -8,6 +8,7 @@ const createEmailEntry = (payload) => ({
     id: payload.id,
     email: payload.email || '',
     emailType: payload.emailType || '',
+    emailObj: payload.emailObj || {},
     isEmailPrimary: payload.isEmailPrimary || false,
 });
 

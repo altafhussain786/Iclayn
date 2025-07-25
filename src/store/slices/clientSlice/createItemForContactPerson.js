@@ -14,6 +14,7 @@ const createContactPersonEntry = (payload) => ({
     email: payload.email || '',
     phoneNumber: payload.phoneNumber || '',
     isContactPersonPrimary: payload.isContactPersonPrimary || false,
+    contactPersonObj: payload.contactPersonObj || {},
 });
 
 const createContactPersonSlice = createSlice({
