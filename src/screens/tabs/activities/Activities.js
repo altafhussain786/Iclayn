@@ -7,6 +7,7 @@ import MyText from '../../../components/MyText';
 
 //Icons
 import Entypo from "react-native-vector-icons/Entypo";
+import AntDesign from "react-native-vector-icons/AntDesign";
 import Wrapper from '../../../components/Wrapper';
 import SearchBar from '../../../components/SearchBar';
 import FloatingButton from '../../../components/FloatingButton';
@@ -16,6 +17,7 @@ import { formatNumber } from '../../../helper/Helpers';
 import moment from 'moment';
 import TimekeeperModal from '../../../components/TimekeeperModal';
 import LinearGradient from 'react-native-linear-gradient';
+import { Swipeable } from 'react-native-gesture-handler';
 
 const Activities = ({ navigation }) => {
   const [tabs, setTabs] = React.useState("Time entries");
@@ -65,6 +67,19 @@ const Activities = ({ navigation }) => {
       setFilteredData(filtered);
     }
   }, [searchText, activityData]);
+
+  const renderLeftActions = (item) => (
+
+
+    <View style={{ flexDirection: 'row' }}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate(item?.type == 'DISBURSEMENT' ? 'EditExpense' : 'EditTimeEntry', { communicationDetails: item })}
+        style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+      >
+        <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
+      </TouchableOpacity>
+    </View>
+  );
   return (
     <>
 
@@ -123,35 +138,37 @@ const Activities = ({ navigation }) => {
               renderItem={({ item, i }) => {
                 return (
                   <>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        gap: 10,
-                        borderBottomWidth: 1,
-                        paddingVertical: 15,
-                        borderColor: COLORS?.BORDER_LIGHT_COLOR,
-                      }}
-                    >
-                      <View style={{ gap: 5, width: "65%", }}>
-                        <MyText style={styles.timeColor}>{moment(item?.entryDate).format("DD-MM-YYYY")}</MyText>
-                        <MyText style={[styles.txtStyle, { fontWeight: "300" }]}>{item?.matterName}</MyText>
-                        {item?.description !== "" && <MyText style={styles.timeColor}>
-                          {item?.description}
-                        </MyText>}
-                      </View>
-                      <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
-                        <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "right" }]}>${formatNumber(item?.amount)}</MyText>
-                        <MyText style={[styles.txtStyle, { textAlign: "right" }]}>{item?.duration}</MyText>
-                        <View style={{ backgroundColor: "#ffc2cd", alignSelf: "flex-end", width: getResponsiveWidth(20), borderRadius: 5, paddinHorizontal: 30 }}>
-                          <MyText style={[styles.timeColor, { fontWeight: "300", textAlign: "center", color: "#6c0014" }]}>
-                            {item?.billed ? "Billed" : "Unbilled"}
-                          </MyText>
+                    <Swipeable renderLeftActions={() => renderLeftActions(item)} >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          gap: 10,
+                          borderBottomWidth: 1,
+                          paddingVertical: 15,
+                          borderColor: COLORS?.BORDER_LIGHT_COLOR,
+                        }}
+                      >
+                        <View style={{ gap: 5, width: "65%", }}>
+                          <MyText style={styles.timeColor}>{moment(item?.entryDate).format("DD-MM-YYYY")}</MyText>
+                          <MyText style={[styles.txtStyle, { fontWeight: "300" }]}>{item?.matterName}</MyText>
+                          <MyText style={[styles.txtStyle, { fontWeight: "300" }]}>{item?.type}</MyText>
+                          {item?.description !== "" && <MyText style={styles.timeColor}>
+                            {item?.description}
+                          </MyText>}
+                        </View>
+                        <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
+                          <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "right" }]}>${formatNumber(item?.amount)}</MyText>
+                          <MyText style={[styles.txtStyle, { textAlign: "right" }]}>{item?.duration}</MyText>
+                          <View style={{ backgroundColor: "#ffc2cd", alignSelf: "flex-end", width: getResponsiveWidth(20), borderRadius: 5, paddinHorizontal: 30 }}>
+                            <MyText style={[styles.timeColor, { fontWeight: "300", textAlign: "center", color: "#6c0014" }]}>
+                              {item?.billed ? "Billed" : "Unbilled"}
+                            </MyText>
+                          </View>
                         </View>
                       </View>
-                    </View>
-
+                    </Swipeable>
                   </>
                 );
               }}

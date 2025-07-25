@@ -88,6 +88,9 @@ export const getTotalDuration = (durationStr) => {
 }
 
 
+// const imageURL = `data:image/jpeg;base64,${userProfileDTO?.image}`;
+
+
 
 // export const calculateDateRange = (option) => {
 //     const today = moment();

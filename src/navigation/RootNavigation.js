@@ -43,6 +43,9 @@ import CreateInternalLogs from '../screens/more/communications/screens/CreateInt
 import EditClient from '../screens/clients/screens/EditClient';
 import EditBilling from '../screens/tabs/bills/screens/EditBilling';
 import EditParties from '../screens/more/parties/screens/EditParties';
+import EditPhoneLog from '../screens/more/communications/screens/Edit/EditPhoneLog';
+import EditInternalLog from '../screens/more/communications/screens/Edit/EditInternalLog';
+import EditExpense from '../screens/more/expense/screens/EditExpense';
 
 
 
@@ -99,6 +102,7 @@ const RootNavigation = () => {
         <Stack.Screen name="TaskDocuments" component={TaskDocuments} />
         <Stack.Screen name="TaskFiles" component={TaskFiles} />
         <Stack.Screen name="CreateExpense" component={CreateExpense} />
+        <Stack.Screen name="EditExpense" component={EditExpense} />
 
         {/* //more  */}
         <Stack.Screen name="Parties" component={Parties} />
@@ -107,7 +111,9 @@ const RootNavigation = () => {
         <Stack.Screen name="Documents" component={Documents} />
         <Stack.Screen name="Communications" component={Communications} />
         <Stack.Screen name="CreatePhoneLog" component={CreatePhoneLog} />
+        <Stack.Screen name="EditPhoneLog" component={EditPhoneLog} />
         <Stack.Screen name="CreateInternalLogs" component={CreateInternalLogs} />
+        <Stack.Screen name="EditInternalLog" component={EditInternalLog} />
         <Stack.Screen name="AppSettings" component={AppSettings} />
         <Stack.Screen name="Reports" component={Reports} />
         <Stack.Screen name="Transaction" component={Transaction} />
