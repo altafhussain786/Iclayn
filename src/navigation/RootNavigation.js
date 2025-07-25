@@ -42,6 +42,7 @@ import CreatePhoneLog from '../screens/more/communications/screens/CreatePhoneLo
 import CreateInternalLogs from '../screens/more/communications/screens/CreateInternalLogs';
 import EditClient from '../screens/clients/screens/EditClient';
 import EditBilling from '../screens/tabs/bills/screens/EditBilling';
+import EditParties from '../screens/more/parties/screens/EditParties';
 
 
 
@@ -102,6 +103,7 @@ const RootNavigation = () => {
         {/* //more  */}
         <Stack.Screen name="Parties" component={Parties} />
         <Stack.Screen name="CreateParties" component={CreateParties} />
+        <Stack.Screen name="EditParties" component={EditParties} />
         <Stack.Screen name="Documents" component={Documents} />
         <Stack.Screen name="Communications" component={Communications} />
         <Stack.Screen name="CreatePhoneLog" component={CreatePhoneLog} />

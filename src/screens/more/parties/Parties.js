@@ -14,6 +14,8 @@ import ScreenHeader from '../../../components/ScreenHeader';
 import { COLORS, IconUri } from '../../../constants';
 import { calculatefontSize, getResponsiveWidth } from '../../../helper/responsiveHelper';
 import MyText from '../../../components/MyText';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import { Swipeable } from 'react-native-gesture-handler';
 
 
 
@@ -82,6 +84,17 @@ const Parties = ({ navigation }) => {
             setFilteredData(filtered);
         }
     }, [searchText, tabs, partiesData]);
+
+    const renderLeftActions = (item) => (
+        <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity
+                onPress={() => navigation.navigate("EditParties", { partiesDetails: item })}
+                style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+            >
+                <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
+            </TouchableOpacity>
+        </View>
+    );
     return (
         <>
 
@@ -93,7 +106,7 @@ const Parties = ({ navigation }) => {
                 style={styles.tabContainer}
             >
                 {/* <View > */}
-                {["All","Individual", "Supplier"].map((item) => (
+                {["All", "Individual", "Supplier"].map((item) => (
 
                     <TouchableOpacity
                         key={item}
@@ -137,38 +150,40 @@ const Parties = ({ navigation }) => {
                             keyExtractor={(item, index) => index.toString()}
                             renderItem={({ item, i }) => {
                                 return (
-                                    <View
-                                        style={{
-                                            flexDirection: "row",
-                                            justifyContent: "space-between",
-                                            alignItems: "center",
-                                            gap: 10,
-                                            borderBottomWidth: 1,
-                                            paddingVertical: 15,
-                                            borderColor: COLORS?.BORDER_LIGHT_COLOR,
-                                        }}
-                                    >
-                                        <View style={{ gap: 5, width: "65%", }}>
-                                            <MyText style={styles.timeColor}>{item?.type}</MyText>
-                                            <MyText style={[styles.txtStyle, { fontWeight: "300" }]}>
-                                                {item?.type === 'Supplier'
-                                                    ? item?.companyName
-                                                    : `${item?.firstName || ''} ${item?.lastName || ''}`}
-                                            </MyText>
-                                            {item?.description !== "" && <MyText style={styles.timeColor}>
-                                                {item?.partyEmailAddressDTOList[0]?.email}
-                                            </MyText>}
-                                        </View>
-                                        <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
-                                            {/* <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "right" }]}>${formatNumber(item?.balance)}</MyText> */}
-                                            <MyText style={[styles.txtStyle, { textAlign: "right" }]}>{item?.duration}</MyText>
-                                            <View style={{ backgroundColor: "#22C55E", alignSelf: "flex-end", width: getResponsiveWidth(20), borderRadius: 5, paddinHorizontal: 30 }}>
-                                                <MyText style={[styles.timeColor, { fontWeight: "300", textAlign: "center", color: COLORS?.whiteColors }]}>
-                                                    {item?.status}
+                                    <Swipeable renderLeftActions={() => renderLeftActions(item)}>
+                                        <View
+                                            style={{
+                                                flexDirection: "row",
+                                                justifyContent: "space-between",
+                                                alignItems: "center",
+                                                gap: 10,
+                                                borderBottomWidth: 1,
+                                                paddingVertical: 15,
+                                                borderColor: COLORS?.BORDER_LIGHT_COLOR,
+                                            }}
+                                        >
+                                            <View style={{ gap: 5, width: "65%", }}>
+                                                <MyText style={styles.timeColor}>{item?.type}</MyText>
+                                                <MyText style={[styles.txtStyle, { fontWeight: "300" }]}>
+                                                    {item?.type === 'Supplier'
+                                                        ? item?.companyName
+                                                        : `${item?.firstName || ''} ${item?.lastName || ''}`}
                                                 </MyText>
+                                                {item?.description !== "" && <MyText style={styles.timeColor}>
+                                                    {item?.partyEmailAddressDTOList[0]?.email}
+                                                </MyText>}
+                                            </View>
+                                            <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
+                                                {/* <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "right" }]}>${formatNumber(item?.balance)}</MyText> */}
+                                                <MyText style={[styles.txtStyle, { textAlign: "right" }]}>{item?.duration}</MyText>
+                                                <View style={{ backgroundColor: "#22C55E", alignSelf: "flex-end", width: getResponsiveWidth(20), borderRadius: 5, paddinHorizontal: 30 }}>
+                                                    <MyText style={[styles.timeColor, { fontWeight: "300", textAlign: "center", color: COLORS?.whiteColors }]}>
+                                                        {item?.status}
+                                                    </MyText>
+                                                </View>
                                             </View>
                                         </View>
-                                    </View>
+                                    </Swipeable>
                                 );
                             }}
                             ListFooterComponent={() => <View style={{ height: 100 }} />}

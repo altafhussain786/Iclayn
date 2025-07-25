@@ -58,7 +58,6 @@ const EditBilling = ({ navigation, route }) => {
             navigation: navigation
         })
         if (res) {
-            console.log(res, "Billing DATA =======================================>");
             setDefaultData(res?.data);
             setClientId(res?.data?.clientIds)
             if (res?.data?.matterBillingDTOList?.length > 0) {
