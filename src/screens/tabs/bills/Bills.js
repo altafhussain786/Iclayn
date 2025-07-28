@@ -93,7 +93,7 @@ const Bills = ({ navigation }) => {
       <ScreenHeader isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="Bills" />
 
       {/* Scrollable Tabs */}
-      <LinearGradient
+      {/* <LinearGradient
         colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT,]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
@@ -141,7 +141,7 @@ const Bills = ({ navigation }) => {
             }}
           />
         </View>
-      </LinearGradient>
+      </LinearGradient> */}
       <Wrapper>
         {/* Search Row */}
         <View
@@ -162,6 +162,55 @@ const Bills = ({ navigation }) => {
             style={{ height: 30, width: 30, resizeMode: 'contain' }}
           />
         </View>
+        {/* <LinearGradient
+          colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT,]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}
+
+        > */}
+        <View
+          style={{}}
+        >
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={tabList}
+
+            renderItem={({ item, i }) => {
+              return (
+                <>
+                  <TouchableOpacity
+                    key={item}
+                    style={[
+                      styles.tab,
+
+                      {
+                        opacity: tabs === item ? 1 : 0.5,
+                        backgroundColor:
+                          COLORS.PRIMARY_COLOR
+                      },
+                    ]}
+                    onPress={() => setTabs(item)}
+                  >
+                    <MyText
+                      style={{
+
+                        color: '#fff',
+                        fontWeight: '600',
+                        fontSize: calculatefontSize(1.7),
+                      }}
+                      numberOfLines={1}
+                    >
+                      {item}
+                    </MyText>
+                  </TouchableOpacity>
+                </>
+              )
+            }}
+          />
+        </View>
+        {/* </LinearGradient> */}
 
         {/* Task List */}
         {filteredData?.length > 0 ? <FlatList
