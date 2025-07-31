@@ -25,9 +25,11 @@ import TimekeeperModal from '../../../components/TimekeeperModal';
 import LinearGradient from 'react-native-linear-gradient';
 import { Swipeable } from 'react-native-gesture-handler';
 import Loader from '../../../components/Loader';
+import { useToast } from 'react-native-toast-notifications';
 
 const Matters = ({ navigation }) => {
     const [tabs, setTabs] = React.useState('All');
+    const toast = useToast()
     const [modalVisible, setModalVisible] = useState(false);
 
     const tabList = ['All', 'Open', 'Pending', 'Closed',];
@@ -81,17 +83,17 @@ const Matters = ({ navigation }) => {
         setFilteredData(filtered);
     }, [searchText, data, tabs]);
 
-    const deleteMatter = async (id) => {
-        const matterIds = [id]
+    const deleteMatter = async (item) => {
         const { res, err } = await httpRequest({
             method: 'delete',
             path: `/ic/matter/`,
             navigation: navigation,
-            params: [4],
+            params: [item?.matterId],
         })
         console.log(res, "===================>");
 
         if (res) {
+            toast.show('Matter deleted successfully', { type: 'success' })
             getMatters()
         }
         else {
@@ -106,7 +108,7 @@ const Matters = ({ navigation }) => {
         return (
             <View style={{ flexDirection: 'row', width: 200 }}> {/* <-- fixed width */}
                 <TouchableOpacity
-                    onPress={() => navigation.navigate("EditMatter", { matterDetails:item })}
+                    onPress={() => navigation.navigate("EditMatter", { matterDetails: item })}
                     style={{ backgroundColor: '#0068D1', justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
                 >
                     <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
@@ -115,7 +117,7 @@ const Matters = ({ navigation }) => {
                     </Text> */}
                 </TouchableOpacity>
                 <TouchableOpacity
-                    onPress={() => deleteMatter(item?.matterId)}
+                    onPress={() => deleteMatter(item)}
                     style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
                 >
                     <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
@@ -207,72 +209,72 @@ const Matters = ({ navigation }) => {
 
                 {/* Task List */}
                 {
-                isLoader ? <Loader /> :
-                filteredData?.length > 0 ? <FlatList
-                    showsVerticalScrollIndicator={false}
-                    data={filteredData}
-                    keyExtractor={(item, index) => index.toString()}
-                    contentContainerStyle={{ paddingBottom: 100 }}
-                    renderItem={({ item, index }) => {
-                        return (
-                            <Swipeable renderLeftActions={() => renderLeftActions(item)}>
-                                <TouchableOpacity onPress={() => navigation.navigate('MatterDetails', { matterData: item })}
-                                    style={{
-                                        flexDirection: 'row',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        paddingVertical: 15,
-                                        paddingHorizontal: 10,
-                                        borderBottomWidth: 1,
-                                        borderColor: COLORS?.BORDER_LIGHT_COLOR,
-                                        backgroundColor: '#fff',
-                                    }}
-                                >
-                                    <View style={{ gap: 5, width: "65%" }}>
-                                        <MyText style={styles.timeColor}>Open {moment(item?.openDate).format('DD-MM-YYYY')}</MyText>
-                                        <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300', }]}>
-                                            {item?.name}
-                                        </MyText>
-                                        <MyText style={styles.timeColor}>{item?.clientNames}</MyText>
-                                    </View>
-                                    <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
-
-                                        <View
+                    isLoader ? <Loader /> :
+                        filteredData?.length > 0 ? <FlatList
+                            showsVerticalScrollIndicator={false}
+                            data={filteredData}
+                            keyExtractor={(item, index) => index.toString()}
+                            contentContainerStyle={{ paddingBottom: 100 }}
+                            renderItem={({ item, index }) => {
+                                return (
+                                    <Swipeable renderLeftActions={() => renderLeftActions(item)}>
+                                        <TouchableOpacity onPress={() => navigation.navigate('MatterDetails', { matterData: item })}
                                             style={{
-                                                backgroundColor: item?.status == "Open" ? '#EFE4FF' : '#ffc2cd',
-                                                borderWidth: 1,
-                                                borderColor: item?.status == "COMPLETED" ? '#7C4EC9' : '#6c0014',
-                                                // alignSelf: 'flex-end',
-                                                borderRadius: 5,
-                                                paddingHorizontal: 8,
-                                                paddingVertical: 2,
+                                                flexDirection: 'row',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                paddingVertical: 15,
+                                                paddingHorizontal: 10,
+                                                borderBottomWidth: 1,
+                                                borderColor: COLORS?.BORDER_LIGHT_COLOR,
+                                                backgroundColor: '#fff',
                                             }}
                                         >
-                                            <MyText
-                                                style={{
-                                                    // fontWeight: '600',
-                                                    // textAlign: 'center',
-                                                    color: item?.status == "COMPLETED" ? COLORS?.whiteColors : '#6c0014',
-                                                    fontSize: calculatefontSize(1.4),
-                                                }}
-                                            >
-                                                {item?.status}
-                                            </MyText>
-                                        </View>
-                                    </View>
-                                </TouchableOpacity>
-                            </Swipeable>
-                        );
-                    }}
-                    refreshControl={
-                        <RefreshControl refreshing={refreshing} onRefresh={getMatters} />
-                    }
-                />
-                    :
-                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 10 }}>
-                        <Image source={IconUri?.task} style={{ height: 50, width: 50, resizeMode: "contain" }} />
-                        <MyText style={{ fontSize: calculatefontSize(1.5), color: COLORS.PRIMARY_COLOR }}>No Data Found</MyText>
-                    </View>
+                                            <View style={{ gap: 5, width: "65%" }}>
+                                                <MyText style={styles.timeColor}>Open {moment(item?.openDate).format('DD-MM-YYYY')}</MyText>
+                                                <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300', }]}>
+                                                    {item?.name}
+                                                </MyText>
+                                                <MyText style={styles.timeColor}>{item?.clientNames}</MyText>
+                                            </View>
+                                            <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
+
+                                                <View
+                                                    style={{
+                                                        backgroundColor: item?.status == "Open" ? '#EFE4FF' : '#ffc2cd',
+                                                        borderWidth: 1,
+                                                        borderColor: item?.status == "COMPLETED" ? '#7C4EC9' : '#6c0014',
+                                                        // alignSelf: 'flex-end',
+                                                        borderRadius: 5,
+                                                        paddingHorizontal: 8,
+                                                        paddingVertical: 2,
+                                                    }}
+                                                >
+                                                    <MyText
+                                                        style={{
+                                                            // fontWeight: '600',
+                                                            // textAlign: 'center',
+                                                            color: item?.status == "COMPLETED" ? COLORS?.whiteColors : '#6c0014',
+                                                            fontSize: calculatefontSize(1.4),
+                                                        }}
+                                                    >
+                                                        {item?.status}
+                                                    </MyText>
+                                                </View>
+                                            </View>
+                                        </TouchableOpacity>
+                                    </Swipeable>
+                                );
+                            }}
+                            refreshControl={
+                                <RefreshControl refreshing={refreshing} onRefresh={getMatters} />
+                            }
+                        />
+                            :
+                            <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 10 }}>
+                                <Image source={IconUri?.task} style={{ height: 50, width: 50, resizeMode: "contain" }} />
+                                <MyText style={{ fontSize: calculatefontSize(1.5), color: COLORS.PRIMARY_COLOR }}>No Data Found</MyText>
+                            </View>
                 }
 
 

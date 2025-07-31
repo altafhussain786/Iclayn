@@ -232,7 +232,7 @@ const CreateMatter = ({ navigation }) => {
                         description: '',
 
                         openDate: moment().format('DD/MM/YYYY'),
-                        selectedDate: moment().format('MM/DD/YYYY'),
+                        selectedDate: moment()?.toISOString(),
                         isOpenDate: false,
                         // ==========================================================================>
                         // //Supervisor Solicitor
@@ -315,7 +315,7 @@ const CreateMatter = ({ navigation }) => {
                 }
                 validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
-                    // console.log(values?.clientItems, "========================================== selectReferalItems");
+                    console.log(values?.selectedDate, "========================================== selectReferalItems");
 
                     const mappedData = itemsForBilling?.map((item, index) => {
                         return {
@@ -341,7 +341,7 @@ const CreateMatter = ({ navigation }) => {
                             matterPerUserId: null,
                             userId: item?.userId || 0,
                             email: item?.email || 0,
-                            fullName: item?.userProfileDTO?.fullName || 0,
+                            fullName: item?.userProfileDTO?.fullName || "",
                         }
                     })
                     const mappedPerNotification = values?.matterNotificationItem?.map((item, index) => {
@@ -354,7 +354,7 @@ const CreateMatter = ({ navigation }) => {
                             matterPerNotifUserId: null,
                             userId: item?.userId || 0,
                             email: item?.email || 0,
-                            fullName: item?.userProfileDTO?.fullName || 0,
+                            fullName: item?.userProfileDTO?.fullName || "",
                         }
                     })
                     const mappedmatterRelatedPar = items?.map((item, index) => {
