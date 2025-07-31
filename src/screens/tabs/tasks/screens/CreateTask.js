@@ -19,7 +19,8 @@ import BottomModalListWithSearch from '../../../../components/BottomModalListWit
 import DatePicker from 'react-native-date-picker';
 import { useToast } from 'react-native-toast-notifications'
 import ReminderItems from '../components/ReminderItems'
-import { addReminderItem } from '../../../../store/slices/taskSlice/createItemforReminder'
+import { addReminderItem, resetReminderItems } from '../../../../store/slices/taskSlice/createItemforReminder'
+import { removeDocument } from '../../../../store/slices/taskSlice/createItemforDocuments'
 
 
 
@@ -180,7 +181,7 @@ const CreateTask = ({ navigation }) => {
                         isOpentaskType: false,
                         // DUE DATE ==>
                         dueDate: moment().format('DD/MM/YYYY'),
-                        selectedDate: moment().format('MM/DD/YYYY'),
+                        selectedDate: moment().toISOString(),
                         isdueDate: false,
 
                         //timeEstimatetype
@@ -252,7 +253,8 @@ const CreateTask = ({ navigation }) => {
                     if (res) {
                         toast.show('Task created successfully', { type: 'success' })
                         setFieldValue('loader', false)
-
+                        dispatch(resetReminderItems());
+                        dispatch(removeDocument());
                         navigation.goBack()
                     }
                     else {
@@ -267,7 +269,13 @@ const CreateTask = ({ navigation }) => {
                 {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
 
                     <>
-                        <ScreenHeader isLoading={values?.loader} onPressSave={handleSubmit} isShowSave={true} extraStyle={{ backgroundColor: '#F5F6F8' }} isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="New Task" />
+                        <ScreenHeader isLoading={values?.loader} onPressSave={handleSubmit} isShowSave={true} extraStyle={{ backgroundColor: '#F5F6F8' }} isGoBack={true} onPress={() => {
+                            {
+                                dispatch(resetReminderItems());
+                                dispatch(removeDocument());
+                                navigation.goBack()
+                            }
+                        }} isShowTitle={true} title="New Task" />
                         <Wrapper>
                             <KeyboardAvoidingView
                                 style={{ flex: 1 }}
@@ -339,7 +347,6 @@ const CreateTask = ({ navigation }) => {
                                     <TextInputWithTitle
                                         title="Task type"
                                         isButton={true}
-                                        isRequired={true}
                                         buttonText={values.taskType || 'Find a task type'}
                                         onPressButton={() => setFieldValue('isOpentaskType', true)}
                                     />
@@ -352,26 +359,24 @@ const CreateTask = ({ navigation }) => {
                                     />
 
                                     <TextInputWithTitle
-                                        title="Select Type"
+                                        title="Select Estimate Type"
                                         isButton={true}
-                                        isRequired={true}
                                         buttonText={values.timeEstimateType || '1 Hours'}
                                         onPressButton={() => setFieldValue('isOpenTimeEstimateType', true)}
                                     />
                                     <TextInputWithTitle
                                         title="Time Estimate Number"
                                         isButton={true}
-                                        isRequired={true}
                                         buttonText={values.timeEstimateNumber || 1}
                                         onPressButton={() => setFieldValue('isTimeEstimateNumberOpen', true)}
                                     />
-                                    <TextInputWithTitle
+                                    {/* <TextInputWithTitle
                                         title="Matter"
                                         isButton={true}
                                         isRequired={true}
                                         buttonText={values.matterSelected || 'Select Matter'}
                                         onPressButton={() => setFieldValue('isOpenMatterSelected', true)}
-                                    />
+                                    /> */}
 
 
                                     <TextInputWithTitle

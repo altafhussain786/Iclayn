@@ -168,7 +168,7 @@ const EditTask = ({ navigation, route }) => {
         feeEarnerSolicitor: Yup.string().required('Assign to is required'),
     })
 
-    console.log(tasktypeData, "tasktypeData=======d==f=====>");
+    console.log(defaultData, "tasktydpeData===f====d==f=====>");
 
     return (
         <>
@@ -202,7 +202,7 @@ const EditTask = ({ navigation, route }) => {
                         isOpentaskType: false,
                         // DUE DATE ==>
                         dueDate: moment(defaultData?.dueDate).format('DD/MM/YYYY'),
-                        selectedDate: moment().format('MM/DD/YYYY'),
+                        selectedDate: defaultData?.dueDate || moment().toISOString(),
                         isdueDate: false,
 
                         //Due time
@@ -217,7 +217,7 @@ const EditTask = ({ navigation, route }) => {
 
                         //time estimateNumber
                         timeEstimateNumber: defaultData?.timeEstimate || "",
-                        timeEstimateValue: "",
+                        timeEstimateValue: defaultData?.timeEstimate || "",
                         timeEstimateNumberObj: {},
                         isTimeEstimateNumberOpen: false,
 
@@ -227,6 +227,8 @@ const EditTask = ({ navigation, route }) => {
                 }
                 validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
+                    console.log(values.timeEstimateValue, "----------------------------------------->");
+
                     const mappedDataForTask = items?.map(data => {
                         return {
                             createdOn: "",
@@ -247,7 +249,7 @@ const EditTask = ({ navigation, route }) => {
                         createdBy: userDetails?.userId,
                         updatedBy: userDetails?.userId || null,
                         revision: null,
-                        taskId: taskTypeObj?.taskId || null,
+                        taskId: defaultData?.taskId || values?.taskTypeObj?.taskId || null,
                         name: values?.name,
                         cod: defaultData?.code || null,
                         priority: values?.priorityStatus,
@@ -274,7 +276,7 @@ const EditTask = ({ navigation, route }) => {
                     console.log(paylod, "========================================== selectReferalItems");
                     setFieldValue('loader', true)
                     const { res, err } = await httpRequest({
-                        method: `post`,
+                        method: `put`,
                         path: `/ic/matter/task/`,
                         params: paylod,
                         navigation: navigation
@@ -282,7 +284,8 @@ const EditTask = ({ navigation, route }) => {
                     if (res) {
                         toast.show('Task created successfully', { type: 'success' })
                         setFieldValue('loader', false)
-
+                        dispatch(resetReminderItems());
+                        dispatch(removeDocument());
                         navigation.goBack()
                     }
                     else {

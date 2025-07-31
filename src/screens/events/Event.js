@@ -198,6 +198,8 @@ const Event = ({ navigation }) => {
         }
         validationSchema={validationSchema}
         onSubmit={async (values, { setFieldValue }) => {
+          console.log(values, "EVENT CREATE ====>");
+          const payload = {}
 
         }}
       >
