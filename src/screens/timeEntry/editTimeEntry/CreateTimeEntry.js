@@ -158,12 +158,7 @@ const CreateTimeEntry = ({ navigation }) => {
         firmData: Yup.string().required('User is required'),
 
         rate: Yup.string().required('rate is required'),
-        // duration: Yup.string()
-        //     .required('Duration is required')
-        //     .matches(
-        //         /^(\d{1,2}h\s?\d{1,2}m\s?\d{1,2}s)$/,
-        //         'Duration must be in format like 1h12m13s or 1h 12m 13s'
-        //     ),
+
     })
 
 
@@ -187,7 +182,7 @@ const CreateTimeEntry = ({ navigation }) => {
 
                         //Date
                         date: moment().format('DD/MM/YYYY'),
-                        selectedDate: moment(new Date()).toISOString(),
+                        selectedDate: moment().toISOString(),
                         isdateOpen: false,
 
                         //Firm Data
@@ -232,8 +227,9 @@ const CreateTimeEntry = ({ navigation }) => {
                         revision: null,
                         matterTimeEntryId: null,
                         matterId: values?.matterObj?.matterId,
-                        matterName: "",
+                        matterName: values?.matterObj?.name || "",
                         entryDate: values?.selectedDate,
+                        // entryDate: "2025-07-31T14:15:21+05:00",
                         firmUserId: values?.firmObj?.userId,
                         rate: Number(values?.rate),
                         nonBillable: values?.nonBillable,

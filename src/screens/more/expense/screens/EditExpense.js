@@ -24,7 +24,8 @@ import { pick } from '@react-native-documents/picker'
 
 const TIMER_KEY = 'TIMEKEEPER_STATE';
 
-const EditExpense = ({ navigation }) => {
+const EditExpense = ({ navigation, route }) => {
+    const communicationDetails = route?.params?.communicationDetails;
     const [matterData, setmatterData] = React.useState([]);
     const [firmData, setfirmData] = React.useState([]);
     const [partyData, setPartyData] = React.useState([]);
@@ -33,7 +34,31 @@ const EditExpense = ({ navigation }) => {
     const userDetails = useSelector(state => state?.userDetails?.userDetails);
 
     //TIMMER
+    const [defaultData, setDefaultData] = useState({});
     const toast = useToast()
+
+    console.log(communicationDetails, "=========");
+
+
+    const getDefaultData = async () => {
+        const { res, err } = await httpRequest({
+            method: `get`,
+            path: `/ic/matter/exp-entry/${communicationDetails?.matterExpenseEntryId}`,
+            navigation: navigation
+        })
+        if (res) {
+            setDefaultData(res?.data);
+        }
+        else {
+            console.log(err, "GET CUSTOMER RESPONSE===>err");
+        }
+    }
+
+    useEffect(() => {
+        getDefaultData();
+    }, [communicationDetails])
+
+
 
 
     const getMatterData = async () => {
@@ -126,24 +151,24 @@ const EditExpense = ({ navigation }) => {
     return (
         <>
             <Formik
-                // enableReinitialize
+                enableReinitialize
                 initialValues={
                     {
                         //matter details
-                        matter: '',
-                        matterItems: [],
+                        matter: matterData?.find(user => user?.matterId === defaultData?.matterId)?.name || '',
+                        matterObj: matterData?.find(user => user?.matterId === defaultData?.matterId) || {},
                         matterObj: {},
                         isOpenmatter: false,
 
                         // expense Type ==>
-                        expenseType: 'Disbursment', // default
+                        expenseType: defaultData?.type == "DISBURSEMENT" ? "Disbursment" : 'Expense Recoveries', // default
 
 
                         //Party Data
                         party: '',
-                        partyItems: [],
                         partyObj: {},
                         isOpenParty: false,
+                        // partyItems: [],
 
                         //expense Data
                         expense: '',
@@ -158,23 +183,23 @@ const EditExpense = ({ navigation }) => {
                         isOpentax: false,
 
                         //Firm Data
-                        firmData: "",
-                        firmItems: [],
-                        firmObj: {},
+                        firmData: firmData?.find(user => user?.userId === defaultData?.firmUserId)?.userProfileDTO?.fullName || "",
+                        firmObj: firmData?.find(user => user?.userId === defaultData?.firmUserId) || {},
                         isOpenfirm: false,
 
                         //Date
-                        date: moment().format('DD/MM/YYYY'),
-                        selectedDate: moment(new Date()).toISOString(),
+                        date: moment(defaultData?.expDate).format('DD/MM/YYYY'),
+                        selectedDate: defaultData?.expDate || moment().toISOString(),
                         isdateOpen: false,
 
-                        description: '',
+                        description: defaultData?.description || '',
 
                         //rate
-                        rate: '',
+                        rate: defaultData?.amount || '',
 
-                        nonBillable: false,
-                        isShowEntryontheBill: false,
+                        nonBillable: defaultData?.nonBillable || false,
+                        isShowEntryontheBill: defaultData?.visibleBill || false,
+
 
                         //Document
                         documentFile: [],
@@ -239,29 +264,7 @@ const EditExpense = ({ navigation }) => {
                         toast.show(err?.message, { type: 'danger' })
                     }
 
-                    //         {
-                    //             "createdOn": "",
-                    // "updatedOn": null,
-                    // "createdBy": 1,
-                    // "updatedBy": null,
-                    // "revision": null,
-                    // "matterExpenseEntryId": null,
-                    // "matterId": 5,
-                    // "expDate": "2025-07-23T12:57:23.758Z",
-                    // "categoryId": 1,
-                    // "category": "Stamp papers fee",
-                    // "firmUserId": 1,
-                    // "amount": 30,
-                    // "taxId": 1,
-                    // "taxRate": 20,
-                    // "partyId": 3,
-                    // "nonBillable": false,
-                    // "visibleBill": false,
-                    // "description": "dfsd",
-                    // "billed": false,
-                    // "type": "DISBURSEMENT",
-                    // "matterExpenseEntryAttachmentDTOList": null
-                    // }
+
 
 
                 }}
@@ -358,6 +361,7 @@ const EditExpense = ({ navigation }) => {
                                 />
 
                                 <TextInputWithTitle
+
                                     onPressButton={() => setFieldValue('isOpenParty', true)}
                                     title="Party"
                                     isRequired={true}
@@ -372,6 +376,7 @@ const EditExpense = ({ navigation }) => {
                                     buttonText={values.expense ? values.expense : 'Select a expense'}
                                 />
                                 <TextInputWithTitle
+
                                     placeholder={'Amount'}
                                     title="Amount"
                                     isRequired={true}
@@ -388,7 +393,7 @@ const EditExpense = ({ navigation }) => {
                                 {
                                     errors.rate && touched.rate && <MyText style={{ color: 'red' }}>{errors.rate}</MyText>
                                 }
-                                <TextInputWithTitle onChangeText={(txt) => setFieldValue('description', txt)} title=" Description" placeholder={'Enter description'} />
+                                <TextInputWithTitle value={values.description} onChangeText={(txt) => setFieldValue('description', txt)} title=" Description" placeholder={'Enter description'} />
                                 <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderBottomWidth: 1, paddingVertical: 10, borderColor: '#ddd', }}>
 
                                     <MyText style={styles.title}>Non-billable</MyText>

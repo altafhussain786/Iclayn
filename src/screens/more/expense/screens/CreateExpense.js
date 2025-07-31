@@ -214,7 +214,6 @@ const CreateExpense = ({ navigation }) => {
                     let jsonString = JSON.stringify(payload);
                     formdata.append('data', new Blob([jsonString], { type: 'application/json' }));
                     if (values?.documentFile.length) {
-
                         values?.documentFile?.map(v => (
                             // formdata.append("attachment", v)
                             formdata.append('attachment', {
@@ -239,29 +238,6 @@ const CreateExpense = ({ navigation }) => {
                         toast.show(err?.message, { type: 'danger' })
                     }
 
-                    //         {
-                    //             "createdOn": "",
-                    // "updatedOn": null,
-                    // "createdBy": 1,
-                    // "updatedBy": null,
-                    // "revision": null,
-                    // "matterExpenseEntryId": null,
-                    // "matterId": 5,
-                    // "expDate": "2025-07-23T12:57:23.758Z",
-                    // "categoryId": 1,
-                    // "category": "Stamp papers fee",
-                    // "firmUserId": 1,
-                    // "amount": 30,
-                    // "taxId": 1,
-                    // "taxRate": 20,
-                    // "partyId": 3,
-                    // "nonBillable": false,
-                    // "visibleBill": false,
-                    // "description": "dfsd",
-                    // "billed": false,
-                    // "type": "DISBURSEMENT",
-                    // "matterExpenseEntryAttachmentDTOList": null
-                    // }
 
 
                 }}

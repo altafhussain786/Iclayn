@@ -18,6 +18,7 @@ import moment from 'moment';
 import TimekeeperModal from '../../../components/TimekeeperModal';
 import LinearGradient from 'react-native-linear-gradient';
 import { Swipeable } from 'react-native-gesture-handler';
+import { useToast } from 'react-native-toast-notifications';
 
 const Activities = ({ navigation }) => {
   const [tabs, setTabs] = React.useState("Time entries");
@@ -27,7 +28,7 @@ const Activities = ({ navigation }) => {
   const [loader, setLoader] = React.useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
-
+  const toast = useToast();
 
   const getActivityData = async () => {
     setLoader(true)
@@ -68,6 +69,25 @@ const Activities = ({ navigation }) => {
     }
   }, [searchText, activityData]);
 
+
+  const handleDeleteItem = async (item) => {
+    console.log(item, "DEETE ITEM");
+
+    const { res, err } = await httpRequest({
+      method: 'delete',
+      navigation: navigation,
+      path: tabs !== "Time entries" ? '/ic/matter/exp-entry/' : `/ic/matter/time-entry/`,
+      params: [tabs !== "Time entries" ? item?.matterExpenseEntryId : item?.matterTimeEntryId]
+    })
+    if (res) {
+      toast.show('Activity deleted successfully', { type: 'success' })
+      getActivityData();
+    }
+    else {
+      console.log("err", err);
+    }
+  }
+
   const renderLeftActions = (item) => (
 
 
@@ -77,6 +97,18 @@ const Activities = ({ navigation }) => {
         style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
       >
         <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
+      </TouchableOpacity>
+    </View>
+  );
+  const renderRightActions = (item) => (
+
+
+    <View style={{ flexDirection: 'row' }}>
+      <TouchableOpacity
+        onPress={() => handleDeleteItem(item)}
+        style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+      >
+        <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
       </TouchableOpacity>
     </View>
   );
@@ -138,7 +170,7 @@ const Activities = ({ navigation }) => {
               renderItem={({ item, i }) => {
                 return (
                   <>
-                    <Swipeable renderLeftActions={() => renderLeftActions(item)} >
+                    <Swipeable renderLeftActions={() => renderLeftActions(item)} renderRightActions={() => renderRightActions(item)}>
                       <View
                         style={{
                           flexDirection: "row",

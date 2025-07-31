@@ -16,9 +16,13 @@ import moment from 'moment'
 import DatePicker from 'react-native-date-picker';
 import LinearGradient from 'react-native-linear-gradient'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useSelector } from 'react-redux'
+import { useToast } from 'react-native-toast-notifications'
 const TIMER_KEY = 'TIMEKEEPER_STATE';
 
-const EditTimeEntry = ({ navigation }) => {
+const EditTimeEntry = ({ navigation, route }) => {
+    const toast = useToast();
+    const communicationDetails = route?.params?.communicationDetails;
     const [matterData, setmatterData] = React.useState([]);
     const [firmData, setfirmData] = React.useState([]);
     //TIMMER
@@ -28,6 +32,31 @@ const EditTimeEntry = ({ navigation }) => {
     const [description, setDescription] = useState('No description');
     const [matter, setMatter] = useState('No matter');
     const intervalRef = useRef(null);
+
+    //Default
+    const userDetails = useSelector(state => state?.userDetails?.userDetails);
+
+    const [defaultData, setDefaultData] = useState({});
+
+
+    const getDefaultData = async () => {
+        const { res, err } = await httpRequest({
+            method: `get`,
+            path: `/ic/matter/time-entry/${communicationDetails?.matterTimeEntryId}`,
+            navigation: navigation
+        })
+        if (res) {
+            setDefaultData(res?.data);
+        }
+        else {
+            console.log(err, "GET CUSTOMER RESPONSE===>err");
+        }
+    }
+
+    useEffect(() => {
+        getDefaultData();
+    }, [communicationDetails])
+
 
 
     useEffect(() => {
@@ -165,67 +194,110 @@ const EditTimeEntry = ({ navigation }) => {
 
 
 
+
+
     return (
         <>
             <Formik
                 enableReinitialize
                 initialValues={
                     {
+
                         //matter details
-                        matter: '',
-                        matterItems: [],
-                        matterObj: {},
+                        matter: matterData?.find(user => user?.matterId === defaultData?.matterId)?.name || '',
+                        matterObj: matterData?.find(user => user?.matterId === defaultData?.matterId) || {},
                         isOpenmatter: false,
 
-                        description: '',
+                        description: defaultData?.description || '',
 
                         //Duration
-                        duration: formatTime(duration),
+                        duration: defaultData?.duration ? defaultData?.duration : formatTime(duration),
 
                         //Date
-                        date: moment().format('DD/MM/YYYY'),
-                        selectedDate: moment().format('MM/DD/YYYY'),
+                        date: moment(defaultData?.entryDate).format('DD/MM/YYYY'),
+                        selectedDate: defaultData?.entryDate || moment().toISOString(),
                         isdateOpen: false,
 
                         //Firm Data
-                        firmData: "",
-                        firmItems: [],
-                        firmObj: {},
+                        firmData: firmData?.find(user => user?.userId === defaultData?.firmUserId)?.userProfileDTO?.fullName || "",
+                        firmObj: firmData?.find(user => user?.userId === defaultData?.firmUserId) || {},
                         isOpenfirm: false,
+                        // firmItems: [],
 
                         //rate
-                        rate: '',
+                        rate: defaultData?.rate || '',
 
-                        nonBillable: false,
-                        isShowEntryontheBill: false,
+                        nonBillable: defaultData?.nonBillable || false,
+                        isShowEntryontheBill: defaultData?.visibleBill || false,
                         //loader
                         loader: false
                     }
                 }
-                validationSchema={validationSchema}
+                // validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
                     console.log(values);
 
-                    const payload = {
-                        amount: Number(values.rate),
-                        billed: false,
-                        createdBy: 1,
-                        createdOn: "",
-                        description: "Time entry",
-                        duration: "00:47:41",
-                        entryDate: "2025-07-09T17:02:35+05:00",
-                        firmUserId: 1,
-                        matterId: 13,
-                        matterName: "",
-                        matterTimeEntryId: null,
-                        module: "DASHBOARD",
-                        nonBillable: false,
-                        rate: Number(values.rate),
+
+                    const durationRange = formatTime(duration)
+                    console.log(durationRange, "Range");
+
+
+                    const durationRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/;
+
+                    if (!durationRegex.test(durationRange)) {
+                        Alert.alert('Invalid Format', 'Please enter duration in hh:mm:ss format (e.g. 02:30:00)');
+                        return;
+                    }
+                    const [hh, mm, ss] = durationRange?.split(':').map(Number);
+                    const totalHours = hh + mm / 60 + ss / 3600;
+                    const totalHOurs = (totalHours * values?.rate)?.toFixed(2);
+                    console.log(totalHours * values?.rate, "totalHours====>", values?.rate);
+                    const payload =
+                    {
+                        createdOn: defaultData?.createdOn,
+                        updatedOn: defaultData?.updatedOn,
+                        createdBy: userDetails?.userId,
+                        updatedBy: userDetails?.userId,
                         revision: null,
-                        updatedBy: null,
-                        updatedOn: null,
-                        visibleBill:
-                            false,
+                        matterTimeEntryId: communicationDetails?.matterTimeEntryId,
+                        matterId: values?.matterObj?.matterId,
+                        taskId: null,
+                        eventScheduleId: null,
+                        attachmentId: null,
+                        odDocId: null,
+                        matterName: values?.matterObj?.name || null,
+                        entryDate: values?.selectedDate,
+                        firmUserId: values?.firmObj?.userId,
+                        rate: Number(values?.rate),
+                        nonBillable: values?.nonBillable,
+                        visibleBill: values?.isShowEntryontheBill,
+                        duration: durationRange,
+                        description: values?.description,
+                        billed: false,
+                        amount: defaultData?.amount || Number(totalHOurs),
+                        module: "DASHBOARD",
+                        noteId: null,
+                        commLogId: null
+
+                    }
+                    setFieldValue('loader', true)
+                    const { res, err } = await httpRequest(
+                        {
+                            method: `put`,
+                            path: `/ic/matter/time-entry/`,
+                            params: payload,
+                            navigation: navigation
+                        })
+                    if (res) {
+                        toast.show('Time Entry updated successfully', { type: 'success' })
+                        setFieldValue('loader', false)
+
+                        navigation.goBack();
+                    }
+                    else {
+                        setFieldValue('loader', false)
+
+                        console.log("err", err);
                     }
 
                 }}
@@ -282,7 +354,7 @@ const EditTimeEntry = ({ navigation }) => {
                                     isButton={true}
                                     buttonText={values.date ? values.date : 'Select Open date'}
                                 />
-                                <TextInputWithTitle onChangeText={(txt) => setFieldValue('description', txt)} title=" Description" placeholder={'Enter description'} />
+                                <TextInputWithTitle value={values.description} onChangeText={(txt) => setFieldValue('description', txt)} title=" Description" placeholder={'Enter description'} />
 
                                 <TextInputWithTitle
                                     onPressButton={() => setFieldValue('isOpenfirm', true)}
