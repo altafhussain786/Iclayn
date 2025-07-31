@@ -16,6 +16,8 @@ import moment from 'moment';
 import LoaderModal from '../../../components/LoaderModal';
 import { Swipeable } from 'react-native-gesture-handler';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import FloatingButton from '../../../components/FloatingButton';
+import TimekeeperModal from '../../../components/TimekeeperModal';
 
 const TOP_TABS = ['Funds', 'Receive Advance', 'Transfer Advance'];
 const SUB_TABS = ['All', 'Pending', 'Partial Received', 'Received', 'Cancelled'];
@@ -26,6 +28,9 @@ const TransactionsScreen = ({ navigation }) => {
     const [data, setData] = useState([]);
     const [search, setSearch] = useState('');
     const [loader, setLoader] = useState(false);
+
+    const [modalVisible, setModalVisible] = useState(false);
+
 
     const getData = async () => {
         setLoader(true)
@@ -272,7 +277,16 @@ const TransactionsScreen = ({ navigation }) => {
                                 </Text>
                             </View>
                         )}
-
+            <FloatingButton
+                style={{ marginBottom: 40 }}
+                onPress={() => setModalVisible(true)}
+                icon="plus"
+                navigateTo="CreateScreen"
+                backgroundColor={COLORS.PRIMARY_COLOR_LIGHT}
+                size={50}
+                iconSize={25}
+            />
+            <TimekeeperModal navigation={navigation} visible={modalVisible} onClose={() => setModalVisible(false)} />
 
             {/* </Wrapper> */}
         </>

@@ -15,10 +15,12 @@ import { COLORS, IconUri } from '../../../constants';
 import { calculatefontSize, getResponsiveWidth } from '../../../helper/responsiveHelper';
 import MyText from '../../../components/MyText';
 import { Swipeable } from 'react-native-gesture-handler';
+import { useToast } from 'react-native-toast-notifications';
 
 
 
 const Communications = ({ navigation }) => {
+    const toast = useToast();
     const [tabs, setTabs] = React.useState("All");
     const [communicationData, setcommunicationData] = React.useState([]);
     const [filteredData, setFilteredData] = React.useState([]);
@@ -79,6 +81,24 @@ const Communications = ({ navigation }) => {
         }
     }, [tabs, communicationData]);
 
+    const handleDeleteItems = async (item) => {
+        console.log(item, "DELETE ITEM");
+
+        const { res, err } = await httpRequest({
+            method: 'delete',
+            path: `/ic/matter/comm-log/`,
+            navigation: navigation,
+            params: [item?.matterComLogId]
+        })
+        if (res) {
+            toast.show('Communication deleted successfully', { type: 'success' })
+            getCommunicationData();
+        }
+        else {
+            console.log("err=================", err);
+        }
+    }
+
     useEffect(() => {
         if (tabs === 'All') {
             setFilteredData(communicationData);
@@ -108,6 +128,16 @@ const Communications = ({ navigation }) => {
                 style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
             >
                 <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
+            </TouchableOpacity>
+        </View>
+    );
+    const renderRightActions = (item) => (
+        <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity
+                onPress={() => handleDeleteItems(item)}
+                style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+            >
+                <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
             </TouchableOpacity>
         </View>
     );
@@ -181,7 +211,7 @@ const Communications = ({ navigation }) => {
                             keyExtractor={(item, index) => index.toString()}
                             renderItem={({ item, i }) => {
                                 return (
-                                    <Swipeable renderLeftActions={() => renderLeftActions(item)} >
+                                    <Swipeable renderLeftActions={() => renderLeftActions(item)} renderRightActions={() => renderRightActions(item)}>
                                         <View
                                             style={{
                                                 flexDirection: "row",

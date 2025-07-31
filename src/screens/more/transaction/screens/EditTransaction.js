@@ -24,7 +24,8 @@ import AddButton from '../../../../components/AddButton'
 
 
 
-const CreateTransaction = ({ navigation }) => {
+const CreateTransaction = ({ navigation, route }) => {
+    const transactionDetails = route?.params?.transactionDetails
     const dispatch = useDispatch();
     const userDetails = useSelector(state => state?.userDetails?.userDetails);
     const toast = useToast()
@@ -33,6 +34,28 @@ const CreateTransaction = ({ navigation }) => {
     const [matterId, setMatterId] = useState('');
     const [clientData, setClientData] = useState([]);
     const [defaultData, setDefaultData] = useState({});
+
+
+
+
+    const getDefaultData = async () => {
+        const { res, err } = await httpRequest({
+            method: `get`,
+            path: `/ic/matter/client-fund/${transactionDetails?.matterClientFundId}`,
+            navigation: navigation
+        })
+        if (res) {
+            setDefaultData(res?.data);
+        }
+        else {
+            console.log(err, "GET CUSTOMER RESPONSE===>err");
+        }
+    }
+
+    useEffect(() => {
+
+        getDefaultData();
+    }, [transactionDetails])
 
     const getMatterData = async () => {
         const { res, err } = await httpRequest({
@@ -50,7 +73,7 @@ const CreateTransaction = ({ navigation }) => {
     const getClientData = async () => {
         const { res, err } = await httpRequest({
             method: `get`,
-            path: `/ic/matter/${matterId}/client`,
+            path: `/ic/matter/${defaultData?.matterId || matterId}/client`,
             navigation: navigation
         })
         if (res) {
@@ -75,44 +98,49 @@ const CreateTransaction = ({ navigation }) => {
     const validationSchema = Yup.object().shape({
     })
 
+    console.log(clientData, "dCLIENT DATA===>");
+
+
     return (
         <>
             <Formik
-                // enableReinitialize
+                enableReinitialize
                 initialValues={
                     {
                         isYourType: "Individual",
 
                         //individual===========================>
                         // matter  ============>
-                        matter: "",
-                        matterObj: {},
+                        matter: matterData?.find(item => item?.matterId === defaultData?.matterId)?.name || "",
+                        matterObj: matterData?.find(item => item?.matterId === defaultData?.matterId) || {},
                         ismatterOpen: false,
                         // ============>
-                        client: "",
+                        client: clientData?.find(item => item?.clientId == 1)?.firstName + " " + clientData?.find(item => item?.clientId == 1)?.lastName || "",
                         clientObj: {},
                         isClientOpen: false,
-                        prefix: "",
+
+                        //
+                        prefix: defaultData?.code || "",
                         isPrefixOpen: false,
                         // matter END  ============>
 
-                        amount: "",
-                        isShowNote: false,
-                        Note: "",
+                        amount: defaultData?.amount?.toString() || "",
+                        isShowNote: defaultData?.note?.lenght > 0 || false,
+                        Note: defaultData?.note || "",
 
 
                         //Date of birth
 
-                        issueDate: moment().format('DD/MM/YYYY'),
-                        selectedissueDate: moment(new Date()).toISOString(),
+                        issueDate: moment(defaultData?.issueDate).format('DD/MM/YYYY'),
+                        selectedissueDate: defaultData?.issueDate || moment(new Date()).toISOString(),
                         isissueDateOpen: false,
 
-                        dueDate: moment().format('DD/MM/YYYY'),
-                        selecteddueDate: moment(new Date()).toISOString(),
+                        dueDate: moment(defaultData?.dueDate).format('DD/MM/YYYY'),
+                        selecteddueDate: defaultData?.dueDate || moment(new Date()).toISOString(),
                         isdueDateOpen: false,
 
-                        isEmailConfirmation: false,
-                        isSmsConfirmation: false,
+                        isEmailConfirmation: defaultData?.sendEmail || false,
+                        isSmsConfirmation: defaultData?.sendSMS || false,
 
 
 

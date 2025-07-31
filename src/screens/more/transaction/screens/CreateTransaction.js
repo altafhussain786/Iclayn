@@ -72,6 +72,9 @@ const CreateTransaction = ({ navigation }) => {
     }, [])
 
     const validationSchema = Yup.object().shape({
+        // matter: Yup.string().required('Matter is required'),
+        // client: Yup.string().required('Client is required'),
+        // amount: Yup.string().required('Amount is required'),
     })
 
     return (
@@ -90,7 +93,10 @@ const CreateTransaction = ({ navigation }) => {
                         // ============>
                         client: "",
                         clientObj: {},
+                        clientItems: [],
                         isClientOpen: false,
+
+                        //
                         prefix: "",
                         isPrefixOpen: false,
                         // matter END  ============>
@@ -110,8 +116,8 @@ const CreateTransaction = ({ navigation }) => {
                         selecteddueDate: moment(new Date()).toISOString(),
                         isdueDateOpen: false,
 
-                        isEmailConfirmation: false,
-                        isSmsConfirmation: false,
+                        isEmailConfirmation: true,
+                        isSmsConfirmation: true,
 
 
 
@@ -119,9 +125,9 @@ const CreateTransaction = ({ navigation }) => {
                         loader: false
                     }
                 }
-                // validationSchema={validationSchema}
+                validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
-                    console.log(values, "values==>");
+                    // console.log(values, "values==>");
                     const payload = {
                         createdOn: "",
                         updatedOn: null,
@@ -132,7 +138,7 @@ const CreateTransaction = ({ navigation }) => {
                         issueDate: values?.selectedissueDate,
                         dueDate: values?.selecteddueDate,
                         receiptDate: null,
-                        clientIds: String(values?.clientObj?.clientId),
+                        clientIds: String(values?.clientItems?.map((item) => item?.clientId).join(",")),
                         matterId: values?.matterObj?.matterId,
                         matterName: values?.matterObj?.name,
                         amount: Number(values.amount),
@@ -143,6 +149,8 @@ const CreateTransaction = ({ navigation }) => {
                         code: null,
                         paidAmount: null
                     }
+                    console.log(payload, "payload");
+                    setFieldValue('loader', true);
                     const { res, err } = await httpRequest({
                         method: `post`,
                         path: `/ic/matter/client-fund/`,
@@ -151,14 +159,17 @@ const CreateTransaction = ({ navigation }) => {
                     })
                     if (res) {
                         toast.show('Transaction created successfully', { type: 'success' })
-                        console.log(res, "CREATE TRANSACTION RESPONSE===>");
+                        setFieldValue('loader', false);
+
                         navigation.goBack();
                     }
                     else {
+                        setFieldValue('loader', false);
+
                         console.log(err, "GET CUSTOMER RESPONSE===>err");
                     }
 
-                    console.log(payload, "payload");
+                    // console.log(payload, "payload");
 
 
                 }}
@@ -210,11 +221,49 @@ const CreateTransaction = ({ navigation }) => {
                                         </>
                                     }
                                     <TextInputWithTitle
+                                        setFieldValue={setFieldValue}
+                                        arrayValue={values?.clientItems}
+                                        onPressButton={() => setFieldValue('isClientOpen', true)}
+
+                                        title="Client"
+                                        isButton={true}
+                                        buttonText={'Select Client'}
+                                        customView={({ arrayValue, setFieldValue, onPressButton, buttonText }) => (
+
+                                            <View style={{ marginTop: 10 }}>
+                                                {arrayValue.map((item, index) => (
+                                                    <View
+                                                        key={item.clientId}
+                                                        style={styles.itemContainer}
+                                                    >
+                                                        <MyText>
+                                                            {item?.companyName ? item?.companyName : item?.firstName + ' ' + item?.lastName}
+                                                        </MyText>
+                                                        <TouchableOpacity
+                                                            onPress={() => {
+                                                                const updatedList = arrayValue.filter(
+                                                                    (c) => c.clientId !== item.clientId
+                                                                );
+                                                                setFieldValue('clientItems', updatedList);
+                                                            }}
+                                                        >
+                                                            <AntDesign name="delete" size={20} color="red" />
+                                                        </TouchableOpacity>
+                                                    </View>
+                                                ))}
+                                                <TouchableOpacity onPress={onPressButton} style={{ paddingVertical: 10 }}>
+                                                    <MyText style={styles.btnTextStyle}>{buttonText}</MyText>
+                                                </TouchableOpacity>
+                                            </View>
+
+                                        )}
+                                    />
+                                    {/* <TextInputWithTitle
                                         onPressButton={() => setFieldValue('isClientOpen', true)}
                                         title="Client"
                                         isButton={true}
                                         buttonText={values.client ? values.client : 'Select Prefix'}
-                                    />
+                                    /> */}
                                     <TextInputWithTitle
                                         onPressButton={() => setFieldValue('isdueDateOpen', true)}
                                         title="Due Date"
@@ -228,7 +277,7 @@ const CreateTransaction = ({ navigation }) => {
                                         buttonText={values.issueDate ? values.issueDate : 'DD/MM/YYYY'}
                                     />
                                     <TextInputWithTitle
-
+                                        keyboardType='numeric'
                                         placeholder={"Amount"}
                                         value={values.amount}
                                         onChangeText={(txt) => setFieldValue('amount', txt)}
@@ -293,6 +342,37 @@ const CreateTransaction = ({ navigation }) => {
                                     <BottomModalListWithSearch
                                         onClose={() => setFieldValue('isClientOpen', false)}
                                         renderItem={({ item }) => (
+                                            console.log(item, "ITEMS====>"),
+
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    const alreadyExists = values.clientItems?.find(
+                                                        (i) => i.clientId === item.clientId
+                                                    );
+                                                    if (!alreadyExists) {
+                                                        setFieldValue('clientItems', [...values.clientItems, item]);
+                                                    }
+                                                    else {
+                                                        Alert.alert('Client already added');
+                                                    }
+                                                    setFieldValue('client', item?.companyName ? item?.companyName : item?.firstName + ' ' + item?.lastName || '');
+                                                    setFieldValue('clientObj', item);
+                                                    setFieldValue('isClientOpen', false);
+                                                }}
+                                                style={styles.itemStyle}
+                                            >
+                                                <MyText style={{ fontSize: calculatefontSize(1.9) }}>
+                                                    {item?.companyName ? item?.companyName : item?.firstName + ' ' + item?.lastName}
+                                                </MyText>
+                                            </TouchableOpacity>
+                                        )}
+                                        visible={values?.isClientOpen}
+                                        data={clientData}
+                                        searchKey={"status"}
+                                    />
+                                    {/* <BottomModalListWithSearch
+                                        onClose={() => setFieldValue('isClientOpen', false)}
+                                        renderItem={({ item }) => (
                                             <TouchableOpacity
                                                 onPress={() => {
                                                     setFieldValue('client', item?.companyName ? item?.companyName : item?.firstName + ' ' + item?.lastName || '');
@@ -309,7 +389,7 @@ const CreateTransaction = ({ navigation }) => {
                                         visible={values?.isClientOpen}
                                         data={clientData}
                                         searchKey="firstName"
-                                    />
+                                    /> */}
 
                                     <DatePicker
                                         modal
@@ -381,5 +461,21 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         paddingVertical: 10,
         borderColor: COLORS?.BORDER_LIGHT_COLOR
+    },
+    itemContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 10,
+        marginBottom: 5,
+        backgroundColor: '#f0f0f0',
+        width: '100%',
+        borderRadius: 5,
+    },
+    btnTextStyle: {
+        fontSize: calculatefontSize(1.9),
+        fontWeight: '600',
+        bottom: 10,
+        color: COLORS?.PRIMARY_COLOR_LIGHT
     },
 })
