@@ -77,6 +77,20 @@ const Bills = ({ navigation }) => {
     setFilteredData(filtered);
   }, [searchText, data, tabs]);
 
+  const handleDeleteItem = async (item) => {
+    const { res, err } = await httpRequest({
+      method: 'delete',
+      path: `/ic/matter/bill/${item._id}`,
+      navigation: navigation,
+    })
+    if (res) {
+      getBills()
+    }
+    else {
+      console.log("err=================", err);
+    }
+  }
+
   const renderLeftActions = (item) => (
     <View style={{ flexDirection: 'row' }}>
       <TouchableOpacity
@@ -84,6 +98,16 @@ const Bills = ({ navigation }) => {
         style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
       >
         <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
+      </TouchableOpacity>
+    </View>
+  );
+  const renderRightActions = (item) => (
+    <View style={{ flexDirection: 'row' }}>
+      <TouchableOpacity
+        onPress={() => handleDeleteItem(item)}
+        style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+      >
+        <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
       </TouchableOpacity>
     </View>
   );
@@ -220,7 +244,7 @@ const Bills = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 100 }}
           renderItem={({ item, index }) => {
             return (
-              <Swipeable renderLeftActions={() => renderLeftActions(item)}>
+              <Swipeable renderLeftActions={() => renderLeftActions(item)} >
                 <TouchableOpacity onPress={() => navigation.navigate('MatterDetails', { matterData: item })}
                   style={{
                     flexDirection: 'row',

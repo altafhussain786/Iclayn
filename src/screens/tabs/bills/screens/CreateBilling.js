@@ -34,6 +34,8 @@ const CreateBilling = ({ navigation }) => {
     const [firmUserData, setFirmUserData] = useState([])
     const items = useSelector(state => state.createBillingTimeEntryItem.items);
     const expenseEntryItem = useSelector(state => state.createBillingExpenseEntryItem.items);
+    const userDetails = useSelector(state => state?.userDetails?.userDetails);
+
 
     const [matterData, setmatterData] = React.useState([]);
     const [eventTypeData, seteventTypeData] = React.useState([]);
@@ -160,12 +162,12 @@ const CreateBilling = ({ navigation }) => {
                         //start data/time
                         isOpeninvDate: false,
                         invDate: '',
-                        selectedinvDate: new Date(), // 👈 must be a Date object
+                        selectedinvDate: moment(new Date()).toISOString(), // 👈 must be a Date object
 
                         //end date/time
                         isOpendueDate: false,
                         dueDate: '',
-                        selecteddueDate: new Date(),
+                        selecteddueDate: moment(new Date()).toISOString(),
 
 
                         //description
@@ -176,8 +178,72 @@ const CreateBilling = ({ navigation }) => {
                         loader: false
                     }
                 }
-                validationSchema={validationSchema}
+                // validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
+
+                    const mappedData = expenseEntryItem?.map((d, i) => {
+                        return {
+                            createdOn: "",
+                            updatedOn: null,
+                            createdBy: null,
+                            updatedBy: null,
+                            revision: null,
+                            matterBillExpenseId: null,
+                            expEntryId: null,
+                            expDate: moment(d?.date, 'MM/DD/YYYY').toISOString(),
+                            userId: d?.userObj?.userId || 0,
+                            description: d?.description || '',
+                            rate: d?.hourlyRate || "0",
+                            taxRate: 0,
+                            quantity: 1,
+                            taxId: d?.taxObj?.taxId || 1,
+                            taxPer: Number(d?.taxAmount),
+                            taxAmount: (Number(d?.hourlyRate) / 100) * Number(d?.taxAmount) || 0,
+                            totalAmount: Number(d?.hourlyRate) || 0,
+                            nonBillable: false,
+                            visibleBill: false
+                        }
+                    })
+                    const payload = {
+
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: userDetails?.userId || 0,
+                        updatedBy: null,
+                        revision: null,
+                        matterBillId: null,
+                        dueDate: values?.selecteddueDate || "",
+                        invoiceDate: values?.selecteddueDate || "",
+                        matterId: values?.matterSelectedObj?.matterId || 0,
+                        matterDescription: values.matterSelectedObj?.description || '',
+                        subTotal: subtotal || 0,
+                        taxTotal: totalTax || 0,
+                        netTotal: netTotal || 0,
+                        paidTotal: 0,
+                        // invoiceDate: values?.selectedinvDate || "",
+                        // dueDate: values?.selecteddueDate || "",
+                        status: "UNPAID",
+                        matterBillingDTOList: [],
+                        matterBillExpenseDTOList: mappedData || [],
+                        clientIds: toClientData?.map(item => item?.clientId).join(",") || "",
+                    }
+
+                    console.log(payload, "PAYLOAD ", expenseEntryItem);
+                    const { res, err } = await httpRequest({
+                        method: `post`,
+                        path: `/ic/matter/bill/`,
+                        body: payload,
+                        navigation: navigation
+                    })
+                    if (res) {
+                        toast.show('Billing created successfully', { type: 'success' })
+                        navigation.goBack()
+                    }
+                    else {
+                        console.log("err", err);
+                    }
+
+
 
                 }}
             >
@@ -361,10 +427,10 @@ const CreateBilling = ({ navigation }) => {
                                 modal
                                 mode='datetime'
                                 open={values.isOpeninvDate}
-                                date={values.selectedinvDate || new Date()}
+                                date={new Date()}
                                 onConfirm={date => {
                                     setFieldValue('invDate', `${moment(date).format('MM/DD/YYYY')} : ${moment(date).format('hh:mm A')}`);
-                                    setFieldValue('selectedinvDate', date); // ✅ keep as Date object
+                                    setFieldValue('selectedinvDate', date?.toISOString()); // ✅ keep as Date object
                                     setFieldValue('isOpeninvDate', false);
                                 }}
                                 onCancel={() => {
@@ -376,10 +442,10 @@ const CreateBilling = ({ navigation }) => {
                                 modal
                                 mode='datetime'
                                 open={values.isOpendueDate}
-                                date={values.selecteddueDate || new Date()}
+                                date={new Date()}
                                 onConfirm={date => {
                                     setFieldValue('dueDate', `${moment(date).format('MM/DD/YYYY')} : ${moment(date).format('hh:mm A')}`);
-                                    setFieldValue('selecteddueDate', date); // ✅ keep as Date object
+                                    setFieldValue('selecteddueDate', date?.toISOString()); // ✅ keep as Date object
                                     setFieldValue('isOpendueDate', false);
                                 }}
                                 onCancel={() => {

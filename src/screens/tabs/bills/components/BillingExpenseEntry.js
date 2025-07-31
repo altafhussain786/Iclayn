@@ -147,7 +147,7 @@ const BillingExpenseEntry = ({ item, navigation }) => {
 
             <View style={{ alignItems: "flex-end", }}>
                 <View style={{ marginVertical: 10, }}>
-                    <MyText style={[styles.totalTaxt, {}]}>Tax Amount : {item?.taxAmount.toFixed(2)}</MyText>
+                    <MyText style={[styles.totalTaxt, {}]}>Tax Amount : {((item?.hourlyRate / 100) * item?.taxAmount)?.toFixed(2)}</MyText>
                     <MyText style={[styles.totalTaxt, {}]}>Total : {(item?.hourlyRate || 0)}</MyText>
                 </View>
             </View>
