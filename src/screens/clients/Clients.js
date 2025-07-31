@@ -17,6 +17,7 @@ import { COLORS, IconUri } from '../../constants';
 import { calculatefontSize, getResponsiveWidth } from '../../helper/responsiveHelper';
 import MyText from '../../components/MyText';
 import { Swipeable } from 'react-native-gesture-handler';
+import { useToast } from 'react-native-toast-notifications';
 
 
 
@@ -27,6 +28,7 @@ const Clients = ({ navigation }) => {
   const [searchText, setSearchText] = useState(''); // ✅ for search
   const [loader, setLoader] = React.useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const toast = useToast()
 
 
 
@@ -80,6 +82,23 @@ const Clients = ({ navigation }) => {
 
     setFilteredData(filtered);
   }, [searchText, tabs, activityData]);
+  const handleDeleteItem = async (item) => {
+    console.log(item, "DEETE ITEM");
+
+    const { res, err } = await httpRequest({
+      method: 'delete',
+      navigation: navigation,
+      path: `/ic/client/`,
+      params: [item?.clientId]
+    })
+    if (res) {
+      toast.show('Client deleted successfully', { type: 'success' })
+      getActivityData();
+    }
+    else {
+      console.log("err", err);
+    }
+  }
 
   const renderLeftActions = (item) => (
     <View style={{ flexDirection: 'row' }}>
@@ -88,6 +107,16 @@ const Clients = ({ navigation }) => {
         style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
       >
         <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
+      </TouchableOpacity>
+    </View>
+  );
+  const renderRightActions = (item) => (
+    <View style={{ flexDirection: 'row' }}>
+      <TouchableOpacity
+        onPress={() => handleDeleteItem(item)}
+        style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+      >
+        <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
       </TouchableOpacity>
     </View>
   );
@@ -148,7 +177,7 @@ const Clients = ({ navigation }) => {
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item, i }) => {
                 return (
-                  <Swipeable renderLeftActions={() => renderLeftActions(item)}>
+                  <Swipeable renderLeftActions={() => renderLeftActions(item)} renderRightActions={() => renderRightActions(item)}>
                     <View
                       style={{
                         flexDirection: "row",
