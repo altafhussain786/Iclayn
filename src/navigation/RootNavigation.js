@@ -46,6 +46,7 @@ import EditParties from '../screens/more/parties/screens/EditParties';
 import EditPhoneLog from '../screens/more/communications/screens/Edit/EditPhoneLog';
 import EditInternalLog from '../screens/more/communications/screens/Edit/EditInternalLog';
 import EditExpense from '../screens/more/expense/screens/EditExpense';
+import EditTransaction from '../screens/more/transaction/screens/EditTransaction';
 
 
 
@@ -118,6 +119,7 @@ const RootNavigation = () => {
         <Stack.Screen name="Reports" component={Reports} />
         <Stack.Screen name="Transaction" component={Transaction} />
         <Stack.Screen name="CreateTransaction" component={CreateTransaction} />
+        <Stack.Screen name="EditTransaction" component={EditTransaction} />
 
 
 

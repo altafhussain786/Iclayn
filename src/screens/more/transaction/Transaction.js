@@ -14,6 +14,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import httpRequest from '../../../api/apiHandler';
 import moment from 'moment';
 import LoaderModal from '../../../components/LoaderModal';
+import { Swipeable } from 'react-native-gesture-handler';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const TOP_TABS = ['Funds', 'Receive Advance', 'Transfer Advance'];
 const SUB_TABS = ['All', 'Pending', 'Partial Received', 'Received', 'Cancelled'];
@@ -56,24 +58,59 @@ const TransactionsScreen = ({ navigation }) => {
         return matchStatus && matchSearch;
     });
 
+    const deletItem = async (item) => {
+        console.log(item, "ITEM==========>");
+
+        const { res, err } = await httpRequest({
+            method: 'delete',
+            path: `/ic/matter/client-fund/`,
+            params: [item?.matterClientFundId],
+            navigation: navigation
+        })
+        if (res) {
+            getData();
+        }
+        else {
+            console.log("err", err);
+        }
+    }
+
+
+    const renderLeftActions = (item) => {
+        return (
+            <TouchableOpacity onPress={() => navigation.navigate("EditTransaction", { transactionDetails: item })} style={styles.leftSwipe}>
+                <AntDesign name="edit" size={20} color={COLORS?.BLACK_COLOR} />
+            </TouchableOpacity>
+        );
+    };
+    const renderRightActions = (item) => {
+        return (
+            <TouchableOpacity onPress={() => deletItem(item)} style={[styles.leftSwipe, { backgroundColor: COLORS?.RED_COLOR }]}>
+                <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
+            </TouchableOpacity>
+        );
+    };
+
     const renderItem = ({ item }) => (
-        <View style={styles.card}>
-            <View style={styles.headerRow}>
-                <TouchableOpacity>
-                    <Text style={styles.codeText}>{item.code}</Text>
-                </TouchableOpacity>
-                <Text style={styles.balance}>{item.amount}</Text>
+        <Swipeable renderRightActions={() => renderRightActions(item)} overshootRight={false} overshootLeft={false} renderLeftActions={() => renderLeftActions(item)}>
+            <View style={styles.card}>
+                <View style={styles.headerRow}>
+                    <TouchableOpacity>
+                        <Text style={styles.codeText}>{item.code}</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.balance}>{item.amount}</Text>
+                </View>
+                <MyText style={styles.mainText}>{item.matterName}</MyText>
+                <MyText style={styles.subText}>{item.clientIds}</MyText>
+                <View style={styles.dateRow}>
+                    <Text style={styles.dateText}>{moment(item.issueDate).format('DD/MM/YYYY')}</Text>
+                    <Text style={styles.dueText}>{item.due}</Text>
+                </View>
+                <View style={styles.statusBadge}>
+                    <Text style={styles.statusText}>{item.status}</Text>
+                </View>
             </View>
-            <MyText style={styles.mainText}>{item.matterName}</MyText>
-            <MyText style={styles.subText}>{item.clientIds}</MyText>
-            <View style={styles.dateRow}>
-                <Text style={styles.dateText}>{moment(item.issueDate).format('DD/MM/YYYY')}</Text>
-                <Text style={styles.dueText}>{item.due}</Text>
-            </View>
-            <View style={styles.statusBadge}>
-                <Text style={styles.statusText}>{item.status}</Text>
-            </View>
-        </View>
+        </Swipeable>
     );
     const renderItem1 = ({ item }) => (
         <View style={[styles.card, { flex: 1, }]}>
@@ -97,6 +134,7 @@ const TransactionsScreen = ({ navigation }) => {
         <>
             <ScreenHeader
                 isGoBack={true}
+                isShowTitle={true}
                 title="Transactions"
                 onPress={() => navigation.goBack()}
             />
@@ -170,17 +208,34 @@ const TransactionsScreen = ({ navigation }) => {
             <LoaderModal visible={loader} />
             {/* 📋 Content */}
             {topTab === 'Funds' ? (
-                <FlatList
-                    data={data}
-                    keyExtractor={(item, index) => index.toString()}
-                    renderItem={renderItem}
-                    contentContainerStyle={{ paddingBottom: 100, backgroundColor: COLORS?.whiteColors, flex: 1 }}
-                    ListEmptyComponent={
-                        <Text style={{ textAlign: 'center', marginTop: 50 }}>No transactions found.</Text>
-                    }
-                />
+                // data.length > 0 ? (
+                //     <View
+                //         style={{ flex: 1, backgroundColor: COLORS?.whiteColors, justifyContent: "center", alignItems: "center" }}
+                //     >
+
+                //         <MyText>No funds</MyText>
+                //     </View>
+                // ) :
+                <>
+                    <FlatList
+                        data={data}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={renderItem}
+                        contentContainerStyle={{ paddingBottom: 100, backgroundColor: COLORS?.whiteColors, flex: 1 }}
+                        ListEmptyComponent={
+                            <Text style={{ textAlign: 'center', marginTop: 50 }}>No transactions found.</Text>
+                        }
+                    />
+                </>
             )
                 : topTab === 'Receive Advance' ? (
+                    // data.length > 0 ? (
+                    //     <View
+                    //         style={{ flex: 1, backgroundColor: COLORS?.whiteColors, justifyContent: "center", alignItems: "center" }}
+                    //     >
+                    //         <MyText>No Receive Advance</MyText>
+                    //     </View>
+                    // ) :
                     <FlatList
                         data={data}
                         keyExtractor={(item, index) => index.toString()}
@@ -192,23 +247,23 @@ const TransactionsScreen = ({ navigation }) => {
                     />
                 )
                     : topTab === 'Transfer Advance' ? (
-                        data.length > 0 ? (
-                            <View
-                                style={{ flex: 1, backgroundColor: COLORS?.whiteColors, justifyContent: "center", alignItems: "center" }}
-                            >
-                                <MyText>dkfhkdshfksd</MyText>
-                            </View>
-                        )
-                            :
-                            <FlatList
-                                data={data}
-                                keyExtractor={(item, index) => index.toString()}
-                                renderItem={renderItem}
-                                contentContainerStyle={{ paddingBottom: 100, backgroundColor: COLORS?.whiteColors, flex: 1 }}
-                                ListEmptyComponent={
-                                    <Text style={{ textAlign: 'center', marginTop: 50 }}>No transactions found.</Text>
-                                }
-                            />
+                        // data.length > 0 ? (
+                        //     <View
+                        //         style={{ flex: 1, backgroundColor: COLORS?.whiteColors, justifyContent: "center", alignItems: "center" }}
+                        //     >
+                        //         <MyText>No Transfer Advance</MyText>
+                        //     </View>
+                        // )
+                        //     :
+                        <FlatList
+                            data={data}
+                            keyExtractor={(item, index) => index.toString()}
+                            renderItem={renderItem}
+                            contentContainerStyle={{ paddingBottom: 100, backgroundColor: COLORS?.whiteColors, flex: 1 }}
+                            ListEmptyComponent={
+                                <Text style={{ textAlign: 'center', marginTop: 50 }}>No transactions found.</Text>
+                            }
+                        />
                     )
                         : (
                             <View style={{ marginTop: 50, alignItems: 'center' }}>
@@ -338,6 +393,21 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         backgroundColor: COLORS.PRIMARY_COLOR_LIGHT,
         // padding: 10,
+    },
+    leftSwipe: {
+        backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
+        justifyContent: 'center',
+
+        alignItems: 'flex-start',
+        paddingHorizontal: 20,
+        marginVertical: 6,
+        // borderRadius: 8,
+        // flex: 1,
+    },
+    leftSwipeText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: calculatefontSize(1.6),
     },
     tab: {
         // paddingHorizontal: 10,
