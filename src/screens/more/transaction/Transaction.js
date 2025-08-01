@@ -37,17 +37,17 @@ const TransactionsScreen = ({ navigation }) => {
         const { res, err } = await httpRequest({
             method: 'get',
             path: topTab === 'Funds' ? `/ic/matter/client-fund/` : topTab == "Receive Advance" ? `/ic/payment/advance` : `/ic/payment/transfer-advance`,
-            // path: `/ic/payment/advance`,
             navigation
         })
         if (res) {
             setLoader(false)
 
-            console.log(res, "HEKEKKEKE============d====>");
+            console.log(res, "HEKEKKEKE============dd====>");
 
             setData(res?.data)
         }
         else {
+            setData([]);
             setLoader(false)
             console.log("err", err);
         }
@@ -117,23 +117,52 @@ const TransactionsScreen = ({ navigation }) => {
             </View>
         </Swipeable>
     );
-    const renderItem1 = ({ item }) => (
-        <View style={[styles.card, { flex: 1, }]}>
-            <View style={styles.headerRow}>
-                <TouchableOpacity>
-                    <Text style={styles.codeText}>{item.paymentMethodName}</Text>
-                </TouchableOpacity>
-                <Text style={styles.balance}>{item.amount}</Text>
-            </View>
-            <MyText style={styles.mainText}>{item.entityType}</MyText>
-            <MyText style={styles.subText}>{item.matterId}</MyText>
-            <View style={styles.dateRow}>
-                <Text style={styles.dateText}>{moment(item.issueDate).format('DD/MM/YYYY')}</Text>
-                <Text style={styles.dueText}>{item.due}</Text>
+    const renderItem1 = ({ item }) => {
+        console.log(item, "====>RECEVIE ADVANCE");
+
+        return (
+            <>
+
+                <View style={[styles.card]}>
+                    <View style={styles.headerRow}>
+                        <TouchableOpacity>
+                            <Text style={styles.codeText}>{item.entityType}</Text>
+                        </TouchableOpacity>
+                        <Text style={styles.balance}>{item.amount?.toFixed(2)}</Text>
+                    </View>
+                    {item?.notes && <MyText style={styles.mainText}>{item.notes}</MyText>}
+                    <MyText style={styles.subText}>{item.matterId}</MyText>
+                    <View style={styles.dateRow}>
+                        <Text style={styles.dateText}>{moment(item.createdOn).format('DD/MM/YYYY')}</Text>
+                        <Text style={styles.dueText}>{item.due}</Text>
+                    </View>
+                </View>
+            </>
+
+        )
+    };
+    const renderItem2 = ({ item }) => {
+        return (
+
+            <View style={[styles.card,]}>
+                <View style={styles.headerRow}>
+                    <TouchableOpacity>
+                        <Text style={styles.codeText}>{item.entityType}</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.balance}>{item.amount?.toFixed(2)}</Text>
+                </View>
+                <MyText style={styles.mainText}>{item.notes}</MyText>
+                <MyText style={styles.subText}>{item.matterId}</MyText>
+                <View style={styles.dateRow}>
+                    <Text style={styles.dateText}>{moment(item.createdOn).format('DD/MM/YYYY')}</Text>
+                    <Text style={styles.dueText}>{item.due}</Text>
+                </View>
             </View>
 
-        </View>
-    );
+        )
+    }
+
+
 
     return (
         <>
@@ -203,24 +232,34 @@ const TransactionsScreen = ({ navigation }) => {
             )}
 
             {/* 🔍 Search */}
-            {topTab === 'Funds' && (
-                <SearchBar
-                    placeholder="Search by code..."
-                    value={search}
-                    onChangeText={setSearch}
-                />
-            )}
+            {/* {topTab === 'Funds' && ( */}
+            <View style={{ backgroundColor: COLORS?.whiteColors, flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 10 }}>
+                <View style={{ backgroundColor: COLORS?.whiteColors, width: "85%", alignItems: "center", top: 5 }}>
+                    <SearchBar
+
+                        placeholder="Search by code..."
+                        value={search}
+                        onChangeText={setSearch}
+                    />
+                </View>
+                <TouchableOpacity onPress={() => {
+                    if (topTab === 'Funds') {
+                        navigation.navigate('CreateTransaction');
+                    } else if (topTab === 'Receive Advance') {
+                        navigation.navigate('CreateReceiveAdvance');
+                    } else {
+                        navigation.navigate('CreateTransferAdvance');
+
+                    }
+                }} style={{ padding: 5, backgroundColor: COLORS?.PRIMARY_COLOR, borderRadius: 5 }}>
+                    <MyText style={{ color: COLORS?.whiteColors, fontSize: calculatefontSize(1.9) }}>New</MyText>
+                </TouchableOpacity>
+            </View>
+            {/* )} */}
             <LoaderModal visible={loader} />
             {/* 📋 Content */}
-            {topTab === 'Funds' ? (
-                // data.length > 0 ? (
-                //     <View
-                //         style={{ flex: 1, backgroundColor: COLORS?.whiteColors, justifyContent: "center", alignItems: "center" }}
-                //     >
+            {topTab === 'Funds' && (
 
-                //         <MyText>No funds</MyText>
-                //     </View>
-                // ) :
                 <>
                     <FlatList
                         data={data}
@@ -228,55 +267,45 @@ const TransactionsScreen = ({ navigation }) => {
                         renderItem={renderItem}
                         contentContainerStyle={{ paddingBottom: 100, backgroundColor: COLORS?.whiteColors, flex: 1 }}
                         ListEmptyComponent={
-                            <Text style={{ textAlign: 'center', marginTop: 50 }}>No transactions found.</Text>
+                            <Text style={{ textAlign: 'center', marginTop: 50 }}>No Funds found.</Text>
                         }
                     />
                 </>
             )
-                : topTab === 'Receive Advance' ? (
-                    // data.length > 0 ? (
-                    //     <View
-                    //         style={{ flex: 1, backgroundColor: COLORS?.whiteColors, justifyContent: "center", alignItems: "center" }}
-                    //     >
-                    //         <MyText>No Receive Advance</MyText>
-                    //     </View>
-                    // ) :
+            }
+            {topTab === 'Receive Advance' && (
+
+                <>
                     <FlatList
                         data={data}
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={renderItem1}
                         contentContainerStyle={{ paddingBottom: 100, backgroundColor: COLORS?.whiteColors, flex: 1 }}
                         ListEmptyComponent={
-                            <Text style={{ textAlign: 'center', marginTop: 50 }}>No transactions found.</Text>
+                            <Text style={{ textAlign: 'center', marginTop: 50 }}>No Receive Advance found.</Text>
                         }
                     />
-                )
-                    : topTab === 'Transfer Advance' ? (
-                        // data.length > 0 ? (
-                        //     <View
-                        //         style={{ flex: 1, backgroundColor: COLORS?.whiteColors, justifyContent: "center", alignItems: "center" }}
-                        //     >
-                        //         <MyText>No Transfer Advance</MyText>
-                        //     </View>
-                        // )
-                        //     :
-                        <FlatList
-                            data={data}
-                            keyExtractor={(item, index) => index.toString()}
-                            renderItem={renderItem}
-                            contentContainerStyle={{ paddingBottom: 100, backgroundColor: COLORS?.whiteColors, flex: 1 }}
-                            ListEmptyComponent={
-                                <Text style={{ textAlign: 'center', marginTop: 50 }}>No transactions found.</Text>
-                            }
-                        />
-                    )
-                        : (
-                            <View style={{ marginTop: 50, alignItems: 'center' }}>
-                                <Text style={{ fontSize: calculatefontSize(1.6), color: COLORS.BLACK_COLOR }}>
-                                    {topTab} screen coming soon...
-                                </Text>
-                            </View>
-                        )}
+                </>
+            )
+            }
+            {topTab === 'Transfer Advance' && (
+
+
+                <>
+
+                    <FlatList
+                        data={data}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={renderItem2}
+                        contentContainerStyle={{ paddingBottom: 100, backgroundColor: COLORS?.whiteColors, flex: 1 }}
+                        ListEmptyComponent={
+                            <Text style={{ textAlign: 'center', marginTop: 50 }}>No Transfer Advance found.</Text>
+                        }
+                    />
+                </>
+            )
+            }
+
             <FloatingButton
                 style={{ marginBottom: 40 }}
                 onPress={() => setModalVisible(true)}

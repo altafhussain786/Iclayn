@@ -24,15 +24,31 @@ import AddButton from '../../../../components/AddButton'
 
 
 
-const CreateTransaction = ({ navigation }) => {
+const CreateReceiveAdvance = ({ navigation }) => {
     const dispatch = useDispatch();
     const userDetails = useSelector(state => state?.userDetails?.userDetails);
     const toast = useToast()
 
     const [matterData, setmatterData] = useState([]);
+    const [paymentMethodData, setpaymentMethodData] = useState([]);
     const [matterId, setMatterId] = useState('');
     const [clientData, setClientData] = useState([]);
 
+
+
+    const getPaymentMethodData = async () => {
+        const { res, err } = await httpRequest({
+            method: `get`,
+            path: `/ic/pm/?status=Active`,
+            navigation: navigation
+        })
+        if (res) {
+            setpaymentMethodData(res?.data);
+        }
+        else {
+            console.log(err, "GET CUSTOMER RESPONSE===>err");
+        }
+    }
     const getMatterData = async () => {
         const { res, err } = await httpRequest({
             method: `get`,
@@ -68,6 +84,7 @@ const CreateTransaction = ({ navigation }) => {
 
 
     useEffect(() => {
+        getPaymentMethodData();
         getMatterData();
     }, [])
 
@@ -77,6 +94,9 @@ const CreateTransaction = ({ navigation }) => {
         // amount: Yup.string().required('Amount is required'),
     })
 
+    const clientNam = clientData?.map(item => item?.companyName ? item?.companyName : item?.firstName + ' ' + item?.lastName)
+    console.log(clientData, "====>Client data", clientNam);
+
     return (
         <>
             <Formik
@@ -85,36 +105,35 @@ const CreateTransaction = ({ navigation }) => {
                     {
                         isYourType: "Individual",
 
-                        //individual===========================>
+
                         // matter  ============>
                         matter: "",
                         matterObj: {},
                         ismatterOpen: false,
+
                         // ============>
                         client: "",
                         clientObj: {},
-                        clientItems: [],
+                        clientItems: clientData || [],
                         isClientOpen: false,
+
+                        // Payment Method  ============>
+                        paymentMethod: "",
+                        paymentMethodObj: {},
+                        isPaymentMethodOpen: false,
 
                         //
                         prefix: "",
-                        isPrefixOpen: false,
-                        // matter END  ============>
-
-                        amount: "",
+                        isPrefixOpen: false, amount: "",
                         isShowNote: false,
                         Note: "",
 
 
-                        //Date of birth
 
-                        issueDate: moment().format('DD/MM/YYYY'),
-                        selectedissueDate: moment(new Date()).toISOString(),
-                        isissueDateOpen: false,
 
-                        dueDate: moment().format('DD/MM/YYYY'),
-                        selecteddueDate: moment(new Date()).toISOString(),
-                        isdueDateOpen: false,
+                        date: moment().format('DD/MM/YYYY'),
+                        selecteddate: moment(new Date()).toISOString(),
+                        isDateOpen: false,
 
                         isEmailConfirmation: true,
                         isSmsConfirmation: true,
@@ -134,31 +153,25 @@ const CreateTransaction = ({ navigation }) => {
                         createdBy: userDetails?.userId,
                         updatedBy: null,
                         revision: null,
-                        matterClientFundId: null,
-                        issueDate: values?.selectedissueDate,
-                        dueDate: values?.selecteddueDate,
-                        receiptDate: null,
-                        clientIds: String(values?.clientItems?.map((item) => item?.clientId).join(",")),
+                        matterDepositId: null,
                         matterId: values?.matterObj?.matterId,
-                        matterName: values?.matterObj?.name,
-                        amount: Number(values.amount),
-                        note: values.Note || null,
-                        sendEmail: values.isEmailConfirmation,
-                        sendSMS: values.isSmsConfirmation,
-                        status: "PENDING",
-                        code: null,
-                        paidAmount: null
+                        depositAmount: Number(values.amount),
+                        paymentMethodId: 5,
+                        depositOn: values?.selecteddate,
+                        notes: values?.Note || null,
+                        sendEmailRequest: values.isEmailConfirmation,
+                        sendSmsRequest: values.isSmsConfirmation
                     }
-                    console.log(payload, "payload");
+
                     setFieldValue('loader', true);
                     const { res, err } = await httpRequest({
                         method: `post`,
-                        path: `/ic/matter/client-fund/`,
+                        path: `/ic/payment/receive-advance`,
                         params: payload,
                         navigation: navigation
                     })
                     if (res) {
-                        toast.show('Transaction created successfully', { type: 'success' })
+                        toast.show('Receive Advance created successfully', { type: 'success' })
                         setFieldValue('loader', false);
 
                         navigation.goBack();
@@ -178,7 +191,7 @@ const CreateTransaction = ({ navigation }) => {
                 {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
 
                     <>
-                        <ScreenHeader isLoading={values?.loader} onPressSave={handleSubmit} isShowSave={true} extraStyle={{ backgroundColor: '#F5F6F8' }} isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="Create Transaction Fund" />
+                        <ScreenHeader isLoading={values?.loader} onPressSave={handleSubmit} isShowSave={true} extraStyle={{ backgroundColor: '#F5F6F8' }} isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="Create Receive Advance" />
 
                         <KeyboardAvoidingView
                             style={{ flex: 1 }}
@@ -222,7 +235,7 @@ const CreateTransaction = ({ navigation }) => {
                                     }
                                     <TextInputWithTitle
                                         setFieldValue={setFieldValue}
-                                        arrayValue={values?.clientItems}
+                                        arrayValue={clientData}
                                         onPressButton={() => setFieldValue('isClientOpen', true)}
 
                                         title="Client"
@@ -240,6 +253,7 @@ const CreateTransaction = ({ navigation }) => {
                                                             {item?.companyName ? item?.companyName : item?.firstName + ' ' + item?.lastName}
                                                         </MyText>
                                                         <TouchableOpacity
+                                                            disabled={true}
                                                             onPress={() => {
                                                                 const updatedList = arrayValue.filter(
                                                                     (c) => c.clientId !== item.clientId
@@ -251,7 +265,7 @@ const CreateTransaction = ({ navigation }) => {
                                                         </TouchableOpacity>
                                                     </View>
                                                 ))}
-                                                <TouchableOpacity onPress={onPressButton} style={{ paddingVertical: 10 }}>
+                                                <TouchableOpacity disabled={true} onPress={onPressButton} style={{ paddingVertical: 10 }}>
                                                     <MyText style={styles.btnTextStyle}>{buttonText}</MyText>
                                                 </TouchableOpacity>
                                             </View>
@@ -265,17 +279,18 @@ const CreateTransaction = ({ navigation }) => {
                                         buttonText={values.client ? values.client : 'Select Prefix'}
                                     /> */}
                                     <TextInputWithTitle
-                                        onPressButton={() => setFieldValue('isdueDateOpen', true)}
-                                        title="Due Date"
+                                        onPressButton={() => setFieldValue('isDateOpen', true)}
+                                        title="Date"
                                         isButton={true}
-                                        buttonText={values.dueDate ? values.dueDate : 'DD/MM/YYYY'}
+                                        buttonText={values.date ? values.date : 'DD/MM/YYYY'}
                                     />
                                     <TextInputWithTitle
-                                        onPressButton={() => setFieldValue('isissueDateOpen', true)}
-                                        title="Issue Date"
+                                        onPressButton={() => setFieldValue('isPaymentMethodOpen', true)}
+                                        title="Payment Method"
                                         isButton={true}
-                                        buttonText={values.issueDate ? values.issueDate : 'DD/MM/YYYY'}
+                                        buttonText={values.paymentMethod ? values.paymentMethod : 'Select Payment Method'}
                                     />
+
                                     <TextInputWithTitle
                                         keyboardType='numeric'
                                         placeholder={"Amount"}
@@ -340,6 +355,29 @@ const CreateTransaction = ({ navigation }) => {
                                         searchKey="name"
                                     />
                                     <BottomModalListWithSearch
+                                        onClose={() => setFieldValue('isPaymentMethodOpen', false)}
+                                        renderItem={({ item }) => (
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    setFieldValue('paymentMethodObj', item);
+
+                                                    // setFieldValue('matterId', item?.matterId || '');
+                                                    setMatterId(item?.matterId);
+                                                    setFieldValue('paymentMethod', item?.name || '');
+                                                    setFieldValue('isPaymentMethodOpen', false);
+                                                }}
+                                                style={styles.itemStyle}
+                                            >
+                                                <MyText style={{ fontSize: calculatefontSize(1.9), }}>
+                                                    {item?.name}
+                                                </MyText>
+                                            </TouchableOpacity>
+                                        )}
+                                        visible={values?.isPaymentMethodOpen}
+                                        data={paymentMethodData}
+                                        searchKey="name"
+                                    />
+                                    <BottomModalListWithSearch
                                         onClose={() => setFieldValue('isClientOpen', false)}
                                         renderItem={({ item }) => (
                                             console.log(item, "ITEMS====>"),
@@ -370,59 +408,24 @@ const CreateTransaction = ({ navigation }) => {
                                         data={clientData}
                                         searchKey={"status"}
                                     />
-                                    {/* <BottomModalListWithSearch
-                                        onClose={() => setFieldValue('isClientOpen', false)}
-                                        renderItem={({ item }) => (
-                                            <TouchableOpacity
-                                                onPress={() => {
-                                                    setFieldValue('client', item?.companyName ? item?.companyName : item?.firstName + ' ' + item?.lastName || '');
-                                                    setFieldValue('clientObj', item);
-                                                    setFieldValue('isClientOpen', false);
-                                                }}
-                                                style={styles.itemStyle}
-                                            >
-                                                <MyText style={{ fontSize: calculatefontSize(1.9), }}>
-                                                    {item?.companyName ? item?.companyName : item?.firstName + ' ' + item?.lastName}
-                                                </MyText>
-                                            </TouchableOpacity>
-                                        )}
-                                        visible={values?.isClientOpen}
-                                        data={clientData}
-                                        searchKey="firstName"
-                                    /> */}
+
+
 
                                     <DatePicker
                                         modal
                                         mode='date'
-                                        open={values.isissueDateOpen}
+                                        open={values.isDateOpen}
                                         date={new Date()}
                                         onConfirm={date => {
-                                            setFieldValue('selectedissueDate', date?.toISOString())
-                                            setFieldValue('isissueDateOpen', false);
+                                            setFieldValue('selecteddate', date?.toISOString())
+                                            setFieldValue('isDateOpen', false);
                                             setFieldValue(
-                                                'issueDate',
+                                                'date',
                                                 moment(date).format('MM/DD/YYYY'),
                                             );
                                         }}
                                         onCancel={() => {
-                                            setFieldValue('isissueDateOpen', false);
-                                        }}
-                                    />
-                                    <DatePicker
-                                        modal
-                                        mode='date'
-                                        open={values.isdueDateOpen}
-                                        date={new Date()}
-                                        onConfirm={date => {
-                                            setFieldValue('selecteddueDate', date?.toISOString())
-                                            setFieldValue('isdueDateOpen', false);
-                                            setFieldValue(
-                                                'dueDate',
-                                                moment(date).format('MM/DD/YYYY'),
-                                            );
-                                        }}
-                                        onCancel={() => {
-                                            setFieldValue('isdueDateOpen', false);
+                                            setFieldValue('isDateOpen', false);
                                         }}
                                     />
                                 </ScrollView>
@@ -438,7 +441,7 @@ const CreateTransaction = ({ navigation }) => {
     )
 }
 
-export default CreateTransaction
+export default CreateReceiveAdvance
 
 const styles = StyleSheet.create({
     itemContainer: {

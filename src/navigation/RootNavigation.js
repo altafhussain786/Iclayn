@@ -47,6 +47,8 @@ import EditPhoneLog from '../screens/more/communications/screens/Edit/EditPhoneL
 import EditInternalLog from '../screens/more/communications/screens/Edit/EditInternalLog';
 import EditExpense from '../screens/more/expense/screens/EditExpense';
 import EditTransaction from '../screens/more/transaction/screens/EditTransaction';
+import CreateReceiveAdvance from '../screens/more/transaction/screens/CreateReceiveAdvance';
+import CreateTransferAdvance from '../screens/more/transaction/screens/CreateTransferAdvance';
 
 
 
@@ -119,6 +121,8 @@ const RootNavigation = () => {
         <Stack.Screen name="Reports" component={Reports} />
         <Stack.Screen name="Transaction" component={Transaction} />
         <Stack.Screen name="CreateTransaction" component={CreateTransaction} />
+        <Stack.Screen name="CreateReceiveAdvance" component={CreateReceiveAdvance} />
+        <Stack.Screen name="CreateTransferAdvance" component={CreateTransferAdvance} />
         <Stack.Screen name="EditTransaction" component={EditTransaction} />
 
 
