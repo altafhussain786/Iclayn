@@ -107,24 +107,27 @@ const Matters = ({ navigation }) => {
 
         return (
             <View style={{ flexDirection: 'row', width: 200 }}> {/* <-- fixed width */}
-                <TouchableOpacity
+                <TouchableOpacity onPress={() => navigation.navigate("EditMatter", { matterDetails: item })} style={styles.leftSwipe}>
+                    <AntDesign name="edit" size={20} color={COLORS?.BLACK_COLOR} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => deleteMatter(item)} style={[styles.leftSwipe, { backgroundColor: COLORS?.RED_COLOR }]}>
+                    <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
+                </TouchableOpacity>
+                {/* <TouchableOpacity
                     onPress={() => navigation.navigate("EditMatter", { matterDetails: item })}
                     style={{ backgroundColor: '#0068D1', justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
                 >
                     <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
-                    {/* <Text style={{ color: COLORS?.whiteColors, textAlign: 'center', fontWeight: "bold" }}>
-                       Edit
-                    </Text> */}
+                    
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() => deleteMatter(item)}
                     style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
                 >
                     <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
-                    {/* <Text style={{ color: COLORS?.whiteColors, textAlign: 'center' }}>
-                        Delete
-                    </Text> */}
-                </TouchableOpacity>
+                   
+                </TouchableOpacity> */}
+
             </View>
         );
     };
@@ -215,47 +218,63 @@ const Matters = ({ navigation }) => {
                             data={filteredData}
                             keyExtractor={(item, index) => index.toString()}
                             contentContainerStyle={{ paddingBottom: 100 }}
+
                             renderItem={({ item, index }) => {
                                 return (
                                     <Swipeable renderLeftActions={() => renderLeftActions(item)}>
-                                        <TouchableOpacity onPress={() => navigation.navigate('MatterDetails', { matterData: item })}
+                                        <TouchableOpacity
+                                            onPress={() => navigation.navigate('MatterDetails', { matterData: item })}
                                             style={{
+                                                marginHorizontal: 10,
+                                                marginVertical: 6,
+                                                padding: 15,
+                                                borderRadius: 10,
+                                                backgroundColor: '#fff',
+                                                elevation: 2,
+                                                shadowColor: '#ccc',
+                                                shadowOffset: { width: 0, height: 1 },
+                                                shadowOpacity: 0.2,
+                                                shadowRadius: 2,
                                                 flexDirection: 'row',
                                                 justifyContent: 'space-between',
                                                 alignItems: 'center',
-                                                paddingVertical: 15,
-                                                paddingHorizontal: 10,
-                                                borderBottomWidth: 1,
-                                                borderColor: COLORS?.BORDER_LIGHT_COLOR,
-                                                backgroundColor: '#fff',
                                             }}
                                         >
-                                            <View style={{ gap: 5, width: "65%" }}>
-                                                <MyText style={styles.timeColor}>Open {moment(item?.openDate).format('DD-MM-YYYY')}</MyText>
-                                                <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300', }]}>
+                                            {/* Left Section */}
+                                            <View style={{ width: '65%', gap: 5 }}>
+                                                <MyText style={{ color: COLORS.LIGHT_COLOR, fontSize: calculatefontSize(1.5) }}>
+                                                    {item?.status} • {moment(item?.openDate).format('DD-MM-YYYY')}
+                                                </MyText>
+                                                <MyText
+                                                    numberOfLines={2}
+                                                    style={{ fontSize: calculatefontSize(2), color: COLORS.BLACK_COLOR, fontWeight: '500' }}
+                                                >
                                                     {item?.name}
                                                 </MyText>
-                                                <MyText style={styles.timeColor}>{item?.clientNames}</MyText>
+                                                {!!item?.clientNames && (
+                                                    <MyText style={{ color: COLORS.GREY_COLOR, fontSize: calculatefontSize(1.5) }}>
+                                                        {item?.clientNames}
+                                                    </MyText>
+                                                )}
                                             </View>
-                                            <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
 
+                                            {/* Right Section */}
+                                            <View style={{ width: '35%', alignItems: 'flex-end', gap: 5 }}>
                                                 <View
                                                     style={{
-                                                        backgroundColor: item?.status == "Open" ? '#EFE4FF' : '#ffc2cd',
+                                                        backgroundColor: item?.status === 'Open' ? '#EFE4FF' : '#ffc2cd',
+                                                        borderColor: item?.status === 'Open' ? '#7C4EC9' : '#6c0014',
                                                         borderWidth: 1,
-                                                        borderColor: item?.status == "COMPLETED" ? '#7C4EC9' : '#6c0014',
-                                                        // alignSelf: 'flex-end',
-                                                        borderRadius: 5,
-                                                        paddingHorizontal: 8,
-                                                        paddingVertical: 2,
+                                                        paddingHorizontal: 10,
+                                                        paddingVertical: 4,
+                                                        borderRadius: 6,
                                                     }}
                                                 >
                                                     <MyText
                                                         style={{
-                                                            // fontWeight: '600',
-                                                            // textAlign: 'center',
-                                                            color: item?.status == "COMPLETED" ? COLORS?.whiteColors : '#6c0014',
                                                             fontSize: calculatefontSize(1.4),
+                                                            fontWeight: '600',
+                                                            color: item?.status === 'Open' ? '#7C4EC9' : '#6c0014',
                                                         }}
                                                     >
                                                         {item?.status}
@@ -266,6 +285,58 @@ const Matters = ({ navigation }) => {
                                     </Swipeable>
                                 );
                             }}
+
+                            // renderItem={({ item, index }) => {
+                            //     return (
+                            //         <Swipeable renderLeftActions={() => renderLeftActions(item)}>
+                            //             <TouchableOpacity onPress={() => navigation.navigate('MatterDetails', { matterData: item })}
+                            //                 style={{
+                            //                     flexDirection: 'row',
+                            //                     justifyContent: 'space-between',
+                            //                     alignItems: 'center',
+                            //                     paddingVertical: 15,
+                            //                     paddingHorizontal: 10,
+                            //                     borderBottomWidth: 1,
+                            //                     borderColor: COLORS?.BORDER_LIGHT_COLOR,
+                            //                     backgroundColor: '#fff',
+                            //                 }}
+                            //             >
+                            //                 <View style={{ gap: 5, width: "65%" }}>
+                            //                     <MyText style={styles.timeColor}>Open {moment(item?.openDate).format('DD-MM-YYYY')}</MyText>
+                            //                     <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300', }]}>
+                            //                         {item?.name}
+                            //                     </MyText>
+                            //                     <MyText style={styles.timeColor}>{item?.clientNames}</MyText>
+                            //                 </View>
+                            //                 <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
+
+                            //                     <View
+                            //                         style={{
+                            //                             backgroundColor: item?.status == "Open" ? '#EFE4FF' : '#ffc2cd',
+                            //                             borderWidth: 1,
+                            //                             borderColor: item?.status == "COMPLETED" ? '#7C4EC9' : '#6c0014',
+                            //                             // alignSelf: 'flex-end',
+                            //                             borderRadius: 5,
+                            //                             paddingHorizontal: 8,
+                            //                             paddingVertical: 2,
+                            //                         }}
+                            //                     >
+                            //                         <MyText
+                            //                             style={{
+                            //                                 // fontWeight: '600',
+                            //                                 // textAlign: 'center',
+                            //                                 color: item?.status == "COMPLETED" ? COLORS?.whiteColors : '#6c0014',
+                            //                                 fontSize: calculatefontSize(1.4),
+                            //                             }}
+                            //                         >
+                            //                             {item?.status}
+                            //                         </MyText>
+                            //                     </View>
+                            //                 </View>
+                            //             </TouchableOpacity>
+                            //         </Swipeable>
+                            //     );
+                            // }}
                             refreshControl={
                                 <RefreshControl refreshing={refreshing} onRefresh={getMatters} />
                             }
@@ -320,5 +391,15 @@ const styles = StyleSheet.create({
         color: COLORS?.BLACK_COLOR,
         fontSize: calculatefontSize(1.9),
         fontWeight: '300',
+    },
+    leftSwipe: {
+        backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
+        justifyContent: 'center',
+
+        alignItems: 'flex-start',
+        paddingHorizontal: 20,
+        marginVertical: 6,
+        // borderRadius: 8,
+        // flex: 1,
     },
 });

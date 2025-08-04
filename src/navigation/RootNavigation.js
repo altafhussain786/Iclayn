@@ -49,6 +49,8 @@ import EditExpense from '../screens/more/expense/screens/EditExpense';
 import EditTransaction from '../screens/more/transaction/screens/EditTransaction';
 import CreateReceiveAdvance from '../screens/more/transaction/screens/CreateReceiveAdvance';
 import CreateTransferAdvance from '../screens/more/transaction/screens/CreateTransferAdvance';
+import Profile from '../screens/profile/Profile';
+import ChangePassword from '../screens/changePassword/ChangePassword';
 
 
 
@@ -124,6 +126,8 @@ const RootNavigation = () => {
         <Stack.Screen name="CreateReceiveAdvance" component={CreateReceiveAdvance} />
         <Stack.Screen name="CreateTransferAdvance" component={CreateTransferAdvance} />
         <Stack.Screen name="EditTransaction" component={EditTransaction} />
+        <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen name="ChangePassword" component={ChangePassword} />
 
 
 

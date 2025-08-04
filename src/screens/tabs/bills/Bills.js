@@ -91,85 +91,122 @@ const Bills = ({ navigation }) => {
     }
   }
 
+  const renderBillItem = ({ item }) => {
+    return (
+      <Swipeable
+        renderLeftActions={() => renderLeftActions(item)}
+        renderRightActions={() => renderRightActions(item)}
+        overshootLeft={false}
+        overshootRight={false}
+      >
+        <TouchableOpacity
+          onPress={() => navigation.navigate('MatterDetails', { matterData: item })}
+          activeOpacity={0.9}
+          style={styles.card}
+        >
+          {/* Row 1: Matter Name & Status */}
+          <View style={styles.headerRow}>
+            <MyText style={styles.codeText} numberOfLines={1}>
+              {item?.matterName}
+            </MyText>
+            <View style={[
+              styles.statusBadge,
+              {
+                backgroundColor:
+                  item?.status === 'Open' ? '#EFE4FF' :
+                    item?.status === 'COMPLETED' ? '#7C4EC9' : '#ffc2cd'
+              }]}>
+              <MyText
+                style={[
+                  styles.statusText,
+                  {
+                    color:
+                      item?.status === 'COMPLETED'
+                        ? COLORS?.whiteColors
+                        : '#6c0014'
+                  }
+                ]}
+              >
+                {item?.status}
+              </MyText>
+            </View>
+          </View>
+
+          {/* Row 2: Code */}
+          <MyText style={styles.mainText}>{item?.code}</MyText>
+
+          {/* Row 3: Date */}
+          <View style={styles.dateRow}>
+            <MyText style={styles.dateText}>
+              {moment(item?.openDate).format('DD-MM-YYYY')}
+            </MyText>
+          </View>
+        </TouchableOpacity>
+      </Swipeable>
+    );
+  };
+
   const renderLeftActions = (item) => (
-    <View style={{ flexDirection: 'row' }}>
-      <TouchableOpacity
-        onPress={() => navigation.navigate("EditBilling", { billingDetails: item })}
-        style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
-      >
-        <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity
+      onPress={() => navigation.navigate("EditBilling", { billingDetails: item })}
+      style={{
+        backgroundColor: COLORS?.LIGHT_COLOR,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        marginVertical: 6,
+      }}
+    >
+      <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
+    </TouchableOpacity>
   );
+
   const renderRightActions = (item) => (
-    <View style={{ flexDirection: 'row' }}>
-      <TouchableOpacity
-        onPress={() => handleDeleteItem(item)}
-        style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
-      >
-        <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity
+      onPress={() => handleDeleteItem(item)}
+      style={{
+        backgroundColor: COLORS?.RED_COLOR,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        marginVertical: 6,
+      }}
+    >
+      <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
+    </TouchableOpacity>
   );
+
+  // const renderLeftActions = (item) => (
+  //   <View style={{ flexDirection: 'row' }}>
+  //     <TouchableOpacity
+  //       onPress={() => navigation.navigate("EditBilling", { billingDetails: item })}
+  //       style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+  //     >
+  //       <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
+  //     </TouchableOpacity>
+  //   </View>
+  // );
+  // const renderRightActions = (item) => (
+  //   <View style={{ flexDirection: 'row' }}>
+  //     <TouchableOpacity
+  //       onPress={() => handleDeleteItem(item)}
+  //       style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+  //     >
+  //       <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
+  //     </TouchableOpacity>
+  //   </View>
+  // );
 
   return (
     <>
       <ScreenHeader isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="Bills" />
 
-      {/* Scrollable Tabs */}
-      {/* <LinearGradient
-        colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT,]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}
 
-      >
-        <View
-
-        >
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={tabList}
-
-            renderItem={({ item, i }) => {
-              return (
-                <>
-                  <TouchableOpacity
-                    key={item}
-                    style={[
-                      styles.tab,
-
-                      {
-                        opacity: tabs === item ? 1 : 0.5,
-                        backgroundColor:
-                          COLORS.PRIMARY_COLOR
-                      },
-                    ]}
-                    onPress={() => setTabs(item)}
-                  >
-                    <MyText
-                      style={{
-
-                        color: '#fff',
-                        fontWeight: '600',
-                        fontSize: calculatefontSize(1.7),
-                      }}
-                      numberOfLines={1}
-                    >
-                      {item}
-                    </MyText>
-                  </TouchableOpacity>
-                </>
-              )
-            }}
-          />
-        </View>
-      </LinearGradient> */}
-      <Wrapper>
+      <Wrapper style={{ padding: 0 }}>
         {/* Search Row */}
         <View
           style={{
+            padding: 10,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -186,15 +223,9 @@ const Bills = ({ navigation }) => {
             style={{ height: 30, width: 30, resizeMode: 'contain' }}
           />
         </View>
-        {/* <LinearGradient
-          colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT,]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={{ padding: 10, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT }}
 
-        > */}
         <View
-          style={{}}
+          style={{ padding: 10, }}
         >
           <FlatList
             horizontal
@@ -242,56 +273,57 @@ const Bills = ({ navigation }) => {
           data={filteredData}
           keyExtractor={(item, index) => index.toString()}
           contentContainerStyle={{ paddingBottom: 100 }}
-          renderItem={({ item, index }) => {
-            return (
-              <Swipeable renderLeftActions={() => renderLeftActions(item)} >
-                <TouchableOpacity onPress={() => navigation.navigate('MatterDetails', { matterData: item })}
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: 10,
-                    borderBottomWidth: 1,
-                    paddingVertical: 15,
-                    borderColor: COLORS?.BORDER_LIGHT_COLOR,
-                  }}
-                >
-                  <View style={{ gap: 5, width: "65%" }}>
-                    <MyText style={styles.timeColor}>Open {moment(item?.openDate).format('DD-MM-YYYY')}</MyText>
-                    <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300', }]}>
-                      {item?.matterName}
-                    </MyText>
-                    <MyText style={styles.timeColor}>{item?.code}</MyText>
-                  </View>
-                  <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
+          renderItem={renderBillItem}
+          // renderItem={({ item, index }) => {
+          //   return (
+          //     <Swipeable renderLeftActions={() => renderLeftActions(item)} >
+          //       <TouchableOpacity onPress={() => navigation.navigate('MatterDetails', { matterData: item })}
+          //         style={{
+          //           flexDirection: 'row',
+          //           justifyContent: 'space-between',
+          //           alignItems: 'center',
+          //           gap: 10,
+          //           borderBottomWidth: 1,
+          //           paddingVertical: 15,
+          //           borderColor: COLORS?.BORDER_LIGHT_COLOR,
+          //         }}
+          //       >
+          //         <View style={{ gap: 5, width: "65%" }}>
+          //           <MyText style={styles.timeColor}>Open {moment(item?.openDate).format('DD-MM-YYYY')}</MyText>
+          //           <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300', }]}>
+          //             {item?.matterName}
+          //           </MyText>
+          //           <MyText style={styles.timeColor}>{item?.code}</MyText>
+          //         </View>
+          //         <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
 
-                    <View
-                      style={{
-                        backgroundColor: item?.status == "Open" ? '#EFE4FF' : '#ffc2cd',
-                        borderWidth: 1,
-                        borderColor: item?.status == "COMPLETED" ? '#7C4EC9' : '#6c0014',
-                        // alignSelf: 'flex-end',
-                        borderRadius: 5,
-                        paddingHorizontal: 8,
-                        paddingVertical: 2,
-                      }}
-                    >
-                      <MyText
-                        style={{
-                          // fontWeight: '600',
-                          // textAlign: 'center',
-                          color: item?.status == "COMPLETED" ? COLORS?.whiteColors : '#6c0014',
-                          fontSize: calculatefontSize(1.4),
-                        }}
-                      >
-                        {item?.status}
-                      </MyText>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              </Swipeable>
-            );
-          }}
+          //           <View
+          //             style={{
+          //               backgroundColor: item?.status == "Open" ? '#EFE4FF' : '#ffc2cd',
+          //               borderWidth: 1,
+          //               borderColor: item?.status == "COMPLETED" ? '#7C4EC9' : '#6c0014',
+          //               // alignSelf: 'flex-end',
+          //               borderRadius: 5,
+          //               paddingHorizontal: 8,
+          //               paddingVertical: 2,
+          //             }}
+          //           >
+          //             <MyText
+          //               style={{
+          //                 // fontWeight: '600',
+          //                 // textAlign: 'center',
+          //                 color: item?.status == "COMPLETED" ? COLORS?.whiteColors : '#6c0014',
+          //                 fontSize: calculatefontSize(1.4),
+          //               }}
+          //             >
+          //               {item?.status}
+          //             </MyText>
+          //           </View>
+          //         </View>
+          //       </TouchableOpacity>
+          //     </Swipeable>
+          //   );
+          // }}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={getBills} />
           }
@@ -346,5 +378,50 @@ const styles = StyleSheet.create({
     color: COLORS?.BLACK_COLOR,
     fontSize: calculatefontSize(1.9),
     fontWeight: '300',
+  },
+
+  card: {
+    backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
+    padding: 15,
+    marginVertical: 6,
+    borderRadius: 8,
+    elevation: 1,
+    shadowColor: '#ccc',
+    marginHorizontal: 10,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  codeText: {
+    color: COLORS.PRIMARY_COLOR,
+    fontWeight: '600',
+    fontSize: calculatefontSize(1.8),
+    flex: 1,
+  },
+  mainText: {
+    fontSize: calculatefontSize(1.7),
+    fontWeight: '500',
+    marginTop: 4,
+  },
+  dateRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 4,
+  },
+  dateText: {
+    fontSize: calculatefontSize(1.3),
+    color: '#444',
+  },
+  statusBadge: {
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+    alignSelf: 'flex-end',
+  },
+  statusText: {
+    fontSize: calculatefontSize(1.3),
+    color: COLORS?.whiteColors,
   },
 });

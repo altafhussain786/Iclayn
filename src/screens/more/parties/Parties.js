@@ -104,25 +104,98 @@ const Parties = ({ navigation }) => {
         }
     }
 
+    const renderPartyItem = ({ item }) => {
+        const isSupplier = item?.type === 'Supplier';
+        const name = isSupplier
+            ? item?.companyName
+            : `${item?.firstName || ''} ${item?.lastName || ''}`;
+
+        return (
+            <Swipeable
+                renderLeftActions={() => renderLeftActions(item)}
+                renderRightActions={() => renderRightActions(item)}
+                overshootLeft={false}
+                overshootRight={false}
+            >
+                <TouchableOpacity
+                    activeOpacity={0.9}
+                    style={styles.card}
+                >
+                    <View style={styles.cardLeft}>
+                        <MyText style={styles.partyType}>{item?.type}</MyText>
+                        <MyText style={styles.partyName} numberOfLines={1}>
+                            {name}
+                        </MyText>
+                        {!!item?.partyEmailAddressDTOList?.[0]?.email && (
+                            <MyText style={styles.emailText}>
+                                {item?.partyEmailAddressDTOList[0].email}
+                            </MyText>
+                        )}
+                    </View>
+
+                    <View style={styles.cardRight}>
+                        {!!item?.duration && (
+                            <MyText style={styles.durationText}>{item?.duration}</MyText>
+                        )}
+                        <View style={styles.statusBox}>
+                            <MyText style={styles.statusText}>{item?.status}</MyText>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+            </Swipeable>
+        );
+    };
+
+
+    // const renderLeftActions = (item) => (
+    //     <View style={{ flexDirection: 'row' }}>
+    //         <TouchableOpacity
+    //             onPress={() => navigation.navigate("EditParties", { partiesDetails: item })}
+    //             style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+    //         >
+    //             <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
+    //         </TouchableOpacity>
+    //     </View>
+    // );
+    // const renderRightActions = (item) => (
+    //     <View style={{ flexDirection: 'row' }}>
+    //         <TouchableOpacity
+    //             onPress={() => handleDeleteItem(item)}
+    //             style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+    //         >
+    //             <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
+    //         </TouchableOpacity>
+    //     </View>
+    // );
+
     const renderLeftActions = (item) => (
-        <View style={{ flexDirection: 'row' }}>
-            <TouchableOpacity
-                onPress={() => navigation.navigate("EditParties", { partiesDetails: item })}
-                style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
-            >
-                <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
-            </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+            onPress={() => navigation.navigate("EditParties", { partiesDetails: item })}
+            style={{
+                backgroundColor: COLORS?.LIGHT_COLOR,
+                justifyContent: 'center',
+                alignItems: 'center',
+                paddingHorizontal: 20,
+                marginVertical: 6,
+            }}
+        >
+            <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
+        </TouchableOpacity>
     );
+
     const renderRightActions = (item) => (
-        <View style={{ flexDirection: 'row' }}>
-            <TouchableOpacity
-                onPress={() => handleDeleteItem(item)}
-                style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
-            >
-                <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
-            </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+            onPress={() => handleDeleteItem(item)}
+            style={{
+                backgroundColor: COLORS?.RED_COLOR,
+                justifyContent: 'center',
+                alignItems: 'center',
+                paddingHorizontal: 20,
+                marginVertical: 6,
+            }}
+        >
+            <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
+        </TouchableOpacity>
     );
     return (
         <>
@@ -132,7 +205,7 @@ const Parties = ({ navigation }) => {
                 colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT,]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                style={styles.tabContainer}
+                style={[styles.tabContainer]}
             >
                 {/* <View > */}
                 {["All", "Individual", "Supplier"].map((item) => (
@@ -156,8 +229,8 @@ const Parties = ({ navigation }) => {
                 ))}
                 {/* </View> */}
             </LinearGradient>
-            <Wrapper>
-                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <Wrapper style={{ padding: 0 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10 }}>
                     <SearchBar
                         containerStyle={{ width: "90%" }}
                         placeholder="Search a parties..."
@@ -177,44 +250,45 @@ const Parties = ({ navigation }) => {
                             showsVerticalScrollIndicator={false}
                             data={filteredData}
                             keyExtractor={(item, index) => index.toString()}
-                            renderItem={({ item, i }) => {
-                                return (
-                                    <Swipeable renderLeftActions={() => renderLeftActions(item)} renderRightActions={() => renderRightActions(item)}>
-                                        <View
-                                            style={{
-                                                flexDirection: "row",
-                                                justifyContent: "space-between",
-                                                alignItems: "center",
-                                                gap: 10,
-                                                borderBottomWidth: 1,
-                                                paddingVertical: 15,
-                                                borderColor: COLORS?.BORDER_LIGHT_COLOR,
-                                            }}
-                                        >
-                                            <View style={{ gap: 5, width: "65%", }}>
-                                                <MyText style={styles.timeColor}>{item?.type}</MyText>
-                                                <MyText style={[styles.txtStyle, { fontWeight: "300" }]}>
-                                                    {item?.type === 'Supplier'
-                                                        ? item?.companyName
-                                                        : `${item?.firstName || ''} ${item?.lastName || ''}`}
-                                                </MyText>
-                                                {item?.description !== "" && <MyText style={styles.timeColor}>
-                                                    {item?.partyEmailAddressDTOList[0]?.email}
-                                                </MyText>}
-                                            </View>
-                                            <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
-                                                {/* <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "right" }]}>${formatNumber(item?.balance)}</MyText> */}
-                                                <MyText style={[styles.txtStyle, { textAlign: "right" }]}>{item?.duration}</MyText>
-                                                <View style={{ backgroundColor: "#22C55E", alignSelf: "flex-end", width: getResponsiveWidth(20), borderRadius: 5, paddinHorizontal: 30 }}>
-                                                    <MyText style={[styles.timeColor, { fontWeight: "300", textAlign: "center", color: COLORS?.whiteColors }]}>
-                                                        {item?.status}
-                                                    </MyText>
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </Swipeable>
-                                );
-                            }}
+                            renderItem={renderPartyItem}
+                            // renderItem={({ item, i }) => {
+                            //     return (
+                            //         <Swipeable renderLeftActions={() => renderLeftActions(item)} renderRightActions={() => renderRightActions(item)}>
+                            //             <View
+                            //                 style={{
+                            //                     flexDirection: "row",
+                            //                     justifyContent: "space-between",
+                            //                     alignItems: "center",
+                            //                     gap: 10,
+                            //                     borderBottomWidth: 1,
+                            //                     paddingVertical: 15,
+                            //                     borderColor: COLORS?.BORDER_LIGHT_COLOR,
+                            //                 }}
+                            //             >
+                            //                 <View style={{ gap: 5, width: "65%", }}>
+                            //                     <MyText style={styles.timeColor}>{item?.type}</MyText>
+                            //                     <MyText style={[styles.txtStyle, { fontWeight: "300" }]}>
+                            //                         {item?.type === 'Supplier'
+                            //                             ? item?.companyName
+                            //                             : `${item?.firstName || ''} ${item?.lastName || ''}`}
+                            //                     </MyText>
+                            //                     {item?.description !== "" && <MyText style={styles.timeColor}>
+                            //                         {item?.partyEmailAddressDTOList[0]?.email}
+                            //                     </MyText>}
+                            //                 </View>
+                            //                 <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
+                            //                     {/* <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "right" }]}>${formatNumber(item?.balance)}</MyText> */}
+                            //                     <MyText style={[styles.txtStyle, { textAlign: "right" }]}>{item?.duration}</MyText>
+                            //                     <View style={{ backgroundColor: "#22C55E", alignSelf: "flex-end", width: getResponsiveWidth(20), borderRadius: 5, paddinHorizontal: 30 }}>
+                            //                         <MyText style={[styles.timeColor, { fontWeight: "300", textAlign: "center", color: COLORS?.whiteColors }]}>
+                            //                             {item?.status}
+                            //                         </MyText>
+                            //                     </View>
+                            //                 </View>
+                            //             </View>
+                            //         </Swipeable>
+                            //     );
+                            // }}
                             ListFooterComponent={() => <View style={{ height: 100 }} />}
                         />
                         :
@@ -273,4 +347,56 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 20,
     },
+    //
+    card: {
+        backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
+        marginVertical: 6,
+        marginHorizontal: 10,
+        borderRadius: 10,
+        padding: 15,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        elevation: 1,
+        shadowColor: '#ccc',
+    },
+    cardLeft: {
+        width: '65%',
+        gap: 5,
+    },
+    cardRight: {
+        width: '35%',
+        alignItems: 'flex-end',
+        gap: 5,
+    },
+    partyType: {
+        fontSize: calculatefontSize(1.5),
+        color: COLORS?.LIGHT_COLOR,
+    },
+    partyName: {
+        fontSize: calculatefontSize(1.8),
+        fontWeight: '500',
+        color: COLORS?.BLACK_COLOR,
+    },
+    emailText: {
+        fontSize: calculatefontSize(1.4),
+        color: COLORS?.GREY_COLOR,
+    },
+    durationText: {
+        fontSize: calculatefontSize(1.5),
+        fontWeight: '500',
+    },
+    statusBox: {
+        backgroundColor: '#22C55E',
+        borderRadius: 6,
+        paddingVertical: 2,
+        paddingHorizontal: 10,
+        alignSelf: 'flex-end',
+    },
+    statusText: {
+        color: COLORS?.whiteColors,
+        fontSize: calculatefontSize(1.3),
+        fontWeight: '500',
+    },
+
 })

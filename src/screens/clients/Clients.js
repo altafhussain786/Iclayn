@@ -100,25 +100,59 @@ const Clients = ({ navigation }) => {
     }
   }
 
-  const renderLeftActions = (item) => (
-    <View style={{ flexDirection: 'row' }}>
-      <TouchableOpacity
-        onPress={() => navigation.navigate("EditClient", { clientData: item })}
-        style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+  const renderClientItem = ({ item }) => {
+    return (
+      <Swipeable
+        renderLeftActions={() => renderLeftActions(item)}
+        renderRightActions={() => renderRightActions(item)}
+        overshootLeft={false}
+        overshootRight={false}
       >
-        <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity activeOpacity={0.8} style={styles.card}>
+          {/* Header Row: Name & Status */}
+          <View style={styles.headerRow}>
+            <MyText style={styles.codeText}>
+              {item?.type === 'Company'
+                ? item?.companyName
+                : `${item?.firstName || ''} ${item?.lastName || ''}`}
+            </MyText>
+            <View style={[styles.statusBadge, { backgroundColor: '#22C55E' }]}>
+              <MyText style={styles.statusText}>{item?.status}</MyText>
+            </View>
+          </View>
+
+          {/* Email */}
+          {item?.clientEmailAddressDTOList?.[0]?.email && (
+            <MyText style={styles.mainText}>
+              {item?.clientEmailAddressDTOList[0]?.email}
+            </MyText>
+          )}
+
+          {/* Date & Duration */}
+          <View style={styles.dateRow}>
+            <MyText style={styles.dateText}>
+              {moment(item?.createdOn).format('DD/MM/YYYY')}
+            </MyText>
+            <MyText style={styles.dueText}>{item?.duration}</MyText>
+          </View>
+        </TouchableOpacity>
+      </Swipeable>
+    );
+  };
+
+
+  const renderLeftActions = (item) => (
+
+    <TouchableOpacity onPress={() => navigation.navigate("EditClient", { clientData: item })} style={styles.leftSwipe}>
+      <AntDesign name="edit" size={20} color={COLORS?.BLACK_COLOR} />
+    </TouchableOpacity>
+
   );
   const renderRightActions = (item) => (
-    <View style={{ flexDirection: 'row' }}>
-      <TouchableOpacity
-        onPress={() => handleDeleteItem(item)}
-        style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
-      >
-        <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity onPress={() => handleDeleteItem(item)} style={[styles.leftSwipe, { backgroundColor: COLORS?.RED_COLOR }]}>
+      <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
+    </TouchableOpacity>
+
   );
   return (
     <>
@@ -175,44 +209,46 @@ const Clients = ({ navigation }) => {
               showsVerticalScrollIndicator={false}
               data={filteredData}
               keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item, i }) => {
-                return (
-                  <Swipeable renderLeftActions={() => renderLeftActions(item)} renderRightActions={() => renderRightActions(item)}>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        gap: 10,
-                        borderBottomWidth: 1,
-                        paddingVertical: 15,
-                        borderColor: COLORS?.BORDER_LIGHT_COLOR,
-                      }}
-                    >
-                      <View style={{ gap: 5, width: "65%", }}>
-                        <MyText style={styles.timeColor}>{item?.type}</MyText>
-                        <MyText style={[styles.txtStyle, { fontWeight: "300" }]}>
-                          {item?.type === 'Company'
-                            ? item?.companyName
-                            : `${item?.firstName || ''} ${item?.lastName || ''}`}
-                        </MyText>
-                        {item?.description !== "" && <MyText style={styles.timeColor}>
-                          {item?.clientEmailAddressDTOList[0]?.email}
-                        </MyText>}
-                      </View>
-                      <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
-                        {/* <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "right" }]}>${formatNumber(item?.balance)}</MyText> */}
-                        <MyText style={[styles.txtStyle, { textAlign: "right" }]}>{item?.duration}</MyText>
-                        <View style={{ backgroundColor: "#22C55E", alignSelf: "flex-end", width: getResponsiveWidth(20), borderRadius: 5, paddinHorizontal: 30 }}>
-                          <MyText style={[styles.timeColor, { fontWeight: "300", textAlign: "center", color: COLORS?.whiteColors }]}>
-                            {item?.status}
-                          </MyText>
-                        </View>
-                      </View>
-                    </View>
-                  </Swipeable>
-                );
-              }}
+              renderItem={renderClientItem}
+              // renderItem={({ item, i }) => {
+              //   return (
+
+              //     // <Swipeable renderLeftActions={() => renderLeftActions(item)} renderRightActions={() => renderRightActions(item)}>
+              //     //   <View
+              //     //     style={{
+              //     //       flexDirection: "row",
+              //     //       justifyContent: "space-between",
+              //     //       alignItems: "center",
+              //     //       gap: 10,
+              //     //       borderBottomWidth: 1,
+              //     //       paddingVertical: 15,
+              //     //       borderColor: COLORS?.BORDER_LIGHT_COLOR,
+              //     //     }}
+              //     //   >
+              //     //     <View style={{ gap: 5, width: "65%", }}>
+              //     //       <MyText style={styles.timeColor}>{item?.type}</MyText>
+              //     //       <MyText style={[styles.txtStyle, { fontWeight: "300" }]}>
+              //     //         {item?.type === 'Company'
+              //     //           ? item?.companyName
+              //     //           : `${item?.firstName || ''} ${item?.lastName || ''}`}
+              //     //       </MyText>
+              //     //       {item?.description !== "" && <MyText style={styles.timeColor}>
+              //     //         {item?.clientEmailAddressDTOList[0]?.email}
+              //     //       </MyText>}
+              //     //     </View>
+              //     //     <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
+              //     //       {/* <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "right" }]}>${formatNumber(item?.balance)}</MyText> */}
+              //     //       <MyText style={[styles.txtStyle, { textAlign: "right" }]}>{item?.duration}</MyText>
+              //     //       <View style={{ backgroundColor: "#22C55E", alignSelf: "flex-end", width: getResponsiveWidth(20), borderRadius: 5, paddinHorizontal: 30 }}>
+              //     //         <MyText style={[styles.timeColor, { fontWeight: "300", textAlign: "center", color: COLORS?.whiteColors }]}>
+              //     //           {item?.status}
+              //     //         </MyText>
+              //     //       </View>
+              //     //     </View>
+              //     //   </View>
+              //     // </Swipeable>
+              //   );
+              // }}
               ListFooterComponent={() => <View style={{ height: 100 }} />}
             />
 
@@ -271,5 +307,63 @@ const styles = StyleSheet.create({
     color: COLORS.PRIMARY_COLOR,
     textAlign: 'center',
     marginTop: 20,
+  },
+  // ==>
+  card: {
+    backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
+    padding: 15,
+    marginVertical: 6,
+    borderRadius: 8,
+    elevation: 1,
+    shadowColor: '#ccc',
+    marginHorizontal: 10
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  codeText: {
+    color: COLORS.PRIMARY_COLOR,
+    fontWeight: '600',
+    fontSize: calculatefontSize(1.8)
+  },
+  mainText: {
+    fontSize: calculatefontSize(1.7),
+    fontWeight: '500',
+    marginTop: 4
+  },
+  dateRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 4
+  },
+  dateText: {
+    fontSize: calculatefontSize(1.3),
+    color: '#444'
+  },
+  dueText: {
+    fontSize: calculatefontSize(1.3),
+    color: 'red'
+  },
+  statusBadge: {
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+    alignSelf: 'flex-end'
+  },
+  statusText: {
+    fontSize: calculatefontSize(1.3),
+    color: COLORS?.whiteColors
+  },
+  leftSwipe: {
+    backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
+    justifyContent: 'center',
+
+    alignItems: 'flex-start',
+    paddingHorizontal: 20,
+    marginVertical: 6,
+    // borderRadius: 8,
+    // flex: 1,
   },
 })

@@ -105,56 +105,151 @@ const Tasks = ({ navigation }) => {
   };
 
   const renderRightActions = (item) => (
-    <View style={{ flexDirection: 'row' }}>
-      <TouchableOpacity
-        onPress={() => handleDeleteItem(item)}
-        style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
-      >
-        <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity onPress={() => handleDeleteItem(item)} style={[styles.leftSwipe, { backgroundColor: COLORS?.RED_COLOR }]}>
+      <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
+    </TouchableOpacity>
+    // <View style={{ flexDirection: 'row' }}>
+    //   <TouchableOpacity
+    //     onPress={() => handleDeleteItem(item)}
+    //     style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+    //   >
+    //     <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
+    //   </TouchableOpacity>
+    // </View>
   );
   const renderLeftActions = (item) => (
-    <View style={{ flexDirection: 'row' }}>
-      <TouchableOpacity
-        onPress={() => navigation.navigate("EditTask", { defaultData: item })}
-        style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
-      >
-        <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
-      </TouchableOpacity>
-    </View>
+
+    <TouchableOpacity onPress={() => navigation.navigate("EditTask", { defaultData: item })} style={styles.leftSwipe}>
+      <AntDesign name="edit" size={20} color={COLORS?.BLACK_COLOR} />
+    </TouchableOpacity>
+
+    // <View style={{ flexDirection: 'row' }}>
+    //   <TouchableOpacity
+    //     onPress={() => navigation.navigate("EditTask", { defaultData: item })}
+    //     style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+    //   >
+    //     <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
+    //   </TouchableOpacity>
+    // </View>
   );
 
   const visibleData = filteredData.slice(0, limit);
 
+  // const renderItem = ({ item }) => {
+  //   const isVisible = viewableItems.includes(item._id);
+  //   const TaskContent = (
+  //     <Swipeable renderLeftActions={() => renderLeftActions(item)} renderRightActions={() => renderRightActions(item)}>
+  //       <View style={{ backgroundColor: '#fff' }}>
+  //         <TouchableOpacity
+  //           activeOpacity={0.8}
+  //           onPress={() => navigation.navigate("TaskDetails", { item })}
+  //           style={styles.taskRow}
+  //         >
+  //           <View style={{ gap: 5, width: "65%" }}>
+  //             <MyText style={styles.timeColor}>{item?.code}</MyText>
+  //             <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300' }]}> {item?.name} </MyText>
+  //             <MyText style={styles.timeColor}>{item?.matterName}</MyText>
+  //           </View>
+  //           <View style={styles.statusBox}>
+  //             <View style={{ backgroundColor: checkBGStatusColor(item?.status), borderRadius: 5, paddingHorizontal: 8, paddingVertical: 2 }}>
+  //               <MyText style={{ color: checkTxtStatusColor(item?.status), fontSize: calculatefontSize(1.4) }}>{item?.status}</MyText>
+  //             </View>
+  //           </View>
+  //         </TouchableOpacity>
+  //       </View>
+  //     </Swipeable>
+  //   );
+  //   return isVisible ? (
+  //     { TaskContent }
+  //   ) : TaskContent;
+  // };
+
   const renderItem = ({ item }) => {
     const isVisible = viewableItems.includes(item._id);
+
     const TaskContent = (
-      <Swipeable renderLeftActions={() => renderLeftActions(item)} renderRightActions={() => renderRightActions(item)}>
-        <View style={{ backgroundColor: '#fff' }}>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => navigation.navigate("TaskDetails", { item })}
-            style={styles.taskRow}
-          >
-            <View style={{ gap: 5, width: "65%" }}>
-              <MyText style={styles.timeColor}>{item?.code}</MyText>
-              <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300' }]}> {item?.name} </MyText>
-              <MyText style={styles.timeColor}>{item?.matterName}</MyText>
+      <Swipeable
+        renderLeftActions={() => renderLeftActions(item)}
+        renderRightActions={() => renderRightActions(item)}
+      >
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate("TaskDetails", { item })}
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginHorizontal: 5,
+            marginVertical: 6,
+            padding: 15,
+
+            borderWidth: 0.5,
+            borderColor: COLORS?.BORDER_LIGHT_COLOR,
+            borderRadius: 10,
+            backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
+            // shadowColor: '#000',
+            // shadowOffset: { width: 0, height: 2 },
+            // shadowOpacity: 0.08,
+            // shadowRadius: 4,
+            // elevation: 2,
+          }}
+        >
+          {/* Left Side */}
+          <View style={{ width: '65%', gap: 5 }}>
+            <MyText style={{ color: COLORS.GREY_COLOR, fontSize: calculatefontSize(1.5) }}>
+              {item?.code}
+            </MyText>
+
+            <MyText
+              numberOfLines={2}
+              ellipsizeMode="tail"
+              style={{
+                fontSize: calculatefontSize(2),
+                fontWeight: '500',
+                color: COLORS.BLACK_COLOR,
+              }}
+            >
+              {item?.name}
+            </MyText>
+
+            <MyText
+              numberOfLines={1}
+              style={{ fontSize: calculatefontSize(1.5), color: COLORS.GREY_COLOR }}
+            >
+              {item?.matterName}
+            </MyText>
+          </View>
+
+          {/* Right Side (Status Badge) */}
+          <View style={{ width: '35%', alignItems: 'flex-end' }}>
+            <View
+              style={{
+                backgroundColor: checkBGStatusColor(item?.status),
+                borderColor: checkTxtStatusColor(item?.status),
+                borderWidth: 1,
+                paddingHorizontal: 10,
+                paddingVertical: 4,
+                borderRadius: 20,
+              }}
+            >
+              <MyText
+                style={{
+                  fontSize: calculatefontSize(1.4),
+                  fontWeight: '500',
+                  color: checkTxtStatusColor(item?.status),
+                }}
+              >
+                {item?.status}
+              </MyText>
             </View>
-            <View style={styles.statusBox}>
-              <View style={{ backgroundColor: checkBGStatusColor(item?.status), borderRadius: 5, paddingHorizontal: 8, paddingVertical: 2 }}>
-                <MyText style={{ color: checkTxtStatusColor(item?.status), fontSize: calculatefontSize(1.4) }}>{item?.status}</MyText>
-              </View>
-            </View>
-          </TouchableOpacity>
-        </View>
+          </View>
+        </TouchableOpacity>
       </Swipeable>
     );
-    return isVisible ? (
-      { TaskContent }
-    ) : TaskContent;
+
+    return isVisible ? TaskContent : TaskContent;
   };
+
 
   return (
     <>
@@ -177,8 +272,8 @@ const Tasks = ({ navigation }) => {
         />
       </LinearGradient>
 
-      <Wrapper>
-        <View style={styles.searchRow}>
+      <Wrapper style={{ padding: 0 }}>
+        <View style={[styles.searchRow, { padding: 10 }]}>
           <SearchBar containerStyle={{ width: '90%' }} placeholder="Search a task" value={searchText} onChangeText={text => setSearchText(text)} />
           <Image source={IconUri?.CalenderSearch} style={{ height: 30, width: 30, resizeMode: 'contain' }} />
         </View>
@@ -266,5 +361,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 10
-  }
+  },
+  leftSwipe: {
+    backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
+    justifyContent: 'center',
+
+    alignItems: 'flex-start',
+    paddingHorizontal: 20,
+    marginVertical: 6,
+    // borderRadius: 8,
+    // flex: 1,
+  },
 });
