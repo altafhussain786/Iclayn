@@ -12,8 +12,14 @@ import MyText from '../../components/MyText';
 import ScreenHeader from '../../components/ScreenHeader';
 import Wrapper from '../../components/Wrapper';
 import { calculatefontSize } from '../../helper/responsiveHelper';
+import { useToast } from 'react-native-toast-notifications';
+import httpRequest from '../../api/apiHandler';
+import { useSelector } from 'react-redux';
 
 const ChangePassword = ({ navigation }) => {
+    const userDetails = useSelector(state => state?.userDetails?.userDetails);
+    const [loader, setLoader] = useState(false);
+    const toast = useToast();
     const [form, setForm] = useState({
         currentPassword: '',
         newPassword: '',
@@ -27,6 +33,40 @@ const ChangePassword = ({ navigation }) => {
 
     const handleChange = (field, value) => {
         setForm({ ...form, [field]: value });
+
+
+    };
+
+    const hanldeSubmit = async () => {
+
+        if (form.newPassword !== form.confirmPassword) {
+            toast.show('New password and confirm password does not match', { type: 'danger' })
+            return
+        }
+        setLoader(true)
+        const { res, err } = await httpRequest({
+            method: 'put',
+            path: `/ic/user/change-password`,
+            params: {
+                confirmPassword: form.confirmPassword,
+                currentPassword: form.currentPassword,
+                newPassword: form.newPassword,
+                userId: userDetails?.userId
+            }
+        })
+        if (res) {
+            setLoader(false)
+            setForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
+            toast.show('Password updated successfully', { type: 'success' })
+
+        }
+        else {
+            setLoader(false)
+
+            toast.show(err?.message, { type: 'danger' })
+        }
+        console.log(form, "form");
+
     };
 
     return (
@@ -70,9 +110,11 @@ const ChangePassword = ({ navigation }) => {
                     ))}
 
                     {/* Save Button */}
-                    <TouchableOpacity style={styles.saveBtn}>
-                        <MyText style={styles.saveBtnText}>Save</MyText>
-                    </TouchableOpacity>
+                    <View style={styles.saveBtn}>
+                        {loader ? <MyText style={styles.saveBtnText}>Please wait...</MyText> : <TouchableOpacity onPress={() => { hanldeSubmit() }} >
+                            <MyText style={styles.saveBtnText}>Save</MyText>
+                        </TouchableOpacity>}
+                    </View>
                 </ScrollView>
             </Wrapper>
         </>

@@ -14,27 +14,34 @@ import ScreenHeader from '../../components/ScreenHeader';
 import MyText from '../../components/MyText';
 import Wrapper from '../../components/Wrapper';
 import { calculatefontSize } from '../../helper/responsiveHelper';
+import { useSelector } from 'react-redux';
 
 const Profile = ({ navigation }) => {
+    const userDetails = useSelector(state => state?.userDetails?.userDetails);
+    const { userProfileDTO } = userDetails
+    const imageURL = `data:image/jpeg;base64,${userProfileDTO?.image}`;
+    console.log(userProfileDTO, "userProfileDTO=====================>");
     const [form, setForm] = useState({
-        initials: 'Mr.',
-        firstName: 'System',
-        lastName: 'Admin',
-        country: 'United Kingdom',
-        street1: 'MacDonald Street',
-        street2: 'Street 2',
-        city: 'Birmingham',
-        postalCode: '54000b',
-        region: 'punjab',
-        phone: '+447311444225',
-        selectedColor: '#f87171',
+        initials: userProfileDTO?.initial || '',
+        firstName: userProfileDTO?.firstName || '',
+        lastName: userProfileDTO?.lastName || '',
+        country: userProfileDTO?.country || 'United Kingdom',
+        street1: userProfileDTO?.street1 || 'MacDonald Street',
+        street2: userProfileDTO?.street2 || 'Street 2',
+        city: userProfileDTO?.city || 'Birmingham',
+        postalCode: userProfileDTO?.zipCode || '54000b',
+        region: userProfileDTO?.region || 'punjab',
+        phone: userProfileDTO?.phoneNo || '+447311444225',
+        selectedColor: userProfileDTO?.color || '',
     });
 
     const colorOptions = [
         '#a5b4fc', '#facc15', '#a3a3a3',
         '#86efac', '#fcd34d', '#fb923c',
-        '#f87171', '#0ea5e9', '#22c55e'
+        '#ff6e6f', '#0ea5e9', '#22c55e'
+
     ];
+
 
     const handleInputChange = (field, value) => {
         setForm({ ...form, [field]: value });
@@ -48,11 +55,11 @@ const Profile = ({ navigation }) => {
                     {/* Profile Info */}
                     <View style={styles.profileRow}>
                         <Image
-                            source={{ uri: 'https://i.pravatar.cc/150?img=3' }}
+                            source={{ uri: imageURL }}
                             style={styles.avatar}
                         />
                         <View>
-                            <MyText style={styles.userName}>System Admin</MyText>
+                            <MyText style={styles.userName}>{userProfileDTO?.fullName}</MyText>
                             <MyText style={styles.emailText}>sa@yopmail.com</MyText>
                         </View>
                         <TouchableOpacity
