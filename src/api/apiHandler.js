@@ -63,19 +63,23 @@ const httpRequest = async ({
     navigation,
     params = null,
     baseUrl = API_URL,
+    newToken,
 }) => {
-    let token = await AsyncStorage.getItem("access_token");
+    let token = newToken || await AsyncStorage.getItem("access_token");
+
     // console.log(token,"==");
 
     const headers = {
         ...header,
         ...(token && { "Authorization": `Bearer ${token}` })
     };
+    console.log(token, "=======");
+
 
     try {
         let response;
         const endPoint = `${baseUrl}${path}`;
-        console.log(endPoint, "BASEL URL ====================>",token);
+        console.log(endPoint, "BASEL URL ====================>", token);
 
 
         if (["post", "put", "patch", "delete"].includes(method)) {
@@ -94,7 +98,7 @@ const httpRequest = async ({
         }
         return { res: response?.data, status: response.status };
     } catch (err) {
-        console.log(err, "Catch error==================================================>", baseUrl);
+        console.log(err, "Catchddddddd error==========================================d========>", `${baseUrl}${path} ${newToken}`);
 
         if (err.status === 401) {
             removeToken();

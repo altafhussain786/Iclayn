@@ -8,45 +8,55 @@ import MyText from '../../components/MyText'
 import { calculatefontSize } from '../../helper/responsiveHelper'
 import { COLORS, fontFamily, IconUri } from '../../constants'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import httpRequest from '../../api/apiHandler'
+import { clearuserDetails } from '../../store/slices/userDetails'
+import { useDispatch } from 'react-redux'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
 const Settings = ({ navigation }) => {
     const toast = useToast()
-    // const logoutApp = async () => {
-    //     setLoader(true)
-    //     const { res, err } = await httpRequest({
-    //         method: "get",
-    //         path: `/ic/auth/logout`,
-    //         navigation: navigation,
-
-    //     })
-    //     if (res) {
-    //         console.log(res, "=========================LOGOUT APP");
-
-    //         const remove = await removeToken();
-    //         if (remove === "SUCCESS") {
-    //             setLoader(false)
-
-    //             toast.show("Logout successfully", { type: "success" })
-    //             navigation.reset({ index: 0, routes: [{ name: "Login" }] })
-    //         }
-    //         setLoader(false)
-
-    //     }
-    //     else {
-    //         setLoader(false)
-
-    //         console.log(err, "err");
-
-    //     }
-    // }
+    const [loader, setLoader] = React.useState(false)
+    const dispatch = useDispatch();
     const logoutApp = async () => {
-        const remove = await removeToken();
-        if (remove === "SUCCESS") {
-            toast.show("Logout successfully", { type: "success" })
-            navigation.reset({ index: 0, routes: [{ name: "Login" }] })
+        setLoader(true)
+        const { res, err } = await httpRequest({
+            method: "get",
+            path: `/ic/auth/logout`,
+            navigation: navigation,
+
+        })
+        if (res) {
+            console.log(res, "=========================LOGOUT APP");
+            const remove = await removeToken();
+            console.log(remove, "REMOVE===============>");
+
+            if (remove === "SUCCESS") {
+                dispatch(clearuserDetails());
+                setLoader(false)
+                toast.show("Logout successfully", { type: "success" })
+                navigation.reset({ index: 0, routes: [{ name: "Login" }] })
+            }
+            setLoader(false)
+        }
+        else {
+            setLoader(false)
+
+            console.log(err, "err");
+
         }
     }
+    // const logoutApp = async () => {
+    //     // const tokeen = await AsyncStorage.getItem("access_token");
+    //     // console.log(tokeen, "dfhdk");
+
+    //     // const remove = await removeToken();
+    //     // if (remove === "SUCCESS") {
+    //     //     dispatch(clearuserDetails());
+    //     //     toast.show("Logout successfully", { type: "success" })
+    //     //     navigation.reset({ index: 0, routes: [{ name: "Login" }] })
+    //     // }
+    // }
     const item = [
         {
             id: 1,
@@ -69,7 +79,7 @@ const Settings = ({ navigation }) => {
 
             // icon: "log-out-outline",
             screen: "Logout",
-            onPress: logoutApp
+            onPress: () => logoutApp()
         }
     ]
     return (
@@ -93,7 +103,7 @@ const Settings = ({ navigation }) => {
                             <TouchableOpacity onPress={item.onPress} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
                                 <Image source={item.icon} style={{ height: 25, width: 25 }} />
                                 {/* <Ionicons name={item.icon} size={25} /> */}
-                                <MyText style={{ fontFamily: fontFamily.regulaer, fontSize: calculatefontSize(1.9) }}>{item.title}</MyText>
+                                {loader ? <MyText style={{ fontFamily: fontFamily.regulaer, fontSize: calculatefontSize(1.9) }}>Loading....</MyText> : <MyText style={{ fontFamily: fontFamily.regulaer, fontSize: calculatefontSize(1.9) }}>{item.title}</MyText>}
                             </TouchableOpacity>
                         </View>
                     )}

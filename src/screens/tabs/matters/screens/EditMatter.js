@@ -561,7 +561,7 @@ const EditMatter = ({ navigation, route }) => {
 
 
             updatedBy: userDetails?.userId,
-            updatedOn: defaultData?.updatedOn || null
+            updatedOn: moment().toISOString() || null
           };
 
           // console.log(payload,"PAYLOAD EDIT ==================>");

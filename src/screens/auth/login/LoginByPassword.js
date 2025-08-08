@@ -11,6 +11,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons'; // or any icon libra
 import httpRequest from '../../../api/apiHandler'
 import { saveToken } from '../../../helper/Helpers'
 import { useToast } from 'react-native-toast-notifications'
+import { useDispatch } from 'react-redux'
+import { adduserDetails } from '../../../store/slices/userDetails'
 
 
 
@@ -25,6 +27,7 @@ const LoginByPassword = ({ navigation, route }) => {
     const emailData = route?.params?.emailData
     const [loader, setLoader] = React.useState(false)
     const toast = useToast()
+    const dispatch = useDispatch()
 
     const login = async (values) => {
         console.log(email, values.password, "====>");
@@ -37,13 +40,37 @@ const LoginByPassword = ({ navigation, route }) => {
             header: { "X_TENANT_ID": X_TENANT_ID },
             params: {
                 email: email,
-                password: values.password
+                password: values.password,
+                deviceToken: null,
+                deviceType: "android"
             }
         })
         if (res) {
-            console.log(res, 'login res==========>');
 
             let { token } = res
+            // console.log(token, 'token==========>');
+            // const authResponse = await httpRequest(
+            //     {
+            //         method: 'post',
+            //         path: `/ic/auth/authorize`,
+            //         params: {},
+            //         newToken: token
+            //         // navigation: navigation
+            //     }
+            // )
+            // console.log(authResponse, 'authResponse==========>');
+
+
+            // if (authResponse?.res) {
+            //     dispatch(adduserDetails(res?.data))
+            // }
+            // else {
+            //     console.log(err, "GET USER DATA RES=========d============>", res);
+            // }
+
+            // console.log('======================================dfhkdsfhhds');
+            // return
+
             await saveToken(token, X_TENANT_ID);
             if (emailData?.user2FADTO?.smsEnabled === true || emailData?.user2FADTO?.emailEnabled === true) {
                 navigation.navigate('Otp', { userEmail: email })
@@ -70,7 +97,7 @@ const LoginByPassword = ({ navigation, route }) => {
         <ImageBackground blurRadius={2} source={require("../../../assets/Images/bgimage.png")} style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
             <View >
                 <Image tintColor={COLORS?.whiteColors} source={{ uri: `${BASE_URL}/assets/logo-DuQxixZj.png` }} style={{ width: 150, height: 50, resizeMode: "contain", }} />
-                
+
             </View>
             <Formik
                 initialValues={{ email: email, password: 'Secret@123' }}

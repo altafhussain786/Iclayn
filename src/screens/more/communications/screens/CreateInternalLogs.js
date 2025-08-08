@@ -13,13 +13,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useToast } from 'react-native-toast-notifications'
 import { pick } from '@react-native-documents/picker'
 import { calculatefontSize } from '../../../../helper/responsiveHelper'
-import { COLORS, prefixList } from '../../../../constants'
+import { API_URL, COLORS, prefixList } from '../../../../constants'
 import ScreenHeader from '../../../../components/ScreenHeader'
 import TextInputWithTitle from '../../../../components/TextInputWithTitle'
 import Wrapper from '../../../../components/Wrapper'
 import MyText from '../../../../components/MyText'
 import BottomModalListWithSearch from '../../../../components/BottomModalListWithSearch'
 import httpRequest from '../../../../api/apiHandler'
+import axios from 'axios'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
 
@@ -97,7 +99,16 @@ const CreateInternalLogs = ({ navigation }) => {
 
         return formatted;
     };
-
+    const formatWithOffset = (date) => {
+        const pad = n => String(n).padStart(2, '0');
+        const yyyy = date.getFullYear();
+        const MM = pad(date.getMonth() + 1);
+        const dd = pad(date.getDate());
+        const hh = pad(date.getHours());
+        const mm = pad(date.getMinutes());
+        const ss = pad(date.getSeconds());
+        return `${yyyy}-${MM}-${dd}T${hh}:${mm}:${ss}.000+05:00`;
+    };
 
     return (
         <>
@@ -157,41 +168,70 @@ const CreateInternalLogs = ({ navigation }) => {
                 }
                 // validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
-                    console.log(values, "values=======================>");
-                    const payload =
-                    {
-                        createdOn: "",
-                        updatedOn: null,
+                    const token = await AsyncStorage.getItem('access_token')
+                    // console.log(token, "values=======================>");
+                    const formData = new FormData();
+                    const payload = {
+                        createdOn: `2025-08-08T16:12:00+05:00`,
+                        updatedOn: `2025-08-08T16:12:00+05:00`,
+                        // createdOn: formatWithOffset(new Date()),
+                        // updatedOn: formatWithOffset(new Date()),
                         createdBy: userDetails?.userId,
                         updatedBy: null,
                         revision: null,
                         matterComLogId: null,
-                        logDate: values?.selecteddate,
-                        logTime: values?.selectedtime,
+                        // logDate: values?.selecteddate,
+                        // logTime: values?.selectedtime,
+                        logDate: "2025-08-08T14:11:21+05:00",
+                        logTime: "2025-08-08T14:11:21+05:00",
                         fromId: values?.fromObj?.userId,
                         toId: values?.toObj?.clientId,
                         subject: values?.subject,
                         body: values?.body,
                         timer: null,
                         matterId: values?.matterObj?.matterId,
-                        type: "Phone",
+                        type: "Internal", // or "Phone", based on use case
                         attachmentDTOList: null,
-                        status: "Active"
-                    }
+                        status: "Active",
+                        categoryId: 2
+                    };
 
-                    const { res, err } = await httpRequest({
-                        method: `post`,
-                        path: `/ic/matter/comm-log/`,
-                        params: payload,
-                        navigation: navigation
-                    })
-                    if (res) {
-                        console.log(res, "res data");
-                        navigation.goBack();
+                    formData.append('data', {
+                        string: JSON.stringify(payload), // RN ke kuch builds 'string' key chahte
+                        type: 'application/json',
+                        name: 'data.json',
+                    });
+                    if (values?.documentFile?.length > 0) {
+
+                        formData.append('doc', {
+                            uri: values?.documentFile[0].uri, // local file uri
+                            type: values?.documentFile[0].type, // e.g., image/jpeg
+                            name: values?.documentFile[0].name,
+                        });
                     }
-                    else {
-                        console.log("err", err);
+                    setFieldValue('loader', true);
+                    try {
+                        const response = await fetch(`${API_URL}/ic/matter/inter-log/v1`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                // 'Content-Type': 'multipart/form-data',
+                            },
+                            body: formData,
+                        });
+
+                        const result = await response.json();
+                        setFieldValue('loader', false);
+
+                        console.log('Upload Success:', result);
+                    } catch (error) {
+                        setFieldValue('loader', false);
+
+                        console.error('Upload Error:', error);
                     }
+                    setFieldValue('loader', false);
+
+
 
                 }}
             >

@@ -1,5 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from "moment";
+// utils/parsePhoneNumber.js
+
+
 
 const TOKEN_KEY = 'access_token';
 const EXPIRATION_KEY = 'expires_in';
@@ -86,6 +89,7 @@ export const getTotalDuration = (durationStr) => {
     const totalHours = hh + mm / 60 + ss / 3600;
     return totalHours;
 }
+
 
 
 // const imageURL = `data:image/jpeg;base64,${userProfileDTO?.image}`;

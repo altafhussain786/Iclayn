@@ -26,6 +26,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { Swipeable } from 'react-native-gesture-handler';
 import Loader from '../../../components/Loader';
 import { useToast } from 'react-native-toast-notifications';
+import { useIsFocused } from '@react-navigation/native';
 
 const Matters = ({ navigation }) => {
     const [tabs, setTabs] = React.useState('All');
@@ -39,6 +40,7 @@ const Matters = ({ navigation }) => {
     const [searchText, setSearchText] = useState(''); // ✅ for search
     const [isLoader, setIsLoader] = useState(false);
     const [filteredData, setFilteredData] = useState([]);
+    const isFocused = useIsFocused()
     const getMatters = async () => {
         setIsLoader(true)
         const { res, err } = await httpRequest({
@@ -50,7 +52,7 @@ const Matters = ({ navigation }) => {
             setIsLoader(false)
 
             setFilteredData(res?.data);
-            setData(res?.data)
+            setData(res?.data);
         }
         else {
             setIsLoader(false)
@@ -60,9 +62,8 @@ const Matters = ({ navigation }) => {
 
     useEffect(() => {
         getMatters()
-    }, [])
+    }, [isFocused])
 
-    // ✅ Search logic
     useEffect(() => {
         let filtered = [...data];
 
@@ -80,8 +81,11 @@ const Matters = ({ navigation }) => {
             );
         }
 
-        setFilteredData(filtered);
+        // Reverse the final filtered list
+        setFilteredData(filtered.sort((a, b) => new Date(b.openDate) - new Date(a.openDate)));
+        // setFilteredData(filtered.reverse());
     }, [searchText, data, tabs]);
+
 
     const deleteMatter = async (item) => {
         const { res, err } = await httpRequest({
@@ -113,20 +117,6 @@ const Matters = ({ navigation }) => {
                 <TouchableOpacity onPress={() => deleteMatter(item)} style={[styles.leftSwipe, { backgroundColor: COLORS?.RED_COLOR }]}>
                     <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
                 </TouchableOpacity>
-                {/* <TouchableOpacity
-                    onPress={() => navigation.navigate("EditMatter", { matterDetails: item })}
-                    style={{ backgroundColor: '#0068D1', justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
-                >
-                    <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
-                    
-                </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={() => deleteMatter(item)}
-                    style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
-                >
-                    <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
-                   
-                </TouchableOpacity> */}
 
             </View>
         );
@@ -243,7 +233,7 @@ const Matters = ({ navigation }) => {
                                             {/* Left Section */}
                                             <View style={{ width: '65%', gap: 5 }}>
                                                 <MyText style={{ color: COLORS.LIGHT_COLOR, fontSize: calculatefontSize(1.5) }}>
-                                                    {item?.status} • {moment(item?.openDate).format('DD-MM-YYYY')}
+                                                    {item?.code} • {moment(item?.openDate).format('DD-MM-YYYY')}
                                                 </MyText>
                                                 <MyText
                                                     numberOfLines={2}
@@ -286,57 +276,7 @@ const Matters = ({ navigation }) => {
                                 );
                             }}
 
-                            // renderItem={({ item, index }) => {
-                            //     return (
-                            //         <Swipeable renderLeftActions={() => renderLeftActions(item)}>
-                            //             <TouchableOpacity onPress={() => navigation.navigate('MatterDetails', { matterData: item })}
-                            //                 style={{
-                            //                     flexDirection: 'row',
-                            //                     justifyContent: 'space-between',
-                            //                     alignItems: 'center',
-                            //                     paddingVertical: 15,
-                            //                     paddingHorizontal: 10,
-                            //                     borderBottomWidth: 1,
-                            //                     borderColor: COLORS?.BORDER_LIGHT_COLOR,
-                            //                     backgroundColor: '#fff',
-                            //                 }}
-                            //             >
-                            //                 <View style={{ gap: 5, width: "65%" }}>
-                            //                     <MyText style={styles.timeColor}>Open {moment(item?.openDate).format('DD-MM-YYYY')}</MyText>
-                            //                     <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300', }]}>
-                            //                         {item?.name}
-                            //                     </MyText>
-                            //                     <MyText style={styles.timeColor}>{item?.clientNames}</MyText>
-                            //                 </View>
-                            //                 <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
 
-                            //                     <View
-                            //                         style={{
-                            //                             backgroundColor: item?.status == "Open" ? '#EFE4FF' : '#ffc2cd',
-                            //                             borderWidth: 1,
-                            //                             borderColor: item?.status == "COMPLETED" ? '#7C4EC9' : '#6c0014',
-                            //                             // alignSelf: 'flex-end',
-                            //                             borderRadius: 5,
-                            //                             paddingHorizontal: 8,
-                            //                             paddingVertical: 2,
-                            //                         }}
-                            //                     >
-                            //                         <MyText
-                            //                             style={{
-                            //                                 // fontWeight: '600',
-                            //                                 // textAlign: 'center',
-                            //                                 color: item?.status == "COMPLETED" ? COLORS?.whiteColors : '#6c0014',
-                            //                                 fontSize: calculatefontSize(1.4),
-                            //                             }}
-                            //                         >
-                            //                             {item?.status}
-                            //                         </MyText>
-                            //                     </View>
-                            //                 </View>
-                            //             </TouchableOpacity>
-                            //         </Swipeable>
-                            //     );
-                            // }}
                             refreshControl={
                                 <RefreshControl refreshing={refreshing} onRefresh={getMatters} />
                             }

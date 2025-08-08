@@ -62,7 +62,7 @@ const Login = ({ navigation }) => {
                            </TouchableOpacity> */}
             </View>
             <Formik
-                initialValues={{ email: 'Sa@yopmail.com', }}
+                initialValues={{ email: 'sa@yopmail.com', }}
                 validationSchema={validationSchema}
                 onSubmit={login}
             >

@@ -40,6 +40,33 @@ const Home = ({ navigation }) => {
   const [taskLoader, setTaskLoader] = useState(false); // ✅ for refresh
   const [searchTask, setSearchTask] = useState(''); // ✅ for search
   const [filterTaskData, setFilterTaskData] = useState([]);
+
+  const getUserData = async () => {
+
+    const { res, err } = await httpRequest(
+      {
+        method: 'post',
+        path: `/ic/auth/authorize`,
+        params: {},
+        // navigation: navigation
+      }
+    )
+    if (res) {
+
+      dispatch(adduserDetails(res?.data))
+
+    }
+    else {
+      console.log(err, "GET USER DATA RES=====================>", res);
+
+      console.log("errd", err);
+
+    }
+  }
+
+  useEffect(() => {
+    getUserData()
+  }, [])
   const getTasks = async () => {
     setTaskLoader(true)
     const { res, err } = await httpRequest({
@@ -118,32 +145,7 @@ const Home = ({ navigation }) => {
   }, [selectedDate])
 
 
-  const getUserData = async () => {
 
-    const { res, err } = await httpRequest(
-      {
-        method: 'post',
-        path: `/ic/auth/authorize`,
-        params: {},
-        // navigation: navigation
-      }
-    )
-    if (res) {
-
-      dispatch(adduserDetails(res?.data))
-
-    }
-    else {
-      console.log(err, "GET USER DATA RES=====================>", res);
-
-      console.log("errd", err);
-
-    }
-  }
-
-  useEffect(() => {
-    getUserData()
-  }, [])
 
 
 
@@ -186,7 +188,7 @@ const Home = ({ navigation }) => {
             ]}
             onPress={() => setTabs(item)}
           >
-            {tabs === item && <Image source={IconUri?.checkmark} style={{ height: 20, width: 20 ,resizeMode:"contain",right:10}} />}
+            {tabs === item && <Image source={IconUri?.checkmark} style={{ height: 20, width: 20, resizeMode: "contain", right: 10 }} />}
             <MyText style={{ color: tabs === item ? COLORS?.whiteColors : COLORS?.whiteColors, fontSize: calculatefontSize(2), fontWeight: '600', }}>{item}</MyText>
           </TouchableOpacity>
         ))}
