@@ -1,4 +1,4 @@
-import { Alert, AppState, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, AppState, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import Octicons from 'react-native-vector-icons/Octicons'
@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useToast } from 'react-native-toast-notifications'
 import { pick } from '@react-native-documents/picker'
 import { calculatefontSize } from '../../../helper/responsiveHelper'
-import { COLORS, prefixList } from '../../../constants'
+import { API_URL, COLORS, prefixList } from '../../../constants'
 import ScreenHeader from '../../../components/ScreenHeader'
 import TextInputWithTitle from '../../../components/TextInputWithTitle'
 import Wrapper from '../../../components/Wrapper'
@@ -37,7 +37,10 @@ import { addContactPerson } from '../../../store/slices/clientSlice/createItemFo
 const TIMER_KEY = 'TIMEKEEPER_STATE';
 
 const CreateClients = ({ navigation }) => {
+    const toast = useToast();
     const dispatch = useDispatch();
+    const userDetails = useSelector(state => state?.userDetails?.userDetails);
+
     const items = useSelector(state => state.createItemForAddEmail.items);
     const itemsForPhoneNumber = useSelector(state => state.createItemForAddPhone.items);
     const itemsForWebAddress = useSelector(state => state.createItemForWebAddress.items);
@@ -82,7 +85,7 @@ const CreateClients = ({ navigation }) => {
                         companyNumber: "",
 
                         //
-                        documentFile: '',
+                        documentFile: [],
 
                         //loader
                         loader: false
@@ -90,7 +93,135 @@ const CreateClients = ({ navigation }) => {
                 }
                 // validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
-                    console.log(values, "values==>");
+                    console.log(itemsForAddAddress, "itemsForAddAddress==>");
+                    const token = await AsyncStorage.getItem('access_token')
+                    const formData = new FormData();
+                    const mappedItemForEmailAdd = items.map((i, index) => ({
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: null,
+                        updatedBy: null,
+                        revision: null,
+                        clientEmailAddressId: null,
+                        email: i?.email,
+                        type: i?.emailType,
+                        primary: i?.isEmailPrimary,
+                        clientId: null
+                    }))
+
+                    const mappedItemForClientPhone = itemsForPhoneNumber.map((i, index) => ({
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: null,
+                        updatedBy: null,
+                        revision: null,
+                        clientPhoneNumberId: null,
+                        phoneNo: i?.phoneNumber,
+                        type: i?.phoneNumberType,
+                        primary: i?.isPhoneNumberPrimary,
+                        clientId: null
+                    }))
+
+                    const mappedItemForWebAddress = itemsForWebAddress.map((i, index) => ({
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: null,
+                        updatedBy: null,
+                        revision: null,
+                        clientWebAddresseId: null,
+                        webAddress: i?.webAddress,
+                        type: i?.webAddressType,
+                        primary: i?.isWebAddressPrimary,
+                        clientId: null
+                    }))
+
+                    const mappedItemForAddress = itemsForAddAddress.map((i, index) => ({
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: null,
+                        updatedBy: null,
+                        revision: null,
+                        clientAddressId: null,
+                        street: i?.streetAddress,
+                        city: i?.city,
+                        state: i?.stateAddress,
+                        postCode: i?.postCode,
+                        country: i?.country,
+                        type: i?.type,
+                        primary: i?.isAddressPrimary,
+                        clientId: null
+                    }))
+
+                    const payload = {
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: userDetails.userId,
+                        updatedB: null,
+                        revision: null,
+                        clientId: 0,
+                        companyName: null,
+                        companyNumber: null,
+                        prefix: values?.prefix,
+                        code: null,
+                        firstName: values.firstName,
+                        middleName: values.middleName,
+                        lastName: values.lastName,
+                        company: 'company Name',
+                        title: values.title,
+                        dob: values.selectedDateOfBirth,
+                        status: "Active",
+                        type: "Individual",
+                        photo: null,
+                        clientEmailAddressDTOList: mappedItemForEmailAdd || [],
+                        clientPhoneNumberDTOList: mappedItemForClientPhone || [],
+                        clientWebAddresseDTOList: mappedItemForWebAddress || [],
+                        clientAddresseDTOList: mappedItemForAddress || [],
+                        clientContactPersonDTOList: []
+                    }
+                    formData.append('data', JSON.stringify(payload));
+                    // formData.append('data', {
+                    //     string: JSON.stringify(payload), // RN ke kuch builds 'string' key chahte
+                    //     type: 'application/json',
+                    //     name: 'data.json',
+                    // });
+                    if (values?.documentFile?.length > 0) {
+                        formData.append('photo', {
+                            uri: values?.documentFile[0].uri, // local file uri
+                            type: values?.documentFile[0].type, // e.g., image/jpeg
+                            name: values?.documentFile[0].name,
+                        });
+                    }
+                    console.log(payload, "payload", formData, "formdata");
+
+                    setFieldValue('loader', true);
+                    try {
+                        const response = await fetch(`${API_URL}/ic/client/v1/create/`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                            },
+                            body: formData,
+                        });
+
+                        const result = await response.json();
+                        if (result?.data) {
+                            toast.show('Log created successfully', { type: 'success' })
+                            navigation.goBack()
+                        }
+                        else {
+                            setFieldValue('loader', false);
+                            toast.show('Something went wrong', { type: 'danger' })
+
+                        }
+
+                        console.log('Log:', result);
+                    } catch (error) {
+                        setFieldValue('loader', false);
+
+                        console.error('Upload Error:', error);
+                    }
+                    setFieldValue('loader', false);
+
 
 
                 }}
@@ -122,7 +253,8 @@ const CreateClients = ({ navigation }) => {
                                                         const [pickResult] = await pick();
 
                                                         if (pickResult) {
-                                                            setFieldValue('documentFile', [...(values?.documentFile || []), pickResult]);
+                                                            setFieldValue('documentFile', [pickResult]);
+                                                            // setFieldValue('documentFile', pickResult);
                                                         }
                                                     } catch (err) {
                                                         console.log(err);
@@ -139,7 +271,7 @@ const CreateClients = ({ navigation }) => {
                                                     borderRadius: 30,
                                                 }}
                                             >
-                                                <AntDesign name="camera" size={20} color={COLORS?.PRIMARY_COLOR} />
+                                                {values?.documentFile?.length > 0 ? <Image source={{ uri: values?.documentFile?.[0]?.uri }} style={{ height: 30, width: 30, resizeMode: "cover" }} /> : <AntDesign name="camera" size={20} color={COLORS?.PRIMARY_COLOR} />}
 
                                             </TouchableOpacity>
 
