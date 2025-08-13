@@ -235,7 +235,7 @@ const Communications = ({ navigation }) => {
                                             <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
                                                 {/* <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "right" }]}>${formatNumber(item?.balance)}</MyText> */}
                                                 {item?.timer && <MyText style={[styles.txtStyle,]}>{item?.timer}</MyText>}
-                                                <View style={{ backgroundColor: "#22C55E", alignSelf: "flex-end", width: getResponsiveWidth(20), borderRadius: 5, paddinHorizontal: 30 }}>
+                                                <View style={{ backgroundColor: item?.status == "DELETED" ? COLORS?.RED_COLOR : "#22C55E", alignSelf: "flex-end", width: getResponsiveWidth(20), borderRadius: 5, paddinHorizontal: 30 }}>
                                                     <MyText style={[styles.timeColor, { fontWeight: "300", textAlign: "center", color: COLORS?.whiteColors }]}>
                                                         {item?.status}
                                                     </MyText>

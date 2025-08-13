@@ -100,7 +100,7 @@ const LoginByPassword = ({ navigation, route }) => {
 
             </View>
             <Formik
-                initialValues={{ email: email, password: 'Secret@123' }}
+                initialValues={{ email: email, password: 'London@12345' }}
                 validationSchema={validationSchema}
                 onSubmit={login}
             >

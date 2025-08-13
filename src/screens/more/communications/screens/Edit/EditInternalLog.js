@@ -15,20 +15,14 @@ import { pick } from '@react-native-documents/picker'
 
 //Imports
 import { calculatefontSize } from '../../../../../helper/responsiveHelper'
-import { COLORS, prefixList } from '../../../../../constants'
+import { API_URL, COLORS, prefixList } from '../../../../../constants'
 import ScreenHeader from '../../../../../components/ScreenHeader'
 import TextInputWithTitle from '../../../../../components/TextInputWithTitle'
 import Wrapper from '../../../../../components/Wrapper'
 import MyText from '../../../../../components/MyText'
 import BottomModalListWithSearch from '../../../../../components/BottomModalListWithSearch'
 import httpRequest from '../../../../../api/apiHandler'
-
-
-
-
-
-
-
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const EditInternalLog = ({ navigation, route }) => {
     const communicationDetails = route?.params?.communicationDetails;
@@ -114,7 +108,7 @@ const EditInternalLog = ({ navigation, route }) => {
     const validationSchema = Yup.object().shape({
     })
 
-
+    console.log(defaultData, "toData==dd===========>");
 
     return (
         <>
@@ -165,16 +159,33 @@ const EditInternalLog = ({ navigation, route }) => {
                         companyNumber: "",
 
                         //Document
+                        // attachmentWaliFile 
+                        defaultFiles: defaultData?.attachmentDTOList?.map(item => {
+                            return (
+                                {
+                                    attachment: null,
+                                    createdBy: item?.createdBy,
+                                    createdOn: item?.createdOn,
+                                    matterComLogAttId: item?.matterComLogAttId,
+                                    name: item?.name,
+                                    revision: null,
+                                    updatedBy: null,
+                                    updatedOn: null,
+                                }
+                                // item
+                            )
+                        }) || null,
+                        //dikhany wali file ha
                         documentFile: defaultData?.attachmentDTOList?.map(item => {
                             return (
                                 {
                                     urlPath: item?.attachment,
-
                                     name: item?.name,
                                     type: item?.attachmentType
                                 }
                             )
-                        }) || [],
+                        }) || null,
+                        selectedFile: null,
 
                         //loader
                         loader: false
@@ -182,41 +193,69 @@ const EditInternalLog = ({ navigation, route }) => {
                 }
                 // validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
-                    console.log(values, "values=======================>");
-                    const payload =
-                    {
-                        createdOn: "",
-                        updatedOn: null,
+                    console.log(values, "values=======================>", defaultData);
+
+                    const token = await AsyncStorage.getItem('access_token')
+                    // console.log(token, "values=======================>");
+                    const formData = new FormData();
+                    const payload = {
+                        createdOn: defaultData?.createdOn,
+                        updatedOn: defaultData?.updatedOn,
                         createdBy: userDetails?.userId,
-                        updatedBy: null,
+                        updatedBy: userDetails?.userId,
                         revision: null,
-                        matterComLogId: null,
-                        logDate: values?.selecteddate,
-                        logTime: values?.selectedtime,
-                        fromId: values?.fromObj?.userId,
-                        toId: values?.toObj?.clientId,
+                        matterComLogId: defaultData?.matterComLogId,
+                        logDate: defaultData?.logDate,
+                        logTime: defaultData?.logTime,
+                        fromId: null,
+                        toId: null,
                         subject: values?.subject,
                         body: values?.body,
                         timer: null,
                         matterId: values?.matterObj?.matterId,
-                        type: "Phone",
-                        attachmentDTOList: null,
-                        status: "Active"
-                    }
+                        type: "Internal",
+                        attachmentDTOList: values?.defaultFiles,
+                        status: "Active",
+                        categoryId: values?.categoryObj?.docCategoryId
+                    };
+                    console.log(payload, "payload============>", values?.selectedFile);
 
-                    const { res, err } = await httpRequest({
-                        method: `post`,
-                        path: `/ic/matter/comm-log/`,
-                        params: payload,
-                        navigation: navigation
-                    })
-                    if (res) {
-                        console.log(res, "res data");
-                        navigation.goBack();
+                    formData.append('data', {
+                        string: JSON.stringify(payload), // RN ke kuch builds 'string' key chahte
+                        type: 'application/json',
+                        name: 'data.json',
+                    });
+
+                    if (values?.selectedFile?.length > 0) {
+                        formData.append('doc', {
+                            uri: values?.selectedFile[0].uri, // local file uri
+                            type: values?.selectedFile[0].type, // e.g., image/jpeg
+                            name: values?.selectedFile[0].name,
+                        });
                     }
-                    else {
-                        console.log("err", err);
+                    setFieldValue('loader', true);
+                    try {
+                        const response = await fetch(`${API_URL}/ic/matter/inter-log/v1`, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                            },
+                            body: formData,
+                        });
+
+                        console.log('Status Code:', response.status);
+                        const result = await response.json();
+                        setFieldValue('loader', false);
+
+                        console.log('Upload Success:', result);
+                    } catch (error) {
+                        setFieldValue('loader', false);
+
+                        console.error('Upload Error:', error.message);
                     }
+                    setFieldValue('loader', false);
+
+
 
                 }}
             >
@@ -296,8 +335,8 @@ const EditInternalLog = ({ navigation, route }) => {
                                                                 return
                                                             }
                                                             else {
+                                                                setFieldValue('selectedFile', [...(values?.selectedFile || []), pickResult]);
                                                                 setFieldValue('documentFile', [...(values?.documentFile || []), pickResult]);
-
                                                             }
 
                                                         }
@@ -345,11 +384,21 @@ const EditInternalLog = ({ navigation, route }) => {
                                                             <MyText style={{ width: "70%" }}>{d?.name || 'Unnamed File'}</MyText>
                                                         </View>
                                                         <TouchableOpacity
-                                                            onPress={() =>
+                                                            onPress={() => {
+
+                                                                setFieldValue(
+                                                                    'defaultFiles',
+                                                                    values?.defaultFiles?.filter((_, index) => index !== i)
+                                                                )
+                                                                setFieldValue(
+                                                                    'selectedFile',
+                                                                    values?.selectedFile?.filter((_, index) => index !== i)
+                                                                )
                                                                 setFieldValue(
                                                                     'documentFile',
                                                                     values?.documentFile?.filter((_, index) => index !== i)
                                                                 )
+                                                            }
                                                             }
                                                         >
                                                             <Entypo name="circle-with-cross" size={20} color="red" />

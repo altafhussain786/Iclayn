@@ -29,6 +29,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const CreateInternalLogs = ({ navigation }) => {
     const dispatch = useDispatch();
+    const toast = useToast();
     const items = useSelector(state => state.createItemForAddEmail.items);
     const userDetails = useSelector(state => state?.userDetails?.userDetails);
 
@@ -154,7 +155,6 @@ const CreateInternalLogs = ({ navigation }) => {
                         //duration
                         recordedTime: '',
 
-
                         // ========================>COMPANY ===>
                         companyName: "",
                         companyNumber: "",
@@ -168,6 +168,8 @@ const CreateInternalLogs = ({ navigation }) => {
                 }
                 // validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
+                    console.log(values, "values=======================>");
+
                     const token = await AsyncStorage.getItem('access_token')
                     // console.log(token, "values=======================>");
                     const formData = new FormData();
@@ -190,19 +192,17 @@ const CreateInternalLogs = ({ navigation }) => {
                         body: values?.body,
                         timer: null,
                         matterId: values?.matterObj?.matterId,
-                        type: "Internal", // or "Phone", based on use case
+                        type: "Internal",
                         attachmentDTOList: null,
                         status: "Active",
-                        categoryId: 2
+                        categoryId: values?.categoryObj?.docCategoryId
                     };
-
                     formData.append('data', {
                         string: JSON.stringify(payload), // RN ke kuch builds 'string' key chahte
                         type: 'application/json',
                         name: 'data.json',
                     });
                     if (values?.documentFile?.length > 0) {
-
                         formData.append('doc', {
                             uri: values?.documentFile[0].uri, // local file uri
                             type: values?.documentFile[0].type, // e.g., image/jpeg
@@ -215,15 +215,22 @@ const CreateInternalLogs = ({ navigation }) => {
                             method: 'POST',
                             headers: {
                                 'Authorization': `Bearer ${token}`,
-                                // 'Content-Type': 'multipart/form-data',
                             },
                             body: formData,
                         });
 
                         const result = await response.json();
-                        setFieldValue('loader', false);
+                        if (result?.data) {
+                            toast.show('Log created successfully', { type: 'success' })
+                            navigation.goBack()
+                        }
+                        else {
+                            setFieldValue('loader', false);
+                            toast.show('Something went wrong', { type: 'danger' })
 
-                        console.log('Upload Success:', result);
+                        }
+
+                        console.log('Log:', result);
                     } catch (error) {
                         setFieldValue('loader', false);
 
