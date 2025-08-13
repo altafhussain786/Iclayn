@@ -156,7 +156,7 @@ const CreateClients = ({ navigation }) => {
                         createdOn: "",
                         updatedOn: null,
                         createdBy: userDetails.userId,
-                        updatedB: null,
+                        updatedBy: null,
                         revision: null,
                         clientId: 0,
                         companyName: null,
@@ -184,7 +184,7 @@ const CreateClients = ({ navigation }) => {
                     //     type: 'application/json',
                     //     name: 'data.json',
                     // });
-                    if (values?.documentFile?.length > 0) {
+                    if (values?.documentFile?.uri) {
                         formData.append('photo', {
                             uri: values?.documentFile[0].uri, // local file uri
                             type: values?.documentFile[0].type, // e.g., image/jpeg

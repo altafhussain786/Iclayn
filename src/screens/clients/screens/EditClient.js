@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useToast } from 'react-native-toast-notifications'
 import { pick } from '@react-native-documents/picker'
 import { calculatefontSize } from '../../../helper/responsiveHelper'
-import { COLORS, prefixList } from '../../../constants'
+import { API_URL, COLORS, prefixList } from '../../../constants'
 import ScreenHeader from '../../../components/ScreenHeader'
 import TextInputWithTitle from '../../../components/TextInputWithTitle'
 import Wrapper from '../../../components/Wrapper'
@@ -44,6 +44,9 @@ const EditClient = ({ navigation, route }) => {
     const [defaultData, setDefaultData] = useState({});
     const [loader, setLoader] = useState(false);
     const dispatch = useDispatch();
+    const toast = useToast();
+    const userDetails = useSelector(state => state?.userDetails?.userDetails);
+
     const items = useSelector(state => state.createItemForAddEmail.items);
     const itemsForPhoneNumber = useSelector(state => state.createItemForAddPhone.items);
     const itemsForWebAddress = useSelector(state => state.createItemForWebAddress.items);
@@ -144,6 +147,8 @@ const EditClient = ({ navigation, route }) => {
                     }));
                 })
             }
+            console.log(res?.data?.clientContactPersonDTOList, "====================RES");
+
             setLoader(false)
 
 
@@ -166,6 +171,8 @@ const EditClient = ({ navigation, route }) => {
 
 
     const imageURL = `data:image/jpeg;base64,${defaultData?.photo}`;
+    console.log(defaultData, "=========d=d=>");
+
 
 
     return (
@@ -178,7 +185,7 @@ const EditClient = ({ navigation, route }) => {
 
                         //individual===========================>
                         // prefix  ============>
-                        prefix: "",
+                        prefix: defaultData?.prefix || "",
                         isOpenPrefix: false,
                         // prefix END  ============>
 
@@ -198,8 +205,13 @@ const EditClient = ({ navigation, route }) => {
                         companyName: defaultData?.companyName || "",
                         companyNumber: defaultData?.companyNumber || "",
 
+
+                        // attachmentWaliFile 
+                        defaultFiles: defaultData?.photo || null,
                         //
-                        documentFile: '',
+                        documentFile: {},
+                        //common file
+                        commonDocumentFile: defaultData?.photo,
 
                         //loader
                         loader: false
@@ -207,13 +219,190 @@ const EditClient = ({ navigation, route }) => {
                 }
                 // validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
-                    console.log(values, "values==>");
+                    console.log(itemsForContactPerson, "itemsForContactPerson");
+
+                    const token = await AsyncStorage.getItem('access_token')
+                    const formData = new FormData();
+                    const mappedItemForEmailAdd = items.map((i, index) => ({
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: null,
+                        updatedBy: null,
+                        revision: null,
+                        clientEmailAddressId: i?.emailObj?.clientEmailAddressId || null,
+                        email: i?.email,
+                        type: i?.emailType,
+                        primary: i?.isEmailPrimary,
+                        clientId: i?.emailObj?.clientId || null
+                    }))
+
+                    const mappedItemForClientPhone = itemsForPhoneNumber.map((i, index) => ({
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: null,
+                        updatedBy: null,
+                        revision: null,
+                        clientPhoneNumberId: i?.phoneNumberObj?.clientPhoneNumberId || null,
+                        phoneNo: i?.phoneNumber,
+                        type: i?.phoneNumberType,
+                        primary: i?.isPhoneNumberPrimary,
+                        clientId: i?.phoneNumberObj?.clientId || null
+                    }))
+
+                    const mappedItemForWebAddress = itemsForWebAddress.map((i, index) => ({
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: null,
+                        updatedBy: null,
+                        revision: null,
+                        clientWebAddresseId: i?.webAddressObj?.clientWebAddresseId || null,
+                        webAddress: i?.webAddress,
+                        type: i?.webAddressType,
+                        primary: i?.isWebAddressPrimary,
+                        clientId: i?.webAddressObj?.clientId || null
+                    }))
+
+                    const mappedItemForAddress = itemsForAddAddress.map((i, index) => ({
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: null,
+                        updatedBy: null,
+                        revision: null,
+                        clientAddressId: i?.addressObj?.clientAddressId || null,
+                        street: i?.streetAddress,
+                        city: i?.city,
+                        state: i?.stateAddress,
+                        postCode: i?.postCode,
+                        country: i?.country,
+                        type: i?.type,
+                        primary: i?.isAddressPrimary,
+                        clientId: i?.addressObj?.clientId || null,
+                    }))
+
+                    const mappedItemForcontact = itemsForContactPerson.map((i, index) => ({
+
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: null,
+                        updatedBy: null,
+                        revision: null,
+                        clientContactPersonId: i?.contactPersonObj?.clientContactPersonId,
+                        prefix: i?.prefixName || "",
+                        firstName: i?.firstName || "",
+                        middleName: i?.middleName || "",
+                        lastName: i?.lastName || "",
+                        email: i?.email || "",
+                        phoneNo: i?.phoneNumber || "",
+                        type: i?.type || "",
+                        primary: i?.isContactPersonPrimary || false,
+                        clientId: i?.contactPersonObj?.clientId
+
+                    }))
+
+
+
+                    const payloadForcompany = {
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: userDetails.userId,
+                        updatedBy: userDetails.userId,
+                        revision: null,
+                        clientId: defaultData?.clientId || 0,
+                        companyName: values?.companyName,
+                        companyNumber: values?.companyNumber,
+                        prefix: values?.prefix,
+                        code: null,
+                        firstName: values.firstName,
+                        middleName: values.middleName,
+                        lastName: values.lastName,
+                        company: 'company Name',
+                        title: values.title,
+                        dob: values.selectedDateOfBirth,
+                        status: "Active",
+                        // type: values?.isYourType "Individual",
+                        type: values?.isYourType,
+                        photo: values?.defaultFiles || null,
+                        clientEmailAddressDTOList: mappedItemForEmailAdd || [],
+                        clientPhoneNumberDTOList: mappedItemForClientPhone || [],
+                        clientWebAddresseDTOList: mappedItemForWebAddress || [],
+                        clientAddresseDTOList: mappedItemForAddress || [],
+                        clientContactPersonDTOList: mappedItemForcontact || []
+                    }
+                    const payload = {
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: userDetails.userId,
+                        updatedBy: userDetails.userId,
+                        revision: null,
+                        clientId: defaultData?.clientId || 0,
+                        companyName: null,
+                        companyNumber: null,
+                        prefix: values?.prefix,
+                        code: null,
+                        firstName: values.firstName,
+                        middleName: values.middleName,
+                        lastName: values.lastName,
+                        company: 'company Name',
+                        title: values.title,
+                        dob: values.selectedDateOfBirth,
+                        status: "Active",
+                        // type: values?.isYourType "Individual",
+                        type: values?.isYourType,
+                        photo: values?.defaultFiles || null,
+                        clientEmailAddressDTOList: mappedItemForEmailAdd || [],
+                        clientPhoneNumberDTOList: mappedItemForClientPhone || [],
+                        clientWebAddresseDTOList: mappedItemForWebAddress || [],
+                        clientAddresseDTOList: mappedItemForAddress || [],
+                        clientContactPersonDTOList: mappedItemForcontact || []
+                    }
+                    formData.append('data', JSON.stringify(values?.isYourType === "Company" ? payloadForcompany : payload));
+
+                    if (values?.documentFile?.uri) {
+                        formData.append('photo', {
+                            uri: values?.documentFile?.uri, // local file uri
+                            type: values?.documentFile?.type, // e.g., image/jpeg
+                            name: values?.documentFile?.name,
+                        });
+                    }
+
+
+                    setFieldValue('loader', true);
+                    try {
+                        const response = await fetch(`${API_URL}/ic/client/v1/update/`, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                            },
+                            body: formData,
+                        });
+
+                        const result = await response.json();
+                        if (result?.data) {
+                            toast.show('Log created successfully', { type: 'success' })
+                            navigation.goBack()
+                        }
+                        else {
+                            setFieldValue('loader', false);
+                            toast.show('Something went wrong', { type: 'danger' })
+
+                        }
+
+                        console.log('Log:', result);
+                    } catch (error) {
+                        setFieldValue('loader', false);
+
+                        console.error('Upload Error:', error);
+                    }
+                    setFieldValue('loader', false);
+
 
 
                 }}
             >
 
                 {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
+
+
 
                     <>
                         <LoaderModal visible={loader} />
@@ -241,14 +430,17 @@ const EditClient = ({ navigation, route }) => {
                                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginVertical: 10 }}>
                                         <MyText style={{ width: "70%" }}>Is the client an individual or a company?</MyText>
                                         <View style={{ alignItems: "center", gap: 10 }}>
-                                            {defaultData?.photo ?
+                                            {values?.commonDocumentFile ?
                                                 <TouchableOpacity
                                                     onPress={async () => {
                                                         try {
                                                             const [pickResult] = await pick();
 
                                                             if (pickResult) {
-                                                                setFieldValue('documentFile', [...(values?.documentFile || []), pickResult]);
+                                                                setFieldValue('documentFile', pickResult);
+                                                                setFieldValue('commonDocumentFile', pickResult);
+                                                                setFieldValue('defaultFiles', null);
+
                                                             }
                                                         } catch (err) {
                                                             console.log(err);
@@ -265,7 +457,8 @@ const EditClient = ({ navigation, route }) => {
                                                         borderRadius: 30,
                                                     }}
                                                 >
-                                                    <Image source={{ uri: imageURL }} style={{ height: 40, width: 40, borderRadius: 50, }} />
+                                                    <Image source={{ uri: (values?.commonDocumentFile === defaultData?.photo ? `data:image/jpeg;base64,${values?.commonDocumentFile}` : values?.documentFile?.uri) }} style={{ height: 40, width: 40, borderRadius: 50, }} />
+                                                    {/* <Image source={{ uri: (values?.commonDocumentFile === defaultData?.photo ? `data:image/jpeg;base64,${values?.commonDocumentFile}` : `data:image/jpeg;base64,${values?.commonDocumentFile}`) }} style={{ height: 40, width: 40, borderRadius: 50, }} /> */}
                                                 </TouchableOpacity>
                                                 : <TouchableOpacity
                                                     onPress={async () => {
@@ -273,7 +466,10 @@ const EditClient = ({ navigation, route }) => {
                                                             const [pickResult] = await pick();
 
                                                             if (pickResult) {
-                                                                setFieldValue('documentFile', [...(values?.documentFile || []), pickResult]);
+                                                                setFieldValue('documentFile', pickResult);
+                                                                setFieldValue('commonDocumentFile', pickResult);
+                                                                setFieldValue('defaultFiles', null);
+
                                                             }
                                                         } catch (err) {
                                                             console.log(err);
@@ -305,7 +501,7 @@ const EditClient = ({ navigation, route }) => {
                                                 const isSelected = values.isYourType === item;
                                                 return (
                                                     <>
-                                                        <TouchableOpacity style={{ width: "45%", }} onPress={() => setFieldValue('isYourType', item)}>
+                                                        <TouchableOpacity disabled={defaultData?.defaultData?.type !== item} style={{ width: "45%", }} onPress={() => setFieldValue('isYourType', item)}>
                                                             <LinearGradient
                                                                 colors={isSelected ? [COLORS?.PRIMARY_COLOR_LIGHT, COLORS?.PRIMARY_COLOR,] : [COLORS?.LIGHT_COLOR, COLORS?.BORDER_LIGHT_COLOR,]}
                                                                 start={{ x: 0, y: 0 }}
@@ -315,7 +511,7 @@ const EditClient = ({ navigation, route }) => {
                                                                 {item === "Individual" ? <AntDesign name={"user"} size={20} color={isSelected ? COLORS?.whiteColors : COLORS?.BLACK_COLOR} />
                                                                     :
                                                                     <Octicons name={"organization"} size={20} color={isSelected ? COLORS?.whiteColors : COLORS?.BLACK_COLOR} />}
-                                                                <MyText style={{ textAlign: "center", color: isSelected ? COLORS?.whiteColors : COLORS?.BLACK_COLOR }}>{item}</MyText>
+                                                                <MyText style={{ textAlign: "center", color: isSelected ? COLORS?.whiteColors : COLORS?.GREY_COLOR_LIGHT }}>{item}</MyText>
                                                             </LinearGradient>
                                                         </TouchableOpacity>
                                                     </>
@@ -331,6 +527,7 @@ const EditClient = ({ navigation, route }) => {
                                                 values?.isYourType === "Individual" ?
                                                     <>
                                                         <TextInputWithTitle
+                                                            value={values.prefix}
                                                             onPressButton={() => setFieldValue('isOpenPrefix', true)}
                                                             title="Prefix"
                                                             isButton={true}
