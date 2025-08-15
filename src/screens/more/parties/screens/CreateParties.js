@@ -1,4 +1,4 @@
-import { Alert, AppState, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, AppState, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import Octicons from 'react-native-vector-icons/Octicons'
@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useToast } from 'react-native-toast-notifications'
 import { pick } from '@react-native-documents/picker'
 import { calculatefontSize } from '../../../../helper/responsiveHelper'
-import { COLORS, prefixList } from '../../../../constants'
+import { API_URL, COLORS, prefixList } from '../../../../constants'
 import ScreenHeader from '../../../../components/ScreenHeader'
 import TextInputWithTitle from '../../../../components/TextInputWithTitle'
 import Wrapper from '../../../../components/Wrapper'
@@ -31,10 +31,14 @@ import { addAddress } from '../../../../store/slices/clientSlice/createItemForAd
 import AddContactPerson from '../../../clients/components/AddContactPerson'
 import { addContactPerson } from '../../../../store/slices/clientSlice/createItemForContactPerson'
 import httpRequest from '../../../../api/apiHandler'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
 const CreateParties = ({ navigation }) => {
     const dispatch = useDispatch();
+    const userDetails = useSelector(state => state?.userDetails?.userDetails);
+    const toast = useToast();
+
     const items = useSelector(state => state.createItemForAddEmail.items);
     const itemsForPhoneNumber = useSelector(state => state.createItemForAddPhone.items);
     const itemsForWebAddress = useSelector(state => state.createItemForWebAddress.items);
@@ -74,6 +78,7 @@ const CreateParties = ({ navigation }) => {
                         //individual===========================>
                         // party  ============>
                         party: "",
+                        partyObj: {},
                         isPartyOpen: false,
                         // ============>
                         prefix: "",
@@ -97,7 +102,7 @@ const CreateParties = ({ navigation }) => {
                         companyNumber: "",
 
                         //
-                        documentFile: '',
+                        documentFile: [],
 
                         //loader
                         loader: false
@@ -106,6 +111,157 @@ const CreateParties = ({ navigation }) => {
                 // validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
                     console.log(values, "values==>");
+                    const token = await AsyncStorage.getItem('access_token')
+                    const formData = new FormData();
+                    const mappedItemForEmailAdd = items.map((i, index) => ({
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: null,
+                        updatedBy: null,
+                        revision: null,
+                        partyEmailAddressId: null,
+                        email: i?.email,
+                        type: i?.emailType,
+                        primary: i?.isEmailPrimary,
+                        partyId: null
+                    }))
+
+                    const mappedItemForClientPhone = itemsForPhoneNumber.map((i, index) => ({
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: null,
+                        updatedBy: null,
+                        revision: null,
+                        partyPhoneNumberId: null,
+                        phoneNo: i?.phoneNumber,
+                        type: i?.phoneNumberType,
+                        primary: i?.isPhoneNumberPrimary,
+                        partyId: null
+                    }))
+
+                    const mappedItemForWebAddress = itemsForWebAddress.map((i, index) => ({
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: null,
+                        updatedBy: null,
+                        revision: null,
+                        partyWebAddressId: null,
+                        webAddress: i?.webAddress,
+                        type: i?.webAddressType,
+                        primary: i?.isWebAddressPrimary,
+                        partyId: null
+                    }))
+
+                    const mappedItemForAddress = itemsForAddAddress.map((i, index) => ({
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: null,
+                        updatedBy: null,
+                        revision: null,
+                        partyAddressId: null,
+                        street: i?.streetAddress,
+                        city: i?.city,
+                        state: i?.stateAddress,
+                        postCode: i?.postCode,
+                        country: i?.country,
+                        type: i?.type,
+                        primary: i?.isAddressPrimary,
+                        partyId: null
+                    }))
+                    const payloadForSupplier = {
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: userDetails.userId,
+                        updatedBy: null,
+                        revision: null,
+                        partyId: 0,
+                        partyTypeId: String(values?.partyObj?.partyTypeId),
+                        prefix: values?.prefix,
+                        companyName: values?.companyName,
+                        companyNumber: values?.companyNumber,
+                        firstName: values.firstName,
+                        middleName: values.middleName,
+                        lastName: values.lastName,
+                        company: null,
+                        title: values.title,
+                        dob: values.selectedDateOfBirth,
+                        status: "Active",
+                        type: values?.isYourType || "Individual",
+                        photo: null,
+                        partyEmailAddressDTOList: mappedItemForEmailAdd || [],
+                        partyPhoneNumberDTOList: mappedItemForClientPhone || [],
+                        partyWebAddresseDTOList: mappedItemForWebAddress || [],
+                        partyAddresseDTOList: mappedItemForAddress || [],
+                    }
+
+                    const payload = {
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: userDetails.userId,
+                        updatedBy: null,
+                        revision: null,
+                        partyId: 0,
+                        partyTypeId: String(values?.partyObj?.partyTypeId),
+                        prefix: values?.prefix,
+                        companyName: null,
+                        companyNumber: null,
+                        firstName: values.firstName,
+                        middleName: values.middleName,
+                        lastName: values.lastName,
+                        company: values?.companyName,
+                        title: values.title,
+                        dob: values.selectedDateOfBirth,
+                        status: "Active",
+                        type: values?.isYourType || "Individual",
+                        photo: null,
+                        partyEmailAddressDTOList: mappedItemForEmailAdd || [],
+                        partyPhoneNumberDTOList: mappedItemForClientPhone || [],
+                        partyWebAddresseDTOList: mappedItemForWebAddress || [],
+                        partyAddresseDTOList: mappedItemForAddress || [],
+                    }
+                    formData.append('data', JSON.stringify(values?.isYourType === "Supplier" ? payloadForSupplier : payload));
+
+                    console.log(values?.documentFile, "values?.documentFile");
+
+                    if (values?.documentFile[0]?.uri) {
+                        formData.append('photo', {
+                            uri: values?.documentFile[0].uri, // local file uri
+                            type: values?.documentFile[0].type, // e.g., image/jpeg
+                            name: values?.documentFile[0].name,
+                        });
+                    }
+                    console.log(payload, "payload", formData, "formdata");
+
+                    setFieldValue('loader', true);
+                    try {
+                        const response = await fetch(`${API_URL}/ic/party/v1/create/`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                            },
+                            body: formData,
+                        });
+
+                        const result = await response.json();
+                        if (result?.data) {
+                            toast.show('Log created successfully', { type: 'success' })
+                            navigation.goBack()
+                        }
+                        else {
+                            setFieldValue('loader', false);
+                            toast.show('Something went wrong', { type: 'danger' })
+
+                        }
+
+                        console.log('Log:', result);
+                    } catch (error) {
+                        setFieldValue('loader', false);
+
+                        console.error('Upload Error:', error);
+                    }
+                    setFieldValue('loader', false);
+
+
 
 
                 }}
@@ -137,7 +293,9 @@ const CreateParties = ({ navigation }) => {
                                                         const [pickResult] = await pick();
 
                                                         if (pickResult) {
-                                                            setFieldValue('documentFile', [...(values?.documentFile || []), pickResult]);
+                                                            // setFieldValue('documentFile', [...(values?.documentFile || []), pickResult]);
+                                                            setFieldValue('documentFile', [pickResult]);
+
                                                         }
                                                     } catch (err) {
                                                         console.log(err);
@@ -154,7 +312,7 @@ const CreateParties = ({ navigation }) => {
                                                     borderRadius: 30,
                                                 }}
                                             >
-                                                <AntDesign name="camera" size={20} color={COLORS?.PRIMARY_COLOR} />
+                                                {values?.documentFile?.length > 0 ? <Image source={{ uri: values?.documentFile?.[0]?.uri }} style={{ height: 30, width: 30, resizeMode: "cover" }} /> : <AntDesign name="camera" size={20} color={COLORS?.PRIMARY_COLOR} />}
 
                                             </TouchableOpacity>
 
@@ -195,6 +353,7 @@ const CreateParties = ({ navigation }) => {
                                         isButton={true}
                                         buttonText={values.party ? values.party : 'Select party'}
                                     />
+
                                     {values?.isYourType !== "Individual" &&
                                         <>
                                             <TextInputWithTitle
@@ -221,6 +380,14 @@ const CreateParties = ({ navigation }) => {
                                         isButton={true}
                                         buttonText={values.prefix ? values.prefix : 'Select Prefix'}
                                     />
+                                    {values?.isYourType === "Individual" && <TextInputWithTitle
+                                        placeholder={"Company"}
+
+                                        value={values.companyName}
+                                        onChangeText={(txt) => setFieldValue('companyName', txt)}
+                                        title="Company"
+
+                                    />}
                                     <TextInputWithTitle
                                         placeholder={"First Name"}
                                         value={values.firstName}
@@ -322,6 +489,7 @@ const CreateParties = ({ navigation }) => {
                                         renderItem={({ item }) => (
                                             <TouchableOpacity
                                                 onPress={() => {
+                                                    setFieldValue('partyObj', item || {});
                                                     setFieldValue('party', item?.name || '');
                                                     setFieldValue('isPartyOpen', false);
                                                 }}

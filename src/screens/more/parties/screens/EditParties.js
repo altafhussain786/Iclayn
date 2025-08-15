@@ -1,4 +1,4 @@
-import { Alert, AppState, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, AppState, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import Octicons from 'react-native-vector-icons/Octicons'
@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useToast } from 'react-native-toast-notifications'
 import { pick } from '@react-native-documents/picker'
 import { calculatefontSize } from '../../../../helper/responsiveHelper'
-import { COLORS, prefixList } from '../../../../constants'
+import { API_URL, COLORS, prefixList } from '../../../../constants'
 import ScreenHeader from '../../../../components/ScreenHeader'
 import TextInputWithTitle from '../../../../components/TextInputWithTitle'
 import Wrapper from '../../../../components/Wrapper'
@@ -31,10 +31,14 @@ import { addAddress, resetAddresses } from '../../../../store/slices/clientSlice
 import AddContactPerson from '../../../clients/components/AddContactPerson'
 import { addContactPerson, resetContactPersons } from '../../../../store/slices/clientSlice/createItemForContactPerson'
 import httpRequest from '../../../../api/apiHandler'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
 const EditParties = ({ navigation, route }) => {
     const dispatch = useDispatch();
+    const toast = useToast();
+    const userDetails = useSelector(state => state?.userDetails?.userDetails);
+
     const partiesDetails = route?.params?.partiesDetails;
     const items = useSelector(state => state.createItemForAddEmail.items);
     const itemsForPhoneNumber = useSelector(state => state.createItemForAddPhone.items);
@@ -132,6 +136,11 @@ const EditParties = ({ navigation, route }) => {
     const validationSchema = Yup.object().shape({
     })
 
+    console.log(partiesDetails, "partiesDetails");
+
+
+
+
     return (
         <>
             <Formik
@@ -143,6 +152,7 @@ const EditParties = ({ navigation, route }) => {
                         //individual===========================>
                         // party  ============>
                         party: partyTypeData?.find(item => item.partyTypeId === partiesDetails?.partyTypeId)?.name || "",
+                        partyObj: partyTypeData?.find(item => item.partyTypeId === partiesDetails?.partyTypeId) || {},
                         isPartyOpen: false,
                         // ============>
                         prefix: partiesDetails?.prefix || "",
@@ -167,7 +177,12 @@ const EditParties = ({ navigation, route }) => {
                         companyNumber: partiesDetails?.companyNumber || "",
 
                         //
-                        documentFile: '',
+                        // attachmentWaliFile 
+                        defaultFiles: partiesDetails?.photo || null,
+                        //
+                        documentFile: {},
+                        //common file
+                        commonDocumentFile: partiesDetails?.photo || null,
 
                         //loader
                         loader: false
@@ -175,8 +190,162 @@ const EditParties = ({ navigation, route }) => {
                 }
                 // validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
-                    console.log(values, "values==>");
+                    console.log(values?.partyObj, "items==>");
+                    const token = await AsyncStorage.getItem('access_token')
+                    const formData = new FormData();
+                    const mappedItemForEmailAdd = items.map((i, index) => ({
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: null,
+                        updatedBy: null,
+                        revision: null,
+                        partyEmailAddressId: i?.emailObj?.partyEmailAddressId,
+                        email: i?.email,
+                        type: i?.emailType,
+                        primary: i?.isEmailPrimary,
+                        partyId: i?.emailObj?.partyEmailAddressId,
+                    }))
 
+                    const mappedItemForClientPhone = itemsForPhoneNumber.map((i, index) => ({
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: null,
+                        updatedBy: null,
+                        revision: null,
+                        partyPhoneNumberId: i?.phoneNumberObj?.partyPhoneNumberId,
+                        phoneNo: i?.phoneNumber,
+                        type: i?.phoneNumberType,
+                        primary: i?.isPhoneNumberPrimary,
+                        partyId: i?.phoneNumberObj?.partyId,
+                    }))
+
+                    const mappedItemForWebAddress = itemsForWebAddress.map((i, index) => ({
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: null,
+                        updatedBy: null,
+                        revision: null,
+                        partyWebAddressId: i?.webAddressObj?.partyWebAddressId,
+                        webAddress: i?.webAddress,
+                        type: i?.webAddressType,
+                        primary: i?.isWebAddressPrimary,
+                        partyId: i?.webAddressObj?.partyId
+                    }))
+
+                    const mappedItemForAddress = itemsForAddAddress.map((i, index) => ({
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: null,
+                        updatedBy: userDetails.userId,
+                        revision: null,
+                        partyAddressId: i?.addressObj?.partyAddressId,
+                        street: i?.streetAddress,
+                        city: i?.city,
+                        state: i?.stateAddress,
+                        postCode: i?.postCode,
+                        country: i?.country,
+                        type: i?.type,
+                        primary: i?.isAddressPrimary,
+                        partyId: i?.addressObj?.partyId
+                    }))
+                    const payloadForSupplier = {
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: userDetails.userId,
+                        updatedBy: userDetails.userId,
+                        revision: null,
+                        partyId: partiesDetails?.partyId || 0,
+                        partyTypeId: String(values?.partyObj?.partyTypeId),
+                        prefix: values?.prefix,
+                        companyName: values?.companyName,
+                        companyNumber: values?.companyNumber,
+                        firstName: values.firstName,
+                        middleName: values.middleName,
+                        lastName: values.lastName,
+                        company: null,
+                        title: values.title,
+                        dob: values.selectedDateOfBirth,
+                        status: "Active",
+                        type: values?.isYourType || "Individual",
+                        photo: null,
+                        partyEmailAddressDTOList: mappedItemForEmailAdd || [],
+                        partyPhoneNumberDTOList: mappedItemForClientPhone || [],
+                        partyWebAddresseDTOList: mappedItemForWebAddress || [],
+                        partyAddresseDTOList: mappedItemForAddress || [],
+                    }
+
+                    const payload = {
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: userDetails.userId,
+                        updatedBy: userDetails.userId,
+                        revision: null,
+                        partyId: partiesDetails?.partyId || 0,
+                        partyTypeId: String(values?.partyObj?.partyTypeId),
+                        prefix: values?.prefix,
+                        companyName: null,
+                        companyNumber: null,
+                        firstName: values.firstName,
+                        middleName: values.middleName,
+                        lastName: values.lastName,
+                        company: values?.companyName,
+                        title: values.title,
+                        dob: values.selectedDateOfBirth,
+                        status: "Active",
+                        type: values?.isYourType || "Individual",
+                        photo: null,
+                        partyEmailAddressDTOList: mappedItemForEmailAdd || [],
+                        partyPhoneNumberDTOList: mappedItemForClientPhone || [],
+                        partyWebAddresseDTOList: mappedItemForWebAddress || [],
+                        partyAddresseDTOList: mappedItemForAddress || [],
+                    }
+                    formData.append('data', JSON.stringify(values?.isYourType === "Supplier" ? payloadForSupplier : payload));
+                    console.log(payload, "payload", formData);
+
+                    console.log(values?.documentFile, "values?.documentFile");
+
+                    if (values?.documentFile?.uri) {
+                        formData.append('photo', {
+                            uri: values?.documentFile?.uri, // local file uri
+                            type: values?.documentFile?.type, // e.g., image/jpeg
+                            name: values?.documentFile?.name,
+                        });
+                    }
+                    console.log(payload, "payload", formData, "formdata");
+                    setFieldValue('loader', true);
+                    try {
+                        const response = await fetch(`${API_URL}/ic/party/v1/update/`, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                            },
+                            body: formData,
+                        });
+
+                        const result = await response.json();
+                        if (result?.data) {
+                            toast.show('Log created successfully', { type: 'success' })
+                            dispatch(resetEmails())
+                            dispatch(resetPhoneNumbers())
+                            dispatch(resetWebAddresses())
+                            dispatch(resetAddresses())
+                            dispatch(resetContactPersons())
+                            navigation.goBack()
+                            navigation.goBack()
+                        }
+                        else {
+                            setFieldValue('loader', false);
+                            toast.show('Something went wrong', { type: 'danger' })
+
+                        }
+
+                        console.log('Log:', result);
+                    } catch (error) {
+                        setFieldValue('loader', false);
+
+                        console.error('Upload Error:', error);
+                    }
+                    setFieldValue('loader', false);
 
                 }}
             >
@@ -208,32 +377,65 @@ const EditParties = ({ navigation, route }) => {
                                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginVertical: 10 }}>
                                         <MyText style={{ width: "70%" }}>Is the party an individual or a supplier ?</MyText>
                                         <View style={{ alignItems: "center", gap: 10 }}>
-                                            <TouchableOpacity
-                                                onPress={async () => {
-                                                    try {
-                                                        const [pickResult] = await pick();
+                                            {values?.commonDocumentFile ?
+                                                <TouchableOpacity
+                                                    onPress={async () => {
+                                                        try {
+                                                            const [pickResult] = await pick();
 
-                                                        if (pickResult) {
-                                                            setFieldValue('documentFile', [...(values?.documentFile || []), pickResult]);
+                                                            if (pickResult) {
+                                                                setFieldValue('documentFile', pickResult);
+                                                                setFieldValue('commonDocumentFile', pickResult);
+                                                                setFieldValue('defaultFiles', null);
+
+                                                            }
+                                                        } catch (err) {
+                                                            console.log(err);
                                                         }
-                                                    } catch (err) {
-                                                        console.log(err);
-                                                    }
-                                                }}
-                                                style={{
-                                                    flexDirection: "row",
-                                                    alignItems: "center",
-                                                    backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
-                                                    gap: 10,
-                                                    borderStyle: "dashed",
-                                                    borderWidth: 1,
-                                                    padding: 10,
-                                                    borderRadius: 30,
-                                                }}
-                                            >
-                                                <AntDesign name="camera" size={20} color={COLORS?.PRIMARY_COLOR} />
+                                                    }}
+                                                    style={{
+                                                        flexDirection: "row",
+                                                        alignItems: "center",
+                                                        backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
+                                                        gap: 10,
+                                                        borderStyle: "dashed",
+                                                        borderWidth: 1,
+                                                        padding: 10,
+                                                        borderRadius: 30,
+                                                    }}
+                                                >
+                                                    <Image source={{ uri: (values?.commonDocumentFile === partiesDetails?.photo ? `data:image/jpeg;base64,${values?.commonDocumentFile}` : values?.documentFile?.uri) }} style={{ height: 40, width: 40, borderRadius: 50, }} />
+                                                    {/* <Image source={{ uri: (values?.commonDocumentFile === defaultData?.photo ? `data:image/jpeg;base64,${values?.commonDocumentFile}` : `data:image/jpeg;base64,${values?.commonDocumentFile}`) }} style={{ height: 40, width: 40, borderRadius: 50, }} /> */}
+                                                </TouchableOpacity>
+                                                : <TouchableOpacity
+                                                    onPress={async () => {
+                                                        try {
+                                                            const [pickResult] = await pick();
 
-                                            </TouchableOpacity>
+                                                            if (pickResult) {
+                                                                setFieldValue('documentFile', pickResult);
+                                                                setFieldValue('commonDocumentFile', pickResult);
+                                                                setFieldValue('defaultFiles', null);
+
+                                                            }
+                                                        } catch (err) {
+                                                            console.log(err);
+                                                        }
+                                                    }}
+                                                    style={{
+                                                        flexDirection: "row",
+                                                        alignItems: "center",
+                                                        backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
+                                                        gap: 10,
+                                                        borderStyle: "dashed",
+                                                        borderWidth: 1,
+                                                        padding: 10,
+                                                        borderRadius: 30,
+                                                    }}
+                                                >
+                                                    <AntDesign name="camera" size={20} color={COLORS?.PRIMARY_COLOR} />
+                                                </TouchableOpacity>
+                                            }
 
                                             <MyText style={{ flex: 1, fontSize: calculatefontSize(1.4) }}>
                                                 Upload photo
@@ -246,7 +448,7 @@ const EditParties = ({ navigation, route }) => {
                                                 const isSelected = values.isYourType === item;
                                                 return (
                                                     <>
-                                                        <TouchableOpacity style={{ width: "45%", }} onPress={() => setFieldValue('isYourType', item)}>
+                                                        <TouchableOpacity disabled={partyTypeData?.type !== item} style={{ width: "45%", }} onPress={() => setFieldValue('isYourType', item)}>
                                                             <LinearGradient
                                                                 colors={isSelected ? [COLORS?.PRIMARY_COLOR_LIGHT, COLORS?.PRIMARY_COLOR,] : [COLORS?.LIGHT_COLOR, COLORS?.BORDER_LIGHT_COLOR,]}
                                                                 start={{ x: 0, y: 0 }}
@@ -399,6 +601,7 @@ const EditParties = ({ navigation, route }) => {
                                         renderItem={({ item }) => (
                                             <TouchableOpacity
                                                 onPress={() => {
+                                                    setFieldValue('partyObj', item || {});
                                                     setFieldValue('party', item?.name || '');
                                                     setFieldValue('isPartyOpen', false);
                                                 }}

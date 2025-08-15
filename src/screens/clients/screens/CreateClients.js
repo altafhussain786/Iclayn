@@ -184,7 +184,7 @@ const CreateClients = ({ navigation }) => {
                     //     type: 'application/json',
                     //     name: 'data.json',
                     // });
-                    if (values?.documentFile?.uri) {
+                    if (values?.documentFile[0]?.uri) {
                         formData.append('photo', {
                             uri: values?.documentFile[0].uri, // local file uri
                             type: values?.documentFile[0].type, // e.g., image/jpeg
