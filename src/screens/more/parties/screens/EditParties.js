@@ -331,7 +331,7 @@ const EditParties = ({ navigation, route }) => {
                             dispatch(resetAddresses())
                             dispatch(resetContactPersons())
                             navigation.goBack()
-                            navigation.goBack()
+
                         }
                         else {
                             setFieldValue('loader', false);
