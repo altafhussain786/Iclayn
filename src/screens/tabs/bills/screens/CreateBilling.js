@@ -52,7 +52,7 @@ const CreateBilling = ({ navigation }) => {
             navigation: navigation
         })
         if (res) {
-            console.log(res, "Matter DATA =======================================>");
+
             setmatterData(res?.data);
         }
         else {
@@ -69,20 +69,23 @@ const CreateBilling = ({ navigation }) => {
         })
         if (res) {
 
-            console.log(res, "GET TO CLEINT =======================================>");
+
             setToClientData(res?.data);
             setToClientLoader(false)
         }
         else {
             setToClientLoader(false)
 
-            console.log(err, "GET CUSTOMER RESPONSE===>err");
+            console.log(err, "GET CUSTOMER RESPONSE===>err CLIENT");
 
         }
     }
 
     useEffect(() => {
-        getToClientData()
+        if (clientId !== "") {
+
+            getToClientData()
+        }
     }, [clientId])
 
 
@@ -180,12 +183,13 @@ const CreateBilling = ({ navigation }) => {
                 }
                 // validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
+                    console.log(items, "items");
 
                     const mappedData = expenseEntryItem?.map((d, i) => {
                         return {
                             createdOn: "",
                             updatedOn: null,
-                            createdBy: null,
+                            createdBy: userDetails?.userId || null,
                             updatedBy: null,
                             revision: null,
                             matterBillExpenseId: null,
@@ -196,6 +200,29 @@ const CreateBilling = ({ navigation }) => {
                             rate: d?.hourlyRate || "0",
                             taxRate: 0,
                             quantity: 1,
+                            taxId: d?.taxObj?.taxId || 1,
+                            taxPer: Number(d?.taxAmount),
+                            taxAmount: (Number(d?.hourlyRate) / 100) * Number(d?.taxAmount) || 0,
+                            totalAmount: Number(d?.hourlyRate) || 0,
+                            nonBillable: false,
+                            visibleBill: false
+                        }
+                    })
+                    const mappedMatterBillingDTOList = items?.map((d, i) => {
+                        return {
+                            createdOn: "",
+                            updatedOn: null,
+                            createdBy: null,
+                            updatedBy: null,
+                            revision: null,
+                            matterBillTimeId: null,
+                            matterTimeEntryId: null,
+                            billDate: "2025-08-16T08:07:44.164Z",
+                            userId: d?.userObj?.userId || 0,
+                            description: d?.description || '',
+                            duration: d?.duration,
+                            hourlyRate: d?.hourlyRate,
+                            rate: 0,
                             taxId: d?.taxObj?.taxId || 1,
                             taxPer: Number(d?.taxAmount),
                             taxAmount: (Number(d?.hourlyRate) / 100) * Number(d?.taxAmount) || 0,
@@ -220,15 +247,13 @@ const CreateBilling = ({ navigation }) => {
                         taxTotal: totalTax || 0,
                         netTotal: netTotal || 0,
                         paidTotal: 0,
-                        // invoiceDate: values?.selectedinvDate || "",
-                        // dueDate: values?.selecteddueDate || "",
                         status: "UNPAID",
-                        matterBillingDTOList: [],
+                        matterBillingDTOList: mappedMatterBillingDTOList || [],
                         matterBillExpenseDTOList: mappedData || [],
                         clientIds: toClientData?.map(item => item?.clientId).join(",") || "",
                     }
 
-                    console.log(payload, "PAYLOAD ", expenseEntryItem);
+                    console.log(payload, "PAYLOADd ", expenseEntryItem);
                     const { res, err } = await httpRequest({
                         method: `post`,
                         path: `/ic/matter/bill/`,

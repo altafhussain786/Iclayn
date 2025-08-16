@@ -74,7 +74,7 @@ const CreateReceiveAdvance = ({ navigation }) => {
             setClientData(res?.data);
         }
         else {
-            console.log(err, "GET CUSTOMER RESPONSE===>err");
+            console.log(err, "GET CUSTOMER RESPONSE===>err CLIENT");
         }
     }
 
