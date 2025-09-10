@@ -20,8 +20,16 @@ import FloatingButton from '../../../components/FloatingButton';
 import TimekeeperModal from '../../../components/TimekeeperModal';
 
 const TOP_TABS = ['Funds', 'Receive Advance', 'Transfer Advance'];
-const SUB_TABS = ['All', 'Pending', 'Partial Received', 'Received', 'Cancelled'];
+// const SUB_TABS = ['All', 'Pending', 'Partial Received', 'Received', 'Cancelled'];
 
+const SUB_TABS = [
+    { id: 1, name: 'All', value: 'ALL' },
+    { id: 2, name: 'Pending', value: 'PENDING' },
+    { id: 3, name: 'Received', value: 'RECEIVED' },
+    { id: 4, name: 'Partially Received', value: 'PARTIAL_RECEIVED' },
+    { id: 4, name: 'Partially Released', value: 'PARTIAL_RELEASED' },
+    { id: 4, name: 'Cancelled', value: 'CANCELLED' }
+];
 const TransactionsScreen = ({ navigation }) => {
     const [topTab, setTopTab] = useState('Funds');
     const [subTab, setSubTab] = useState('All');
@@ -209,22 +217,22 @@ const TransactionsScreen = ({ navigation }) => {
                         {SUB_TABS?.map((item) => (
 
                             <TouchableOpacity
-                                key={item}
+                                key={item?.id}
                                 style={[
                                     styles.tab,
                                     {
                                         paddingVertical: 5,
                                         borderRadius: 5,
                                         paddingHorizontal: 30,
-                                        borderColor: subTab === item ? COLORS.PRIMARY_COLOR_LIGHT : "transparent",
+                                        borderColor: subTab === item?.value ? COLORS.PRIMARY_COLOR_LIGHT : "transparent",
                                         backgroundColor:
-                                            subTab === item ? COLORS.PRIMARY_COLOR : COLORS.whiteColors,
+                                            subTab === item?.value ? COLORS.PRIMARY_COLOR : COLORS.whiteColors,
                                     },
                                 ]}
-                                onPress={() => setSubTab(item)}
+                                onPress={() => setSubTab(item?.value)}
                             >
 
-                                <MyText style={{ color: subTab === item ? COLORS?.whiteColors : COLORS?.PRIMARY_COLOR, fontSize: calculatefontSize(2) }}>{item}</MyText>
+                                <MyText style={{ color: subTab === item ? COLORS?.whiteColors : COLORS?.PRIMARY_COLOR, fontSize: calculatefontSize(2) }}>{item?.name}</MyText>
                             </TouchableOpacity>
                         ))}
                     </ScrollView>
@@ -262,7 +270,7 @@ const TransactionsScreen = ({ navigation }) => {
 
                 <>
                     <FlatList
-                        data={data}
+                        data={filteredData}
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={renderItem}
                         contentContainerStyle={{ paddingBottom: 100, backgroundColor: COLORS?.whiteColors, flex: 1 }}

@@ -4,7 +4,7 @@ import ScreenHeader from '../../../components/ScreenHeader';
 import Wrapper from '../../../components/Wrapper';
 import WelcomeContainer from './components/WelcomeContainer';
 import MyText from '../../../components/MyText';
-import { COLORS, IconUri } from '../../../constants';
+import { COLORS, fontFamily, IconUri } from '../../../constants';
 import { calculatefontSize, getResponsiveHeight } from '../../../helper/responsiveHelper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -94,11 +94,20 @@ const Home = ({ navigation }) => {
     }
   }, [tabs])
   useEffect(() => {
+    // if (searchTask.trim() === '') {
+    //   setFilterTaskData(data);
+    // } else {
+    //   const filtered = data.filter(item =>
+    //     item.matterName?.toLowerCase().includes(searchTask.toLowerCase() || item.name?.toLowerCase().includes(searchTask.toLowerCase()))
+    //   );
+    //   setFilterTaskData(filtered);
+    // }
     if (searchTask.trim() === '') {
       setFilterTaskData(data);
     } else {
       const filtered = data.filter(item =>
-        item.matterName?.toLowerCase().includes(searchTask.toLowerCase())
+        item.matterName?.toLowerCase().includes(searchTask.toLowerCase()) ||
+        item.name?.toLowerCase().includes(searchTask.toLowerCase())
       );
       setFilterTaskData(filtered);
     }
@@ -183,13 +192,13 @@ const Home = ({ navigation }) => {
                 borderBottomWidth: tabs === item ? 3 : 0,
                 borderColor: tabs === item ? COLORS.PRIMARY_COLOR : "transparent",
                 backgroundColor:
-                  tabs === item ? COLORS.PRIMARY_COLOR : COLORS.PRIMARY_COLOR,
+                  tabs === item ? COLORS.yellow : COLORS.PRIMARY_COLOR,
               },
             ]}
             onPress={() => setTabs(item)}
           >
-            {tabs === item && <Image source={IconUri?.checkmark} style={{ height: 20, width: 20, resizeMode: "contain", right: 10 }} />}
-            <MyText style={{ color: tabs === item ? COLORS?.whiteColors : COLORS?.whiteColors, fontSize: calculatefontSize(2), fontWeight: '600', }}>{item}</MyText>
+            {/* {tabs === item && <Image source={IconUri?.checkmark} style={{ height: 20, width: 20, resizeMode: "contain", right: 10 }} />} */}
+            <MyText style={{ color: tabs === item ? COLORS?.BLACK_COLOR : COLORS?.whiteColors, fontSize: calculatefontSize(2), fontWeight: '600', }}>{item}</MyText>
           </TouchableOpacity>
         ))}
       </LinearGradient>
@@ -208,8 +217,8 @@ const Home = ({ navigation }) => {
             </MyText>
             <TouchableOpacity onPress={() => setShowMonthPicker(true)}>
               <Image
-                source={IconUri?.CalenderSearch}
-                style={{ height: 35, width: 35, resizeMode: "contain" }}
+                source={IconUri?.Calender}
+                style={{ height: 25, width: 25, resizeMode: 'contain', }}
               />
             </TouchableOpacity>
           </View>
@@ -279,8 +288,8 @@ const Home = ({ navigation }) => {
             :
             <>
               <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 10 }}>
-                <Image source={IconUri?.Calender} style={{ height: 30, width: 30, resizeMode: "contain" }} />
-                <MyText style={{ fontSize: calculatefontSize(1.5), color: COLORS.PRIMARY_COLOR }}>No Data Found</MyText>
+                <Image source={IconUri?.Calender} style={{ height: 30, width: 30, resizeMode: "contain", opacity: 0.5 }} />
+                <MyText style={{ fontSize: calculatefontSize(1.5), color: COLORS.PRIMARY_COLOR, opacity: 0.5 }}>No Data Found</MyText>
               </View>
             </>}
         </Wrapper>
@@ -301,8 +310,8 @@ const Home = ({ navigation }) => {
               onChangeText={text => setSearchTask(text)}
             />
             <Image
-              source={IconUri?.CalenderSearch}
-              style={{ height: 25, width: 25, resizeMode: 'contain' }}
+              source={IconUri?.Calender}
+              style={{ height: 25, width: 25, resizeMode: 'contain', bottom: 5 }}
             />
           </View>
 
@@ -313,6 +322,8 @@ const Home = ({ navigation }) => {
             keyExtractor={(item, index) => index.toString()}
             contentContainerStyle={{ paddingBottom: 100 }}
             renderItem={({ item, index }) => {
+              console.log(item, "ITRATION =====================");
+
               return (
                 <View
                   style={{
@@ -326,9 +337,9 @@ const Home = ({ navigation }) => {
                   }}
                 >
                   <View style={{ gap: 5, width: "70%" }}>
-                    <MyText style={styles.timeColor}>Due 01-05-2025</MyText>
+                    <MyText style={styles.timeColor}>Created {moment(item?.createdOn).format('DD-MM-YYYY')}</MyText>
                     <MyText numberOfLines={2}
-                      ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300', }]}>
+                      ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: fontFamily.Bold, }]}>
                       {item?.name}
                     </MyText>
                     <MyText style={styles.timeColor}>{item?.matterName}</MyText>
@@ -349,7 +360,7 @@ const Home = ({ navigation }) => {
                         style={{
                           fontWeight: '600',
                           textAlign: 'center',
-                          color: item?.status === 'COMPLETED' ? COLORS?.whiteColors : '#6c0014',
+                          color: item?.status === 'COMPLETED' ? COLORS?.whiteColors : '#ff5858ff',
                           fontSize: calculatefontSize(1.4),
 
                         }}
@@ -367,8 +378,8 @@ const Home = ({ navigation }) => {
           />
             :
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 10 }}>
-              <Image tintColor={COLORS.PRIMARY_COLOR} source={IconUri?.Tasks} style={{ height: 30, width: 30, resizeMode: "contain" }} />
-              <MyText style={{ fontSize: calculatefontSize(1.5), color: COLORS.PRIMARY_COLOR }}>No Task Found</MyText>
+              <Image tintColor={COLORS.PRIMARY_COLOR} source={IconUri?.Tasks} style={{ height: 30, width: 30, resizeMode: "contain", opacity: 0.5 }} />
+              <MyText style={{ fontSize: calculatefontSize(1.5), color: COLORS.PRIMARY_COLOR, opacity: 0.5 }}>No Task Found</MyText>
             </View>
           }
 

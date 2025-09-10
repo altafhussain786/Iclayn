@@ -79,10 +79,13 @@ const Calender = ({ navigation }) => {
     });
 
     if (res) {
+
       console.log(res, "res=======CALENDER==d=======>", `/ic/event/date-range?fromDate=${selectedDateStr}&toDate=${selectedDateStr}`);
 
       setCalenderData(res?.data);
     } else {
+      console.log(err, "err");
+
       setCalenderData([]);
     }
     setLoader(false);
@@ -174,7 +177,7 @@ const Calender = ({ navigation }) => {
         </View>
         <TouchableOpacity onPress={() => setShowMonthPicker(true)}>
           <Image
-            source={IconUri?.CalenderSearch}
+            source={IconUri?.Calender}
             style={{ height: 35, width: 35, resizeMode: 'contain' }}
           />
         </TouchableOpacity>

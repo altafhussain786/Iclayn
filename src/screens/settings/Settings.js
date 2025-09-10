@@ -65,6 +65,13 @@ const Settings = ({ navigation }) => {
             screen: "Profile",
             onPress: () => navigation.navigate("Profile")
         },
+        {
+            id: 1,
+            title: "Version 1.0.0",
+            icon: IconUri?.version,
+            // screen: "Profile",
+            onPress: () => { }
+        },
         // {
         //     id:2,
         //     title:"Billing",
