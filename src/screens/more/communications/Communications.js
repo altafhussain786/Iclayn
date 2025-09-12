@@ -19,7 +19,9 @@ import { useToast } from 'react-native-toast-notifications';
 
 
 
-const Communications = ({ navigation }) => {
+const Communications = ({ navigation, route }) => {
+    const matterDetails = route?.params?.matterDetails
+
     const toast = useToast();
     const [tabs, setTabs] = React.useState("All");
     const [communicationData, setcommunicationData] = React.useState([]);
@@ -52,7 +54,7 @@ const Communications = ({ navigation }) => {
         setLoader(true)
         const { res, err } = await httpRequest({
             method: 'get',
-            path: `/ic/matter/comm-log`,
+            path: `/ic/matter${matterDetails?.matterId ? `/${matterDetails?.matterId} ` : ''}/comm-log`,
             navigation: navigation,
         })
         console.log(res, "=========================d=============================>");
@@ -161,13 +163,13 @@ const Communications = ({ navigation }) => {
                                 borderBottomWidth: tabs === item ? 3 : 0,
                                 borderColor: tabs === item ? COLORS.PRIMARY_COLOR_LIGHT : "transparent",
                                 backgroundColor:
-                                    tabs === item ? COLORS.PRIMARY_COLOR : COLORS.PRIMARY_COLOR,
+                                    tabs === item ? COLORS.yellow : COLORS.PRIMARY_COLOR,
                             },
                         ]}
                         onPress={() => setTabs(item)}
                     >
-                        {tabs === item && <Image source={IconUri?.checkmark} style={{ height: 20, width: 20, resizeMode: "contain", right: 10 }} />}
-                        <MyText style={{ color: tabs === item ? COLORS?.whiteColors : COLORS?.whiteColors, fontSize: calculatefontSize(2) }}>{item}</MyText>
+                        {/* {tabs === item && <Image source={IconUri?.checkmark} style={{ height: 20, width: 20, resizeMode: "contain", right: 10 }} />} */}
+                        <MyText style={{ color: tabs === item ? COLORS?.BLACK_COLOR : COLORS?.whiteColors, fontSize: calculatefontSize(2) }}>{item}</MyText>
                     </TouchableOpacity>
                 ))}
                 {/* </View> */}

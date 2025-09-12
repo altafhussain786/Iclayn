@@ -27,10 +27,12 @@ const SUB_TABS = [
     { id: 2, name: 'Pending', value: 'PENDING' },
     { id: 3, name: 'Received', value: 'RECEIVED' },
     { id: 4, name: 'Partially Received', value: 'PARTIAL_RECEIVED' },
-    { id: 4, name: 'Partially Released', value: 'PARTIAL_RELEASED' },
-    { id: 4, name: 'Cancelled', value: 'CANCELLED' }
+    { id: 5, name: 'Partially Released', value: 'PARTIAL_RELEASED' },
+    { id: 6, name: 'Cancelled', value: 'CANCELLED' }
 ];
-const TransactionsScreen = ({ navigation }) => {
+const TransactionsScreen = ({ navigation, route }) => {
+    const matterDetails = route?.params?.matterDetails
+
     const [topTab, setTopTab] = useState('Funds');
     const [subTab, setSubTab] = useState('All');
     const [data, setData] = useState([]);
@@ -44,7 +46,7 @@ const TransactionsScreen = ({ navigation }) => {
         setLoader(true)
         const { res, err } = await httpRequest({
             method: 'get',
-            path: topTab === 'Funds' ? `/ic/matter/client-fund/` : topTab == "Receive Advance" ? `/ic/payment/advance` : `/ic/payment/transfer-advance`,
+            path: topTab === 'Funds' ? `/ic/matter/client-fund/${matterDetails?.matterId ? `mat/${matterDetails?.matterId} ` : ''}` : topTab == "Receive Advance" ? `/ic/payment/advance` : `/ic/payment/transfer-advance`,
             navigation
         })
         if (res) {
@@ -226,7 +228,7 @@ const TransactionsScreen = ({ navigation }) => {
                                         paddingHorizontal: 30,
                                         borderColor: subTab === item?.value ? COLORS.PRIMARY_COLOR_LIGHT : "transparent",
                                         backgroundColor:
-                                            subTab === item?.value ? COLORS.PRIMARY_COLOR : COLORS.whiteColors,
+                                            subTab === item?.value ? COLORS.yellow : COLORS.whiteColors,
                                     },
                                 ]}
                                 onPress={() => setSubTab(item?.value)}

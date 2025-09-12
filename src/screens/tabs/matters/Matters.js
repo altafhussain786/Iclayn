@@ -148,14 +148,14 @@ const Matters = ({ navigation }) => {
                                 <>
 
                                     <TouchableOpacity
-                                        key={item}
+                                        key={i?.toString()}
                                         style={[
                                             styles.tab,
 
                                             {
-                                                opacity: tabs === item ? 1 : 0.5,
+                                                // opacity: tabs === item ? 1 : 0.5,
                                                 backgroundColor:
-                                                    COLORS.PRIMARY_COLOR
+                                                    tabs === item ? COLORS.yellow : COLORS.PRIMARY_COLOR
                                             },
                                         ]}
                                         onPress={() => setTabs(item)}
@@ -163,7 +163,7 @@ const Matters = ({ navigation }) => {
                                         <MyText
                                             style={{
 
-                                                color: '#fff',
+                                                color: tabs === item ? COLORS?.BLACK_COLOR : '#fff',
                                                 fontWeight: '600',
                                                 fontSize: calculatefontSize(1.7),
                                             }}
@@ -195,8 +195,8 @@ const Matters = ({ navigation }) => {
                         onChangeText={text => setSearchText(text)}
                     />
                     <Image
-                        source={IconUri?.CalenderSearch}
-                        style={{ height: 30, width: 30, resizeMode: 'contain' }}
+                        source={IconUri?.Calender}
+                        style={{ height: 30, width: 30, resizeMode: 'contain', bottom: 7 }}
                     />
                 </View>
 
@@ -206,6 +206,7 @@ const Matters = ({ navigation }) => {
                         filteredData?.length > 0 ? <FlatList
                             showsVerticalScrollIndicator={false}
                             data={filteredData}
+                            // style={{ borderWidth: 1 }}
                             keyExtractor={(item, index) => index.toString()}
                             contentContainerStyle={{ paddingBottom: 100 }}
 
@@ -215,16 +216,15 @@ const Matters = ({ navigation }) => {
                                         <TouchableOpacity
                                             onPress={() => navigation.navigate('MatterDetails', { matterData: item })}
                                             style={{
-                                                marginHorizontal: 10,
-                                                marginVertical: 6,
+                                                // marginHorizontal: 10,
+                                                marginVertical: 5,
                                                 padding: 15,
+                                                borderColor: COLORS?.BORDER_LIGHT_COLOR,
+
                                                 borderRadius: 10,
                                                 backgroundColor: '#fff',
-                                                elevation: 2,
-                                                shadowColor: '#ccc',
-                                                shadowOffset: { width: 0, height: 1 },
-                                                shadowOpacity: 0.2,
-                                                shadowRadius: 2,
+                                                borderWidth: 1,
+
                                                 flexDirection: 'row',
                                                 justifyContent: 'space-between',
                                                 alignItems: 'center',
@@ -239,7 +239,7 @@ const Matters = ({ navigation }) => {
                                                     numberOfLines={2}
                                                     style={{ fontSize: calculatefontSize(2), color: COLORS.BLACK_COLOR, fontWeight: '500' }}
                                                 >
-                                                    {item?.name}
+                                                    {item?.name ? item?.name.toString() : ''}
                                                 </MyText>
                                                 {!!item?.clientNames && (
                                                     <MyText style={{ color: COLORS.GREY_COLOR, fontSize: calculatefontSize(1.5) }}>

@@ -31,6 +31,7 @@ const More = ({ navigation }) => {
     return (
         <>
             <ScreenHeader
+                onPress={() => { navigation.navigate("Settings") }}
                 isShowTitle={true}
                 title="More"
                 // leftIcon="bells"

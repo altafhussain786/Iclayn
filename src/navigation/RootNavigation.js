@@ -51,6 +51,7 @@ import CreateReceiveAdvance from '../screens/more/transaction/screens/CreateRece
 import CreateTransferAdvance from '../screens/more/transaction/screens/CreateTransferAdvance';
 import Profile from '../screens/profile/Profile';
 import ChangePassword from '../screens/changePassword/ChangePassword';
+import Tasks from '../screens/tabs/tasks/Tasks';
 
 
 
@@ -108,6 +109,9 @@ const RootNavigation = () => {
         <Stack.Screen name="TaskFiles" component={TaskFiles} />
         <Stack.Screen name="CreateExpense" component={CreateExpense} />
         <Stack.Screen name="EditExpense" component={EditExpense} />
+
+        {/* //New only for Stack  */}
+        <Stack.Screen name="Tasks" component={Tasks} />
 
         {/* //more  */}
         <Stack.Screen name="Parties" component={Parties} />

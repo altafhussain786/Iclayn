@@ -25,7 +25,9 @@ import TimekeeperModal from '../../../components/TimekeeperModal';
 import LinearGradient from 'react-native-linear-gradient';
 import { Swipeable } from 'react-native-gesture-handler';
 
-const Bills = ({ navigation }) => {
+const Bills = ({ navigation, route }) => {
+  const matterDetails = route?.params?.matterDetails
+
   const [tabs, setTabs] = React.useState('All');
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -38,7 +40,7 @@ const Bills = ({ navigation }) => {
   const getBills = async () => {
     const { res, err } = await httpRequest({
       method: 'get',
-      path: `/ic/matter/bill/`,
+      path: `/ic/matter/bill/${matterDetails?.matterId ? `mat/${matterDetails?.matterId} ` : ''}`,
       navigation: navigation,
     })
     if (res) {
@@ -241,9 +243,11 @@ const Bills = ({ navigation }) => {
                       styles.tab,
 
                       {
-                        opacity: tabs === item ? 1 : 0.5,
+                        // opacity: tabs === item ? 1 : 0.5,
                         backgroundColor:
-                          COLORS.PRIMARY_COLOR
+                          tabs === item ? COLORS.yellow : COLORS.PRIMARY_COLOR
+                        // backgroundColor:
+                        //   COLORS.PRIMARY_COLOR
                       },
                     ]}
                     onPress={() => setTabs(item)}
@@ -251,7 +255,7 @@ const Bills = ({ navigation }) => {
                     <MyText
                       style={{
 
-                        color: '#fff',
+                        color: tabs === item ? COLORS.BLACK_COLOR : '#fff',
                         fontWeight: '600',
                         fontSize: calculatefontSize(1.7),
                       }}

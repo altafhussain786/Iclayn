@@ -164,7 +164,7 @@ const Calender = ({ navigation }) => {
 
   return (
     <>
-      <ScreenHeader isShowTitle={true} title="Calendar" />
+      <ScreenHeader onPress={() => { navigation.navigate("Settings") }} isShowTitle={true} title="Calendar" />
       <View style={styles.header}>
         <View style={styles.monthContainer}>
           <TouchableOpacity onPress={() => handleSwipe('right')}>

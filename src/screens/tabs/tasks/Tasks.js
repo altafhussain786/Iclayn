@@ -24,7 +24,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import Loader from '../../../components/Loader';
 import { useToast } from 'react-native-toast-notifications';
 
-const Tasks = ({ navigation }) => {
+const Tasks = ({ navigation, route }) => {
+  const matterDetails = route?.params?.matterDetails
   const [tabs, setTabs] = useState('All');
   const [modalVisible, setModalVisible] = useState(false);
   const [loader, setLoader] = useState(false);
@@ -44,7 +45,7 @@ const Tasks = ({ navigation }) => {
     setLoader(true);
     const { res, err } = await httpRequest({
       method: 'get',
-      path: `/ic/matter/task/`,
+      path: `/ic/matter${matterDetails?.matterId ? `/${matterDetails?.matterId} ` : ''}/task/`,
       navigation,
     });
     if (res) {
@@ -253,7 +254,7 @@ const Tasks = ({ navigation }) => {
 
   return (
     <>
-      <ScreenHeader onPress={() => navigation.navigate("Settings")} isShowTitle={true} title="Tasks" />
+      <ScreenHeader isGoBack={matterDetails ? true : false} onPress={() => matterDetails ? navigation.goBack() : navigation.navigate("Settings")} isShowTitle={true} title="Tasks" />
 
       <LinearGradient colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ padding: 10 }}>
         <FlatList
@@ -263,10 +264,17 @@ const Tasks = ({ navigation }) => {
           renderItem={({ item }) => (
             <TouchableOpacity
               key={item}
-              style={[styles.tab, { opacity: tabs === item ? 1 : 0.5, backgroundColor: COLORS.PRIMARY_COLOR }]}
+              style={[styles.tab,
+              {
+                // opacity: tabs === item ? 1 : 0.5,
+                backgroundColor:
+                  tabs === item ? COLORS.yellow : COLORS.PRIMARY_COLOR
+                // backgroundColor: COLORS.PRIMARY_COLOR
+              }
+              ]}
               onPress={() => setTabs(item)}
             >
-              <MyText style={{ color: '#fff', fontWeight: '600', fontSize: calculatefontSize(1.7) }}>{item}</MyText>
+              <MyText style={{ color: tabs === item ? COLORS?.BLACK_COLOR : '#fff', fontWeight: '600', fontSize: calculatefontSize(1.7) }}>{item}</MyText>
             </TouchableOpacity>
           )}
         />
@@ -275,7 +283,7 @@ const Tasks = ({ navigation }) => {
       <Wrapper style={{ padding: 0 }}>
         <View style={[styles.searchRow, { padding: 10 }]}>
           <SearchBar containerStyle={{ width: '90%' }} placeholder="Search a task" value={searchText} onChangeText={text => setSearchText(text)} />
-          <Image source={IconUri?.CalenderSearch} style={{ height: 30, width: 30, resizeMode: 'contain' }} />
+          <Image source={IconUri?.Calender} style={{ height: 30, width: 30, resizeMode: 'contain', bottom: 7 }} />
         </View>
 
         {

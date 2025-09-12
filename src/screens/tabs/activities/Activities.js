@@ -20,7 +20,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import { Swipeable } from 'react-native-gesture-handler';
 import { useToast } from 'react-native-toast-notifications';
 
-const Activities = ({ navigation }) => {
+const Activities = ({ navigation, route }) => {
+  const matterDetails = route?.params?.matterDetails
   const [tabs, setTabs] = React.useState("Time entries");
   const [activityData, setActivityData] = React.useState([]);
   const [filteredData, setFilteredData] = React.useState([]);
@@ -30,12 +31,15 @@ const Activities = ({ navigation }) => {
 
   const toast = useToast();
 
+  console.log(matterDetails, "==========d============>matterDetails");
+
+
   const getActivityData = async () => {
     setLoader(true)
     const { res, err } = await httpRequest({
       method: 'get',
       navigation: navigation,
-      path: tabs === "Time entries" ? `/ic/matter/time-entry/` : `/ic/matter/exp-entry/`
+      path: tabs === "Time entries" ? `/ic/matter/time-entry/${matterDetails?.matterId ? `mat/${matterDetails?.matterId} ` : ''}` : `/ic/matter/exp-entry/`
     })
     if (res) {
       console.log(res, "====>");
@@ -108,7 +112,7 @@ const Activities = ({ navigation }) => {
           {/* Left content */}
           <View style={styles.cardLeft}>
             <MyText style={styles.dateText}>{moment(item?.entryDate).format("DD-MM-YYYY")}</MyText>
-            <MyText style={styles.titleText} numberOfLines={1}>{item?.matterName}</MyText>
+            <MyText style={styles.titleText} numberOfLines={1}>{item?.matterName || item?.module}</MyText>
             <MyText style={styles.entryType}>{entryType}</MyText>
             {!!item?.description && (
               <MyText style={styles.descText} numberOfLines={2}>{item?.description}</MyText>
@@ -213,13 +217,13 @@ const Activities = ({ navigation }) => {
                 borderBottomWidth: tabs === item ? 3 : 0,
                 borderColor: tabs === item ? COLORS.PRIMARY_COLOR_LIGHT : "transparent",
                 backgroundColor:
-                  tabs === item ? COLORS.PRIMARY_COLOR : COLORS.PRIMARY_COLOR,
+                  tabs === item ? COLORS.yellow : COLORS.PRIMARY_COLOR,
               },
             ]}
             onPress={() => setTabs(item)}
           >
-            {tabs === item && <Image source={IconUri?.checkmark} style={{ height: 20, width: 20, resizeMode: "contain", right: 10 }} />}
-            <MyText style={{ color: tabs === item ? COLORS?.whiteColors : COLORS?.whiteColors, fontSize: calculatefontSize(2) }}>{item}</MyText>
+            {/* {tabs === item && <Image source={IconUri?.checkmark} style={{ height: 20, width: 20, resizeMode: "contain", right: 10 }} />} */}
+            <MyText style={{ color: tabs === item ? COLORS?.BLACK_COLOR : COLORS?.whiteColors, fontSize: calculatefontSize(2) }}>{item}</MyText>
           </TouchableOpacity>
         ))}
         {/* </View> */}

@@ -39,6 +39,10 @@ export const COLORS = {
     COMPLETD_TXT: "#007E17",
     PENDING_BG: "#D2F6FF",
     PENDING_TXT: "#3391A4",
+
+    //NEW
+    OPEN_BG: '#EFE4FF',
+    OPEN_TEXT: '#7C4EC9',
 }
 export const RANDOM_COLOR = ["#6aabed", "#49ac96", "#f28195", "#e7b15f", "#8a7fe6"];
 

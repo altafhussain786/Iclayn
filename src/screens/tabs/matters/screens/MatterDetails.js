@@ -91,40 +91,8 @@ const MatterDetails = ({ navigation, route }) => {
             title: 'Activities',
             value: "activities",
             description: "test description",
-            onPress: () => { },
+            onPress: () => { navigation.navigate("Activities", { matterDetails: matterData }) },
             iconUri: IconUri?.Activitie
-        },
-        {
-            id: 2,
-            title: 'Notes',
-            value: "notes",
-            description: "test description",
-            onPress: () => { },
-            iconUri: IconUri?.documents
-        },
-        {
-            id: 3,
-            title: 'Documents',
-            value: "documents",
-            description: "test description",
-            onPress: () => { },
-            iconUri: IconUri?.documents
-        },
-        {
-            id: 4,
-            title: 'Bills',
-            value: "bills",
-            description: "test description",
-            onPress: () => { },
-            iconUri: IconUri?.bill
-        },
-        {
-            id: 5,
-            title: 'Communication logs',
-            value: "communicationLogs",
-            description: "test description",
-            onPress: () => { },
-            iconUri: IconUri?.communication
         },
         {
             id: 6,
@@ -139,9 +107,53 @@ const MatterDetails = ({ navigation, route }) => {
             title: 'Task',
             value: "task',",
             description: "test description",
-            onPress: () => { },
+            onPress: () => { navigation.navigate("Tasks", { matterDetails: matterData }) },
             iconUri: IconUri?.task
-        }
+        },
+        {
+            id: 3,
+            title: 'Documents',
+            value: "documents",
+            description: "test description",
+            onPress: () => { navigation.navigate("Documents", { matterDetails: matterData }) },
+            iconUri: IconUri?.documents
+        },
+
+
+        {
+            id: 2,
+            title: 'Notes',
+            value: "notes",
+            description: "test description",
+            onPress: () => { },
+            iconUri: IconUri?.documents
+        },
+
+        {
+            id: 4,
+            title: 'Bills',
+            value: "bills",
+            description: "test description",
+            onPress: () => { navigation.navigate("Bills", { matterDetails: matterData }) },
+            iconUri: IconUri?.bill
+        },
+        {
+            id: 10,
+            title: 'Transactions',
+            value: "documents",
+            description: "test description",
+            onPress: () => { navigation.navigate("Transaction", { matterDetails: matterData }) },
+            iconUri: IconUri?.documents
+        },
+        {
+            id: 5,
+            title: 'Communication logs',
+            value: "communicationLogs",
+            description: "test description",
+            onPress: () => { navigation.navigate("Communications", { matterDetails: matterData }) },
+            iconUri: IconUri?.communication
+        },
+
     ]
 
     const financialData = [
@@ -219,7 +231,7 @@ const MatterDetails = ({ navigation, route }) => {
     return (
         <>
             <StatusBar backgroundColor={COLORS.PRIMARY_COLOR_LIGHT} barStyle="light-content" />
-            <ScreenHeader  isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="Matters" />
+            <ScreenHeader isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="Matters" />
             <DescriptionContainer isShowLoader={matterLoading} title={matterDetails?.code} description={matterDetails?.description} />
             <Wrapper>
                 <FlatList
@@ -230,7 +242,7 @@ const MatterDetails = ({ navigation, route }) => {
                         return (
                             <>
 
-                                <MyText style={{ marginBottom: 10 ,fontWeight: "bold"}}>Create New</MyText>
+                                <MyText style={{ marginBottom: 10, fontWeight: "bold" }}>Create New</MyText>
                                 <FlatList
                                     horizontal
                                     showsHorizontalScrollIndicator={false}
@@ -246,7 +258,7 @@ const MatterDetails = ({ navigation, route }) => {
                                                         ]}
                                                         onPress={() => setTabs(item?.value)}
                                                     >
-                                                        <Image  source={item?.iconUri} style={{ width: 30, height: 30, resizeMode: "contain" }} />
+                                                        <Image source={item?.iconUri} style={{ width: 30, height: 30, resizeMode: "contain" }} />
                                                     </TouchableOpacity>
                                                     <MyText
                                                         style={styles.tabText}
@@ -269,7 +281,7 @@ const MatterDetails = ({ navigation, route }) => {
                                                 <View style={{ flexDirection: "row", justifyContent: 'space-between', borderBottomWidth: item?.id === 7 ? 0 : 0.5, borderColor: COLORS?.LIGHT_COLOR, alignItems: "center", paddingBottom: 10 }}>
                                                     <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
                                                         <View style={{ backgroundColor: "#A3DAFF", height: 30, width: 30, padding: 15, justifyContent: "center", alignItems: "center", borderRadius: 30 }}>
-                                                            <Image  source={item?.iconUri} style={{ width: 15, height: 15, resizeMode: "contain" }} />
+                                                            <Image source={item?.iconUri} style={{ width: 15, height: 15, resizeMode: "contain" }} />
                                                         </View>
                                                         <View>
 
@@ -277,7 +289,7 @@ const MatterDetails = ({ navigation, route }) => {
                                                             <MyText>{item?.description}</MyText>
                                                         </View>
                                                     </View>
-                                                    <TouchableOpacity>
+                                                    <TouchableOpacity onPress={item?.onPress}>
                                                         <AntDesign name="right" size={15} color={COLORS?.LIGHT_COLOR} />
                                                     </TouchableOpacity>
                                                 </View>
@@ -431,7 +443,7 @@ const MatterDetails = ({ navigation, route }) => {
                                         <MyText style={{ fontWeight: "500", color: COLORS?.PRIMARY_COLOR_LIGHT, }}>Key Dates</MyText>
                                     </View>
                                 </ContentContainer>
-                                <View style={{justifyContent:"center",alignItems:"center",marginVertical:30}}>
+                                <View style={{ justifyContent: "center", alignItems: "center", marginVertical: 30 }}>
                                     <TouchableOpacity onPress={scrollToTopOrBottom} style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
                                         <MyText style={{ color: COLORS?.GREY_COLOR }}>Back to Top </MyText>
                                         <MaterialIcons
@@ -448,7 +460,7 @@ const MatterDetails = ({ navigation, route }) => {
 
                 />
 
-               {/* {isAtBottom && <TouchableOpacity style={styles.fab} onPress={scrollToTopOrBottom}>
+                {/* {isAtBottom && <TouchableOpacity style={styles.fab} onPress={scrollToTopOrBottom}>
                     <MaterialIcons
                         name={isAtBottom ? 'arrow-upward' : 'arrow-downward'}
                         size={24}
@@ -471,8 +483,8 @@ const styles = StyleSheet.create({
         height: 60,
         width: 60,
         // backgroundColor: '#71A24B',
-        borderWidth:1,
-        borderColor:COLORS?.BORDER_LIGHT_COLOR,
+        borderWidth: 1,
+        borderColor: COLORS?.BORDER_LIGHT_COLOR,
         // backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT,
         // paddingHorizontal: 10,
         borderRadius: 10,
