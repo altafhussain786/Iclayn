@@ -52,6 +52,7 @@ import CreateTransferAdvance from '../screens/more/transaction/screens/CreateTra
 import Profile from '../screens/profile/Profile';
 import ChangePassword from '../screens/changePassword/ChangePassword';
 import Tasks from '../screens/tabs/tasks/Tasks';
+import DocumentViewerScreen from '../screens/documentViewrScreen/DocumentViewerScreen';
 
 
 
@@ -132,6 +133,7 @@ const RootNavigation = () => {
         <Stack.Screen name="EditTransaction" component={EditTransaction} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="ChangePassword" component={ChangePassword} />
+        <Stack.Screen name="DocumentViewerScreen" component={DocumentViewerScreen} />
 
 
 

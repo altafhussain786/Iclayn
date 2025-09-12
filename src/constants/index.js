@@ -125,6 +125,7 @@ export const IconUri = {
     report: require('../assets/Icons/report.png'),
     Activitie: require('../assets/Icons/Activitie.png'),
     settings: require('../assets/Icons/settings.png'),
+    imageType: require('../assets/Icons/imageType.png'),
 }
 
 
