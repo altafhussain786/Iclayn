@@ -25,7 +25,9 @@ import httpRequest from '../../../../api/apiHandler'
 
 
 
-const CreatePhoneLog = ({ navigation }) => {
+const CreatePhoneLog = ({ navigation, route }) => {
+    const matterDetails = route?.params?.matterDetails
+
     const dispatch = useDispatch();
     const items = useSelector(state => state.createItemForAddEmail.items);
     const userDetails = useSelector(state => state?.userDetails?.userDetails);
@@ -109,8 +111,8 @@ const CreatePhoneLog = ({ navigation }) => {
 
                         //individual===========================>
                         // matter  ============>
-                        matter: "",
-                        matterObj: {},
+                        matter: matterDetails?.name || '',
+                        matterObj: matterDetails || {},
                         isOpenMatter: false,
                         // ============>
 

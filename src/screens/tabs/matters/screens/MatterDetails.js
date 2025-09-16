@@ -50,39 +50,83 @@ const MatterDetails = ({ navigation, route }) => {
     const tabList = [
         {
             id: 1,
-            value: 'Event',
-            title: 'Event',
-            onPress: () => { },
-            iconUri: IconUri?.Calender
-        },
-        {
-            id: 2,
-            value: 'Time Entry',
             title: 'Time Entry',
-            onPress: () => { },
+            onPress: () => { navigation.navigate("CreateTimeEntry", { matterDetails: matterData }) },
             iconUri: IconUri?.clock
         },
         {
-            id: 3,
-            value: 'Expense',
-            title: 'Expense',
-            onPress: () => { },
-            iconUri: IconUri?.bill
+            id: 9,
+            title: 'New Expense',
+            onPress: () => { navigation.navigate("CreateExpense", { matterDetails: matterData }) },
+            iconUri: IconUri?.Activitie
         },
         {
-            id: 4,
+            id: 2,
+            value: 'Event',
+            title: 'Event',
+            onPress: () => { navigation.navigate("EditEvent", { matterDetails: matterData }) },
+            iconUri: IconUri?.Calender
+        },
+        {
+            id: 3,
             value: 'Task',
             title: 'Task',
-            onPress: () => { },
+            onPress: () => { navigation.navigate("CreateTask", { matterDetails: matterData }) },
             iconUri: IconUri?.task
         },
+
+        {
+            id: 4,
+            title: 'Documents',
+
+            onPress: () => { navigation.navigate("Documents", { matterDetails: matterData }) },
+            iconUri: IconUri?.documents
+        },
+
         {
             id: 5,
             value: 'Note',
             title: 'Note',
-            onPress: () => { },
+            onPress: () => { navigation.navigate("CreateNotes", { matterDetails: matterData }) },
             iconUri: IconUri?.documents
-        }
+        },
+
+        {
+            id: 6,
+            title: 'Bills',
+            onPress: () => { navigation.navigate("CreateBilling", { matterDetails: matterData }) },
+            iconUri: IconUri?.bill
+        },
+
+        {
+            id: 7,
+            title: 'Transactions',
+
+            onPress: () => { navigation.navigate("Transaction", { matterDetails: matterData }) },
+            iconUri: IconUri?.documents
+        },
+
+        {
+            id: 8,
+            title: 'Communication logs',
+
+            onPress: () => { navigation.navigate("Communications", { matterDetails: matterData }) },
+            iconUri: IconUri?.communication
+        },
+        {
+            id: 10,
+            title: 'Phone log',
+            onPress: () => { navigation.navigate("CreatePhoneLog", { matterDetails: matterData }) },
+            iconUri: IconUri?.communication
+        },
+        {
+            id: 11,
+            title: 'Phone log',
+            onPress: () => { navigation.navigate("CreateInternalLogs", { matterDetails: matterData }) },
+            iconUri: IconUri?.communication
+        },
+
+
     ];
     //Matter content Data
     const matterContentData = [
@@ -99,7 +143,7 @@ const MatterDetails = ({ navigation, route }) => {
             title: 'Calender Event',
             value: "calenderEvent",
             description: "test description",
-            onPress: () => { },
+            onPress: () => { navigation.navigate("MatterCalender", { matterDetails: matterData }) },
             iconUri: IconUri?.Calender
         },
         {
@@ -125,7 +169,7 @@ const MatterDetails = ({ navigation, route }) => {
             title: 'Notes',
             value: "notes",
             description: "test description",
-            onPress: () => { },
+            onPress: () => { navigation.navigate("Notes", { matterDetails: matterData }) },
             iconUri: IconUri?.documents
         },
 
@@ -211,6 +255,7 @@ const MatterDetails = ({ navigation, route }) => {
         if (res) {
             // console.log(res, "CLIENT=d===>");
             setMatterLoading(false)
+            console.log(res?.data, "MATTER DETAILSd");
 
             setMatterDetails(res?.data);
 
@@ -256,13 +301,13 @@ const MatterDetails = ({ navigation, route }) => {
                                                         style={[
                                                             styles.tab,
                                                         ]}
-                                                        onPress={() => setTabs(item?.value)}
+                                                        onPress={() => { item?.onPress() }}
                                                     >
                                                         <Image source={item?.iconUri} style={{ width: 30, height: 30, resizeMode: "contain" }} />
                                                     </TouchableOpacity>
                                                     <MyText
-                                                        style={styles.tabText}
-                                                        numberOfLines={1}
+                                                        style={[styles.tabText, { width: 100, textAlign: "center" }]}
+                                                    // numberOfLines={1}
                                                     >
                                                         {item?.title}
                                                     </MyText>
@@ -278,7 +323,8 @@ const MatterDetails = ({ navigation, route }) => {
                                         data={matterContentData}
                                         renderItem={({ item, i }) => (
                                             <>
-                                                <View style={{ flexDirection: "row", justifyContent: 'space-between', borderBottomWidth: item?.id === 7 ? 0 : 0.5, borderColor: COLORS?.LIGHT_COLOR, alignItems: "center", paddingBottom: 10 }}>
+
+                                                <TouchableOpacity onPress={item?.onPress} style={{ flexDirection: "row", justifyContent: 'space-between', borderBottomWidth: item?.id === 7 ? 0 : 0.5, borderColor: COLORS?.LIGHT_COLOR, alignItems: "center", paddingBottom: 10 }}>
                                                     <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
                                                         <View style={{ backgroundColor: "#A3DAFF", height: 30, width: 30, padding: 15, justifyContent: "center", alignItems: "center", borderRadius: 30 }}>
                                                             <Image source={item?.iconUri} style={{ width: 15, height: 15, resizeMode: "contain" }} />
@@ -289,10 +335,10 @@ const MatterDetails = ({ navigation, route }) => {
                                                             <MyText>{item?.description}</MyText>
                                                         </View>
                                                     </View>
-                                                    <TouchableOpacity onPress={item?.onPress}>
+                                                    <View onPress={item?.onPress}>
                                                         <AntDesign name="right" size={15} color={COLORS?.LIGHT_COLOR} />
-                                                    </TouchableOpacity>
-                                                </View>
+                                                    </View>
+                                                </TouchableOpacity>
                                             </>
                                         )}
                                     />

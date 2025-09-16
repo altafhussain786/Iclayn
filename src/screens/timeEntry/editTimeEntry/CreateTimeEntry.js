@@ -20,7 +20,8 @@ import { useSelector } from 'react-redux'
 import { useToast } from 'react-native-toast-notifications'
 const TIMER_KEY = 'TIMEKEEPER_STATE';
 
-const CreateTimeEntry = ({ navigation }) => {
+const CreateTimeEntry = ({ navigation, route }) => {
+    const matterDetails = route?.params?.matterDetails
     const [matterData, setmatterData] = React.useState([]);
     const [firmData, setfirmData] = React.useState([]);
     //TIMMER
@@ -170,9 +171,8 @@ const CreateTimeEntry = ({ navigation }) => {
                 initialValues={
                     {
                         //matter details
-                        matter: '',
-                        matterItems: [],
-                        matterObj: {},
+                        matter: matterDetails?.name || '',
+                        matterObj: matterDetails || {},
                         isOpenmatter: false,
 
                         description: '',
@@ -273,6 +273,8 @@ const CreateTimeEntry = ({ navigation }) => {
                                 showsVerticalScrollIndicator={false}
                             >
                                 <TextInputWithTitle
+
+                                    editable={matterDetails?.matterId ? true : false}
                                     onPressButton={() => setFieldValue('isOpenmatter', true)}
                                     title="Matter"
                                     isButton={true}

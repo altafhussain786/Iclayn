@@ -1,42 +1,33 @@
 import { Alert, AppState, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
-import AntDesign from 'react-native-vector-icons/AntDesign'
-import Octicons from 'react-native-vector-icons/Octicons'
-import Entypo from 'react-native-vector-icons/Entypo'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
+
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import moment from 'moment'
 import DatePicker from 'react-native-date-picker';
-import LinearGradient from 'react-native-linear-gradient'
 import { useDispatch, useSelector } from 'react-redux'
-import { useToast } from 'react-native-toast-notifications'
-import { pick } from '@react-native-documents/picker'
 import { calculatefontSize } from '../../../../helper/responsiveHelper'
-import { API_URL, COLORS, prefixList } from '../../../../constants'
+import { COLORS } from '../../../../constants'
 import ScreenHeader from '../../../../components/ScreenHeader'
 import TextInputWithTitle from '../../../../components/TextInputWithTitle'
 import Wrapper from '../../../../components/Wrapper'
 import MyText from '../../../../components/MyText'
 import BottomModalListWithSearch from '../../../../components/BottomModalListWithSearch'
 import httpRequest from '../../../../api/apiHandler'
-import axios from 'axios'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
 
 
 
-const CreateInternalLogs = ({ navigation, route }) => {
-    const matterDetails = route?.params?.matterDetails
+
+const CreateNotes = ({ navigation }) => {
     const dispatch = useDispatch();
-    const toast = useToast();
     const items = useSelector(state => state.createItemForAddEmail.items);
     const userDetails = useSelector(state => state?.userDetails?.userDetails);
 
 
     const [matterData, setmatterData] = useState([]);
-    const [categoryData, setcategoryData] = useState([]);
+    const [fromData, setfromData] = useState([]);
     const [toData, settoData] = useState([]);
 
     const getmatterData = async () => {
@@ -52,14 +43,14 @@ const CreateInternalLogs = ({ navigation, route }) => {
             console.log(err, "GET CUSTOMER RESPONSE===>err");
         }
     }
-    const getCategoryData = async () => {
+    const getFromData = async () => {
         const { res, err } = await httpRequest({
             method: `get`,
-            path: `/ic/doc-category/?status=Active`,
+            path: `/ic/user/?status=Active`,
             navigation: navigation
         })
         if (res) {
-            setcategoryData(res?.data);
+            setfromData(res?.data);
         }
         else {
             console.log(err, "GET CUSTOMER RESPONSE===>err");
@@ -82,7 +73,7 @@ const CreateInternalLogs = ({ navigation, route }) => {
 
     useEffect(() => {
         getToData();
-        getCategoryData();
+        getFromData();
         getmatterData();
     }, [])
 
@@ -101,16 +92,7 @@ const CreateInternalLogs = ({ navigation, route }) => {
 
         return formatted;
     };
-    const formatWithOffset = (date) => {
-        const pad = n => String(n).padStart(2, '0');
-        const yyyy = date.getFullYear();
-        const MM = pad(date.getMonth() + 1);
-        const dd = pad(date.getDate());
-        const hh = pad(date.getHours());
-        const mm = pad(date.getMinutes());
-        const ss = pad(date.getSeconds());
-        return `${yyyy}-${MM}-${dd}T${hh}:${mm}:${ss}.000+05:00`;
-    };
+
 
     return (
         <>
@@ -122,14 +104,14 @@ const CreateInternalLogs = ({ navigation, route }) => {
 
                         //individual===========================>
                         // matter  ============>
-                        matter: matterDetails?.name || '',
-                        matterObj: matterDetails || {},
+                        matter: "",
+                        matterObj: {},
                         isOpenMatter: false,
                         // ============>
 
-                        category: "",
-                        categoryObj: {},
-                        isOpenCategory: false,
+                        from: "",
+                        fromObj: {},
+                        isOpenFrom: false,
 
                         //to
                         to: "",
@@ -156,12 +138,13 @@ const CreateInternalLogs = ({ navigation, route }) => {
                         //duration
                         recordedTime: '',
 
+
                         // ========================>COMPANY ===>
                         companyName: "",
                         companyNumber: "",
 
-                        //Document
-                        documentFile: [],
+                        //
+                        documentFile: '',
 
                         //loader
                         loader: false
@@ -170,76 +153,40 @@ const CreateInternalLogs = ({ navigation, route }) => {
                 // validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
                     console.log(values, "values=======================>");
-
-                    const token = await AsyncStorage.getItem('access_token')
-                    // console.log(token, "values=======================>");
-                    const formData = new FormData();
-                    const payload = {
-                        createdOn: `2025-08-08T16:12:00+05:00`,
-                        updatedOn: `2025-08-08T16:12:00+05:00`,
-                        // createdOn: formatWithOffset(new Date()),
-                        // updatedOn: formatWithOffset(new Date()),
+                    const payload =
+                    {
+                        createdOn: "",
+                        updatedOn: null,
                         createdBy: userDetails?.userId,
                         updatedBy: null,
                         revision: null,
                         matterComLogId: null,
-                        // logDate: values?.selecteddate,
-                        // logTime: values?.selectedtime,
-                        logDate: "2025-08-08T14:11:21+05:00",
-                        logTime: "2025-08-08T14:11:21+05:00",
+                        logDate: values?.selecteddate,
+                        logTime: values?.selectedtime,
                         fromId: values?.fromObj?.userId,
                         toId: values?.toObj?.clientId,
                         subject: values?.subject,
                         body: values?.body,
                         timer: null,
                         matterId: values?.matterObj?.matterId,
-                        type: "Internal",
+                        type: "Phone",
                         attachmentDTOList: null,
-                        status: "Active",
-                        categoryId: values?.categoryObj?.docCategoryId
-                    };
-                    formData.append('data', {
-                        string: JSON.stringify(payload), // RN ke kuch builds 'string' key chahte
-                        type: 'application/json',
-                        name: 'data.json',
-                    });
-                    if (values?.documentFile?.length > 0) {
-                        formData.append('doc', {
-                            uri: values?.documentFile[0].uri, // local file uri
-                            type: values?.documentFile[0].type, // e.g., image/jpeg
-                            name: values?.documentFile[0].name,
-                        });
+                        status: "Active"
                     }
-                    setFieldValue('loader', true);
-                    try {
-                        const response = await fetch(`${API_URL}/ic/matter/inter-log/v1`, {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': `Bearer ${token}`,
-                            },
-                            body: formData,
-                        });
 
-                        const result = await response.json();
-                        if (result?.data) {
-                            toast.show('Log created successfully', { type: 'success' })
-                            navigation.goBack()
-                        }
-                        else {
-                            setFieldValue('loader', false);
-                            toast.show('Something went wrong', { type: 'danger' })
-
-                        }
-
-                        console.log('Log:', result);
-                    } catch (error) {
-                        setFieldValue('loader', false);
-
-                        console.error('Upload Error:', error);
+                    const { res, err } = await httpRequest({
+                        method: `post`,
+                        path: `/ic/matter/comm-log/`,
+                        params: payload,
+                        navigation: navigation
+                    })
+                    if (res) {
+                        console.log(res, "res data");
+                        navigation.goBack();
                     }
-                    setFieldValue('loader', false);
-
-
+                    else {
+                        console.log("err", err);
+                    }
 
                 }}
             >
@@ -247,7 +194,7 @@ const CreateInternalLogs = ({ navigation, route }) => {
                 {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
 
                     <>
-                        <ScreenHeader isLoading={values?.loader} onPressSave={handleSubmit} isShowSave={true} extraStyle={{ backgroundColor: '#F5F6F8' }} isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="Create Internal logs" />
+                        <ScreenHeader isLoading={values?.loader} onPressSave={handleSubmit} isShowSave={true} extraStyle={{ backgroundColor: '#F5F6F8' }} isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="Create Notes" />
 
                         <KeyboardAvoidingView
                             style={{ flex: 1 }}
@@ -270,6 +217,32 @@ const CreateInternalLogs = ({ navigation, route }) => {
                                         isButton={true}
                                         buttonText={values.matter ? values.matter : 'Select Matter'}
                                     />
+
+                                    <TextInputWithTitle
+                                        onPressButton={() => setFieldValue('isdateOpen', true)}
+                                        title="Date"
+                                        isButton={true}
+                                        buttonText={values.date ? values.date : 'DD/MM/YYYY'}
+                                    />
+                                    <TextInputWithTitle
+                                        onPressButton={() => setFieldValue('isTimeOpen', true)}
+                                        title="Time"
+                                        isButton={true}
+                                        buttonText={values.time ? values.time : 'hh:mm A'}
+                                    />
+
+                                    <TextInputWithTitle
+                                        onPressButton={() => setFieldValue('isOpenFrom', true)}
+                                        title="From"
+                                        isButton={true}
+                                        buttonText={values.from ? values.from : 'Select....'}
+                                    />
+                                    <TextInputWithTitle
+                                        onPressButton={() => setFieldValue('isOpenTo', true)}
+                                        title="To"
+                                        isButton={true}
+                                        buttonText={values.to ? values.to : 'Select....'}
+                                    />
                                     <TextInputWithTitle
                                         placeholder={"Subject"}
                                         value={values.subject}
@@ -284,112 +257,46 @@ const CreateInternalLogs = ({ navigation, route }) => {
                                         title="Body"
 
                                     />
-                                    <TextInputWithTitle
-                                        onPressButton={() => setFieldValue('isdateOpen', true)}
-                                        title="Received date"
-                                        isButton={true}
-                                        buttonText={values.date ? values.date : 'DD/MM/YYYY'}
+                                    {/* <TextInputWithTitle
+                                        placeholder={"00h 00m 00s"}
+                                        value={values.recordedTime}
+                                        onChangeText={(txt) => setFieldValue('recordedTime', txt)}
+                                        title="Recorded time"
+
+                                    /> */}
+                                    <MyText style={styles.label}>Recorded Time</MyText>
+                                    <TextInput
+                                        keyboardType='numeric'
+                                        placeholder="Duration (hh:mm:ss)"
+                                        value={String(values.duration || '')}
+                                        onChangeText={(txt) => {
+                                            const formatted = formatDurationInput(txt);
+                                            setFieldValue('duration', formatted);
+                                            // dispatch(updateTimeEntryField({ id, field: 'duration', value: formatted }));
+                                        }}
+                                        onEndEditing={(e) => {
+                                            const txt = e.nativeEvent.text;
+                                            const durationRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/;
+
+                                            if (!durationRegex.test(txt)) {
+                                                Alert.alert('Invalid Format', 'Please enter duration in hh:mm:ss format (e.g. 02:30:00)');
+                                                return;
+                                            }
+
+                                            const [hh, mm, ss] = txt.split(':').map(Number);
+                                            const totalHours = hh + mm / 60 + ss / 3600;
+
+
+                                        }}
+                                        style={{
+                                            borderBottomWidth: 1,
+                                            borderRadius: 5,
+                                            padding: 10,
+                                            borderColor: '#ddd',
+                                            fontSize: calculatefontSize(1.8),
+                                            color: COLORS.PRIMARY_COLOR
+                                        }}
                                     />
-                                    <TextInputWithTitle
-                                        onPressButton={() => setFieldValue('isTimeOpen', true)}
-                                        title="Time"
-                                        isButton={true}
-                                        buttonText={values.time ? values.time : 'hh:mm A'}
-                                    />
-
-                                    <View style={{ gap: 10, marginVertical: 10, padding: 15, backgroundColor: COLORS?.BORDER_LIGHT_COLOR }}>
-                                        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-                                            <TouchableOpacity
-                                                onPress={async () => {
-                                                    try {
-                                                        const [pickResult] = await pick();
-                                                        console.log(pickResult, "PICK RESULT");
-
-                                                        if (pickResult) {
-                                                            if (values?.documentFile?.find(doc => doc?.name === pickResult?.name)) {
-                                                                Alert.alert('Alert', 'This file is already uploaded');
-                                                                return
-                                                            }
-                                                            if (values?.documentFile?.length >= 5) {
-                                                                Alert.alert('Alert', 'You can upload a maximum of 5 files');
-                                                                return
-                                                            }
-                                                            else if (pickResult?.size > 5242880) {
-                                                                Alert.alert('Alert', 'You can upload a maximum of 5MB each');
-                                                                return
-                                                            }
-                                                            else {
-                                                                setFieldValue('documentFile', [...(values?.documentFile || []), pickResult]);
-
-                                                            }
-
-                                                        }
-                                                    } catch (err) {
-                                                        console.log(err);
-                                                    }
-                                                }}
-                                                style={{
-                                                    flexDirection: "row",
-                                                    alignItems: "center",
-                                                    backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
-                                                    gap: 10,
-                                                    borderStyle: "dashed",
-                                                    borderWidth: 1,
-                                                    padding: 10,
-                                                    borderRadius: 5,
-                                                }}
-                                            >
-                                                <AntDesign name="upload" size={15} color={COLORS?.BLACK_COLOR} />
-                                                <MyText>Upload File</MyText>
-                                            </TouchableOpacity>
-
-                                            <MyText style={{ flex: 1, fontSize: calculatefontSize(1.4) }}>
-                                                You can upload a maximum of 5 files, 5MB each
-                                            </MyText>
-                                        </View>
-
-                                        {/* Uploaded Files List */}
-                                        {values?.documentFile?.length > 0 && (
-                                            <View style={{ gap: 10, }}>
-                                                {values?.documentFile?.map((d, i) => (
-                                                    <View
-                                                        key={i}
-                                                        style={{
-                                                            flexDirection: "row",
-                                                            justifyContent: "space-between",
-                                                            alignItems: "center",
-                                                            padding: 10,
-                                                            backgroundColor: '#fffcfcff',
-                                                            borderRadius: 5,
-                                                        }}
-                                                    >
-                                                        <MyText style={{ width: "70%" }}>{d?.name || 'Unnamed File'}</MyText>
-                                                        <TouchableOpacity
-                                                            onPress={() =>
-                                                                setFieldValue(
-                                                                    'documentFile',
-                                                                    values?.documentFile?.filter((_, index) => index !== i)
-                                                                )
-                                                            }
-                                                        >
-                                                            <Entypo name="circle-with-cross" size={20} color="red" />
-                                                        </TouchableOpacity>
-                                                    </View>
-                                                ))}
-                                            </View>
-                                        )}
-                                    </View>
-
-                                    <TextInputWithTitle
-                                        onPressButton={() => setFieldValue('isOpenCategory', true)}
-                                        title="Category"
-                                        isButton={true}
-                                        buttonText={values.category ? values.category : 'Find a document Category'}
-                                    />
-
-
-
-
 
 
 
@@ -418,24 +325,24 @@ const CreateInternalLogs = ({ navigation, route }) => {
                                         searchKey="name"
                                     />
                                     <BottomModalListWithSearch
-                                        onClose={() => setFieldValue('isOpenCategory', false)}
+                                        onClose={() => setFieldValue('isOpenFrom', false)}
                                         renderItem={({ item }) => (
                                             <TouchableOpacity
                                                 onPress={() => {
-                                                    setFieldValue('categoryObj', item);
-                                                    setFieldValue('category', item?.name);
-                                                    setFieldValue('isOpenCategory', false);
+                                                    setFieldValue('fromObj', item);
+                                                    setFieldValue('from', item?.userProfileDTO?.fullName || '');
+                                                    setFieldValue('isOpenFrom', false);
                                                 }}
                                                 style={styles.itemStyle}
                                             >
                                                 <MyText style={{ fontSize: calculatefontSize(1.9), }}>
-                                                    {item?.name}
+                                                    {item?.userProfileDTO?.fullName}
                                                 </MyText>
                                             </TouchableOpacity>
                                         )}
-                                        visible={values?.isOpenCategory}
-                                        data={categoryData}
-                                        searchKey="name"
+                                        visible={values?.isOpenFrom}
+                                        data={fromData}
+                                        searchKey="email"
                                     />
                                     <BottomModalListWithSearch
                                         onClose={() => setFieldValue('isOpenTo', false)}
@@ -505,7 +412,7 @@ const CreateInternalLogs = ({ navigation, route }) => {
     )
 }
 
-export default CreateInternalLogs
+export default CreateNotes
 
 const styles = StyleSheet.create({
     itemContainer: {

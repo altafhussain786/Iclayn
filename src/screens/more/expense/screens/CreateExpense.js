@@ -24,7 +24,8 @@ import { pick } from '@react-native-documents/picker'
 
 const TIMER_KEY = 'TIMEKEEPER_STATE';
 
-const CreateExpense = ({ navigation }) => {
+const CreateExpense = ({ navigation, route }) => {
+    const matterDetails = route?.params?.matterDetails
     const [matterData, setmatterData] = React.useState([]);
     const [firmData, setfirmData] = React.useState([]);
     const [partyData, setPartyData] = React.useState([]);
@@ -130,9 +131,8 @@ const CreateExpense = ({ navigation }) => {
                 initialValues={
                     {
                         //matter details
-                        matter: '',
-                        matterItems: [],
-                        matterObj: {},
+                        matter: matterDetails?.name || '',
+                        matterObj: matterDetails || {},
                         isOpenmatter: false,
 
                         // expense Type ==>

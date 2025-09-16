@@ -28,7 +28,8 @@ import { addExpenseEntry } from '../../../../store/slices/billingSlice/createBil
 
 
 
-const CreateBilling = ({ navigation }) => {
+const CreateBilling = ({ navigation, route }) => {
+    const matterDetails = route?.params?.matterDetails
     const dispatch = useDispatch()
     const toast = useToast();
     const [firmUserData, setFirmUserData] = useState([])
@@ -80,6 +81,13 @@ const CreateBilling = ({ navigation }) => {
 
         }
     }
+
+    useEffect(() => {
+        if (matterDetails) {
+            setClientId(matterDetails?.matterId)
+        }
+    }, [matterDetails])
+
 
     useEffect(() => {
         if (clientId !== "") {
@@ -158,8 +166,8 @@ const CreateBilling = ({ navigation }) => {
                     {
 
                         // matterselect 
-                        matterSelected: '',
-                        matterSelectedObj: {},
+                        matterSelected: matterDetails?.name || '',
+                        matterSelectedObj: matterDetails || {},
                         isOpenMatterSelected: false,
 
                         //start data/time

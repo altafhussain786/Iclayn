@@ -53,6 +53,10 @@ import Profile from '../screens/profile/Profile';
 import ChangePassword from '../screens/changePassword/ChangePassword';
 import Tasks from '../screens/tabs/tasks/Tasks';
 import DocumentViewerScreen from '../screens/documentViewrScreen/DocumentViewerScreen';
+import Notes from '../screens/tabs/notes/Notes';
+import MatterCalender from '../screens/tabs/matters/screens/MatterCalender';
+import EditEvent from '../screens/events/screens/EditEvents';
+import CreateNotes from '../screens/tabs/notes/screens/CreateNotes';
 
 
 
@@ -96,6 +100,7 @@ const RootNavigation = () => {
 
         {/* //Matters  */}
         <Stack.Screen name="Event" component={Event} />
+        <Stack.Screen name="EditEvent" component={EditEvent} />
         <Stack.Screen name="CreateMatter" component={CreateMatter} />
         <Stack.Screen name="TimmerDetails" component={TimmerDetails} />
         <Stack.Screen name="EditTimeEntry" component={EditTimeEntry} />
@@ -134,6 +139,9 @@ const RootNavigation = () => {
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="ChangePassword" component={ChangePassword} />
         <Stack.Screen name="DocumentViewerScreen" component={DocumentViewerScreen} />
+        <Stack.Screen name="Notes" component={Notes} />
+        <Stack.Screen name="CreateNotes" component={CreateNotes} />
+        <Stack.Screen name="MatterCalender" component={MatterCalender} />
 
 
 

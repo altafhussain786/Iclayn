@@ -25,13 +25,13 @@ import { removeDocument } from '../../../../store/slices/taskSlice/createItemfor
 
 
 
-const CreateTask = ({ navigation }) => {
+const CreateTask = ({ navigation, route }) => {
+    const matterDetails = route?.params?.matterDetails
     const dispatch = useDispatch()
     const toast = useToast();
     const items = useSelector(state => state.createItemforReminder.items);
     const itemsDocuments = useSelector(state => state.createItemforDocuments.document);
 
-    console.log(itemsDocuments, "itemsDocuments============>");
 
 
     //CLients state===============
@@ -150,6 +150,9 @@ const CreateTask = ({ navigation }) => {
         feeEarnerSolicitor: Yup.string().required('Assign to is required'),
 
     })
+
+    console.log(matterDetails, "matterDetails=========d===>", matterData);
+
     return (
         <>
 
@@ -163,8 +166,8 @@ const CreateTask = ({ navigation }) => {
                         isOpenpriorityStatus: false,
                         description: '',
                         // matterselect 
-                        matterSelected: '',
-                        matterSelectedObj: {},
+                        matterSelected: matterDetails?.name || '',
+                        matterSelectedObj: matterDetails || {},
                         isOpenMatterSelected: false,
                         //isPrivateTask
                         isPrivateTask: false,
@@ -229,8 +232,8 @@ const CreateTask = ({ navigation }) => {
                         taskPrivate: values.isPrivateTask,
                         typeId: values?.taskTypeObj?.taskTypeId,
                         status: "Pending",
-                        document: String(itemsDocuments?.templateId),
-                        documentName: itemsDocuments?.name,
+                        document: itemsDocuments?.templateId ? String(itemsDocuments?.templateId) : null,
+                        documentName: itemsDocuments?.name || null,
                         timeEstimate: values.timeEstimateValue,
                         timeEstimateType: values.timeEstimateType,
                         dueDateEnable: true,
@@ -308,11 +311,20 @@ const CreateTask = ({ navigation }) => {
 
 
                                     <TextInputWithTitle
+                                        editable={matterDetails?.matterId ? false : true}
                                         title="Matter"
                                         isButton={true}
                                         isRequired={true}
                                         buttonText={values.matterSelected || 'Select Matter'}
-                                        onPressButton={() => setFieldValue('isOpenMatterSelected', true)}
+                                        onPressButton={() => {
+                                            if (matterDetails?.matterId) {
+                                                setFieldValue('isOpenMatterSelected', false)
+                                            }
+                                            else {
+                                                setFieldValue('isOpenMatterSelected', true)
+                                            }
+                                            // setFieldValue('isOpenMatterSelected', true)
+                                        }}
                                     />
                                     {
                                         errors.matterSelected && touched.matterSelected && (

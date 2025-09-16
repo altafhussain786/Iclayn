@@ -7,6 +7,7 @@ import LoaderKit from 'react-native-loader-kit'
 import LinearGradient from 'react-native-linear-gradient'
 
 const DescriptionContainer = ({ isShowLoader, title, description }) => (
+
     <LinearGradient
         colors={[COLORS.PRIMARY_COLOR, COLORS.PRIMARY_COLOR_LIGHT,]}
         start={{ x: 0, y: 0 }}
