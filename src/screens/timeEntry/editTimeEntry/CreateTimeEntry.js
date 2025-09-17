@@ -274,7 +274,7 @@ const CreateTimeEntry = ({ navigation, route }) => {
                             >
                                 <TextInputWithTitle
 
-                                    editable={matterDetails?.matterId ? true : false}
+                                    editable={matterDetails?.matterId ? false : true}
                                     onPressButton={() => setFieldValue('isOpenmatter', true)}
                                     title="Matter"
                                     isButton={true}

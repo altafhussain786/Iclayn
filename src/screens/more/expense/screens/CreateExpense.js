@@ -254,6 +254,7 @@ const CreateExpense = ({ navigation, route }) => {
                                 showsVerticalScrollIndicator={false}
                             >
                                 <TextInputWithTitle
+                                    editable={matterDetails?.matterId ? false : true}
                                     onPressButton={() => setFieldValue('isOpenmatter', true)}
                                     title="Matter"
                                     isButton={true}

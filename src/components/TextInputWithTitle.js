@@ -43,7 +43,7 @@ const TextInputWithTitle = ({
                 </MyText>
 
             </View>
-            <View style={[styles.container, !editable && styles.disabledContainer]}>
+            <View style={[styles.container,]}>
                 {isButton ?
                     customView ? (
                         customView({ arrayValue, setFieldValue, onPressButton, buttonText })
@@ -51,8 +51,8 @@ const TextInputWithTitle = ({
                     )
 
                         :
-                        <TouchableOpacity onPress={onPressButton} style={{ paddingVertical: 10 }}>
-                            <MyText style={styles.btnTextStyle}>{buttonText}</MyText>
+                        <TouchableOpacity disabled={editable ? false : true} onPress={onPressButton} style={{ paddingVertical: 10 }}>
+                            <MyText style={[styles.btnTextStyle, !editable && { color: COLORS.LIGHT_COLOR }]}>{buttonText}</MyText>
                         </TouchableOpacity>
 
                     : <TextInput

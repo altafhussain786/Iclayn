@@ -120,6 +120,8 @@ export const IconUri = {
     hamBurger: require('../assets/Icons/hamBurger.png'),
 
     communication: require('../assets/Icons/communication.png'),
+    phone: require('../assets/Icons/phone.png'),
+    internal: require('../assets/Icons/internal.png'),
     documents: require('../assets/Icons/documents.png'),
     parties: require('../assets/Icons/parties.png'),
     report: require('../assets/Icons/report.png'),

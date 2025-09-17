@@ -300,6 +300,8 @@ const CreateBilling = ({ navigation, route }) => {
 
                                     {/* ==========================================================================================> NEW  */}
                                     <TextInputWithTitle
+                                        editable={matterDetails?.matterId ? false : true}
+
                                         title="Matter"
                                         isButton={true}
                                         // isRequired={true}

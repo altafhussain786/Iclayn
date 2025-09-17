@@ -16,19 +16,24 @@ import BottomModalListWithSearch from '../../../../components/BottomModalListWit
 import httpRequest from '../../../../api/apiHandler'
 
 
+// @icons 
+import AntDesign from 'react-native-vector-icons/AntDesign'
 
 
 
 
-const CreateNotes = ({ navigation }) => {
+const CreateNotes = ({ navigation, route }) => {
     const dispatch = useDispatch();
     const items = useSelector(state => state.createItemForAddEmail.items);
     const userDetails = useSelector(state => state?.userDetails?.userDetails);
+    const matterDetails = route?.params?.matterDetails
 
 
     const [matterData, setmatterData] = useState([]);
     const [fromData, setfromData] = useState([]);
     const [toData, settoData] = useState([]);
+    const [billingData, setBillingData] = React.useState([]);
+
 
     const getmatterData = async () => {
         const { res, err } = await httpRequest({
@@ -38,6 +43,22 @@ const CreateNotes = ({ navigation }) => {
         })
         if (res) {
             setmatterData(res?.data);
+        }
+        else {
+            console.log(err, "GET CUSTOMER RESPONSE===>err");
+        }
+    }
+
+    const getBillingData = async () => {
+        const { res, err } = await httpRequest({
+            method: `get`,
+            path: `/ic/user/?status=Active`,
+            navigation: navigation
+        })
+        if (res) {
+            // console.log(res?.data, "==>BIILLLIND DATA");
+
+            setBillingData(res?.data);
         }
         else {
             console.log(err, "GET CUSTOMER RESPONSE===>err");
@@ -72,6 +93,7 @@ const CreateNotes = ({ navigation }) => {
     }
 
     useEffect(() => {
+        getBillingData()
         getToData();
         getFromData();
         getmatterData();
@@ -104,8 +126,8 @@ const CreateNotes = ({ navigation }) => {
 
                         //individual===========================>
                         // matter  ============>
-                        matter: "",
-                        matterObj: {},
+                        matter: matterDetails?.name || '',
+                        matterObj: matterDetails || {},
                         isOpenMatter: false,
                         // ============>
 
@@ -146,13 +168,27 @@ const CreateNotes = ({ navigation }) => {
                         //
                         documentFile: '',
 
+                        //new states
+                        //Matter Access
+                        addUserPermission: '',
+                        addUserItems: [],
+                        addUserPermissionObj: {},
+                        isOpenAddUserPermission: false,
+
+
+                        //Matter Notification
+                        matterNotificationUser: '',
+                        matterNotificationItem: [],
+                        matterNotificationUserObj: {},
+                        isOpenMatterNotificationUser: false,
+
                         //loader
                         loader: false
                     }
                 }
                 // validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
-                    console.log(values, "values=======================>");
+                    // console.log(values, "values=======================>", items);
                     const payload =
                     {
                         createdOn: "",
@@ -160,23 +196,38 @@ const CreateNotes = ({ navigation }) => {
                         createdBy: userDetails?.userId,
                         updatedBy: null,
                         revision: null,
-                        matterComLogId: null,
-                        logDate: values?.selecteddate,
-                        logTime: values?.selectedtime,
-                        fromId: values?.fromObj?.userId,
-                        toId: values?.toObj?.clientId,
+                        noteId: null,
+                        noteDate: values?.selecteddate,
                         subject: values?.subject,
-                        body: values?.body,
-                        timer: null,
+                        noteTime: null,
+                        notifsIds: values?.addUserItems?.map((item) => item?.userId).join(','),
+                        notes: values?.body,
                         matterId: values?.matterObj?.matterId,
-                        type: "Phone",
-                        attachmentDTOList: null,
-                        status: "Active"
+                        status: "Active",
+
                     }
+                    console.log(payload, "payload=======================>", values);
+
+                    // const payload = {
+                    //     "createdOn": "2025-09-16T13:11:15.091+01:00",
+                    //     "updatedOn": "2025-09-16T13:11:15.091+01:00",
+                    //     "createdBy": 1,
+                    //     "updatedBy": null,
+                    //     "revision": null,
+                    //     "noteId": 3,
+                    //     "noteDate": "2025-09-16T11:41:25Z",
+                    //     "subject": "dfdssd",
+                    //     "notes": "dsasfsda",
+                    //     "noteTime": null,
+                    //     "notifsIds": "1,7",
+                    //     "matterId": 21,
+                    //     "status": "Active",
+                    //     "matterTimeEntryDTO": null
+                    // }
 
                     const { res, err } = await httpRequest({
                         method: `post`,
-                        path: `/ic/matter/comm-log/`,
+                        path: `/ic/matter/note/`,
                         params: payload,
                         navigation: navigation
                     })
@@ -211,6 +262,8 @@ const CreateNotes = ({ navigation }) => {
 
 
                                     <TextInputWithTitle
+                                        editable={matterDetails?.matterId ? false : true}
+
                                         onPressButton={() => setFieldValue('isOpenMatter', true)}
                                         title="Matter "
                                         isRequired={true}
@@ -225,36 +278,20 @@ const CreateNotes = ({ navigation }) => {
                                         buttonText={values.date ? values.date : 'DD/MM/YYYY'}
                                     />
                                     <TextInputWithTitle
-                                        onPressButton={() => setFieldValue('isTimeOpen', true)}
-                                        title="Time"
-                                        isButton={true}
-                                        buttonText={values.time ? values.time : 'hh:mm A'}
-                                    />
-
-                                    <TextInputWithTitle
-                                        onPressButton={() => setFieldValue('isOpenFrom', true)}
-                                        title="From"
-                                        isButton={true}
-                                        buttonText={values.from ? values.from : 'Select....'}
-                                    />
-                                    <TextInputWithTitle
-                                        onPressButton={() => setFieldValue('isOpenTo', true)}
-                                        title="To"
-                                        isButton={true}
-                                        buttonText={values.to ? values.to : 'Select....'}
-                                    />
-                                    <TextInputWithTitle
                                         placeholder={"Subject"}
                                         value={values.subject}
+
                                         onChangeText={(txt) => setFieldValue('subject', txt)}
                                         title="Subject"
 
                                     />
                                     <TextInputWithTitle
-                                        placeholder={"body"}
+                                        placeholder={"Notes"}
+                                        multiline={true}
+                                        extraInputStyle={{ borderWidth: 1, borderColor: 'lightgray', borderRadius: 5, height: 100, textAlignVertical: 'top' }}
                                         value={values.body}
                                         onChangeText={(txt) => setFieldValue('body', txt)}
-                                        title="Body"
+                                        title="Note"
 
                                     />
                                     {/* <TextInputWithTitle
@@ -297,13 +334,93 @@ const CreateNotes = ({ navigation }) => {
                                             color: COLORS.PRIMARY_COLOR
                                         }}
                                     />
+                                    <View style={{ marginBottom: 20 }}>
+                                        <MyText style={{ color: 'gray', fontSize: calculatefontSize(1.5), marginVertical: 5 }}>If you enter manual time then enter with this format e.g. 1h 12m 3s</MyText>
+                                    </View>
 
+                                    <TextInputWithTitle
+                                        setFieldValue={setFieldValue}
+                                        arrayValue={values?.addUserItems}
+                                        onPressButton={() => setFieldValue('isOpenAddUserPermission', true)}
+                                        extraStyle={{ borderBottomWidth: 0, }}
+                                        title="Notifications "
+
+                                        // isRequired={true}
+                                        isButton={true}
+                                        buttonText={'Select User'}
+                                        customView={({ arrayValue, setFieldValue, onPressButton, buttonText }) => (
+                                            (
+                                                <View style={{ marginTop: 10 }}>
+                                                    {arrayValue.map((item, index) => (
+                                                        console.log(item), "CUSTOM VIEWd =d==>",
+
+                                                        <View
+                                                            key={item.userId}
+                                                            style={styles.itemContainer}
+                                                        >
+                                                            <MyText>
+                                                                {item?.userProfileDTO?.fullName}
+                                                            </MyText>
+                                                            <TouchableOpacity
+                                                                onPress={() => {
+                                                                    const updatedList = arrayValue.filter(
+                                                                        (c) => c.userId !== item.userId
+                                                                    );
+                                                                    setFieldValue('addUserItems', updatedList);
+                                                                }}
+                                                            >
+                                                                <AntDesign name="delete" size={20} color="red" />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                    ))}
+                                                    <TouchableOpacity onPress={onPressButton} style={{ paddingVertical: 10 }}>
+                                                        <MyText style={styles.btnTextStyle}>{buttonText}</MyText>
+                                                    </TouchableOpacity>
+                                                </View>
+                                            )
+                                        )}
+                                    />
+                                    <View style={{ marginBottom: 20 }}>
+                                        <MyText style={{ color: 'gray', fontSize: calculatefontSize(1.5), marginVertical: 5 }}>Select the users from the firm who should receive notifications regarding this note.</MyText>
+                                    </View>
 
 
 
 
 
                                     {/* ====================================> DROP DOWN MODAL <================================================= */}
+
+                                    <BottomModalListWithSearch
+                                        onClose={() => setFieldValue('isOpenAddUserPermission', false)}
+                                        renderItem={({ item }) => (
+                                            console.log(item, "dfdljhfkj===>"),
+
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    const alreadyExists = values.addUserItems.find(
+                                                        (i) => i.userId === item.userId
+                                                    );
+                                                    if (!alreadyExists) {
+                                                        setFieldValue('addUserItems', [...values.addUserItems, item]);
+                                                    }
+                                                    else {
+                                                        Alert.alert('Client already added');
+                                                    }
+                                                    setFieldValue('addUserPermissionObj', item);
+                                                    setFieldValue('addUserPermission', item?.userProfileDTO?.fullName || '');
+                                                    setFieldValue('isOpenAddUserPermission', false);
+                                                }}
+                                                style={styles.itemStyle}
+                                            >
+                                                <MyText style={{ fontSize: calculatefontSize(1.9) }}>
+                                                    {item?.userProfileDTO?.fullName}
+                                                </MyText>
+                                            </TouchableOpacity>
+                                        )}
+                                        visible={values?.isOpenAddUserPermission}
+                                        data={billingData}
+                                        searchKey="email"
+                                    />
                                     <BottomModalListWithSearch
                                         onClose={() => setFieldValue('isOpenMatter', false)}
                                         renderItem={({ item }) => (
@@ -434,6 +551,22 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         paddingVertical: 10,
         borderColor: COLORS?.BORDER_LIGHT_COLOR
+    },
+    btnTextStyle: {
+        fontSize: calculatefontSize(1.9),
+        fontWeight: '600',
+        bottom: 10,
+        color: COLORS?.PRIMARY_COLOR_LIGHT
+    },
+    itemContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 10,
+        marginBottom: 5,
+        backgroundColor: '#f0f0f0',
+        width: '100%',
+        borderRadius: 5,
     },
     btnTextStyle: {
         fontSize: calculatefontSize(1.9),

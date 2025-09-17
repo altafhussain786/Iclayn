@@ -24,7 +24,8 @@ import AddButton from '../../../../components/AddButton'
 
 
 
-const CreateTransaction = ({ navigation }) => {
+const CreateTransaction = ({ navigation, route }) => {
+    const matterDetails = route?.params?.matterDetails
     const dispatch = useDispatch();
     const userDetails = useSelector(state => state?.userDetails?.userDetails);
     const toast = useToast()
@@ -87,8 +88,8 @@ const CreateTransaction = ({ navigation }) => {
 
                         //individual===========================>
                         // matter  ============>
-                        matter: "",
-                        matterObj: {},
+                        matter: matterDetails?.name || "",
+                        matterObj: matterDetails || {},
                         ismatterOpen: false,
                         // ============>
                         client: "",
@@ -195,6 +196,7 @@ const CreateTransaction = ({ navigation }) => {
 
 
                                     <TextInputWithTitle
+                                        editable={matterDetails?.matterId ? false : true}
                                         onPressButton={() => setFieldValue('ismatterOpen', true)}
                                         title="Matter"
                                         isButton={true}

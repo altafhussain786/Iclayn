@@ -24,7 +24,8 @@ import AddButton from '../../../../components/AddButton'
 
 
 
-const CreateReceiveAdvance = ({ navigation }) => {
+const CreateReceiveAdvance = ({ navigation, route }) => {
+    const matterDetails = route?.params?.matterDetails
     const dispatch = useDispatch();
     const userDetails = useSelector(state => state?.userDetails?.userDetails);
     const toast = useToast()
@@ -107,8 +108,8 @@ const CreateReceiveAdvance = ({ navigation }) => {
 
 
                         // matter  ============>
-                        matter: "",
-                        matterObj: {},
+                        matter: matterDetails?.name || "",
+                        matterObj: matterDetails || {},
                         ismatterOpen: false,
 
                         // ============>
@@ -208,6 +209,7 @@ const CreateReceiveAdvance = ({ navigation }) => {
 
 
                                     <TextInputWithTitle
+                                        editable={matterDetails?.matterId ? false : true}
                                         onPressButton={() => setFieldValue('ismatterOpen', true)}
                                         title="Matter"
                                         isButton={true}

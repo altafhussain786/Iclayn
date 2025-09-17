@@ -218,6 +218,8 @@ const CreatePhoneLog = ({ navigation, route }) => {
 
 
                                     <TextInputWithTitle
+                                        editable={matterDetails?.matterId ? false : true}
+
                                         onPressButton={() => setFieldValue('isOpenMatter', true)}
                                         title="Matter "
                                         isRequired={true}

@@ -756,7 +756,8 @@ import { useToast } from 'react-native-toast-notifications';
 
 const { width } = Dimensions.get('window');
 
-const CreateTransferAdvance = ({ navigation }) => {
+const CreateTransferAdvance = ({ navigation, route }) => {
+    const matterDetails = route?.params?.matterDetails
     const [matterFromData, setMatterFromData] = useState([]);
     const [matterId, setMatterId] = useState(0);
     const [balanceData, setBalanceData] = useState({});
@@ -820,8 +821,8 @@ const CreateTransferAdvance = ({ navigation }) => {
         <Formik
 
             initialValues={{
-                fromMatter: '',
-                fromMatterObj: {},
+                fromMatter: matterDetails?.name || '',
+                fromMatterObj: matterDetails || {},
                 isFromMatterOpen: false,
 
                 toMatter: '',
@@ -896,6 +897,7 @@ const CreateTransferAdvance = ({ navigation }) => {
                                 <View style={styles.matterRow}>
                                     <View style={styles.matterColumn}>
                                         <TextInputWithTitle
+                                            editable={matterDetails?.matterId ? false : true}
                                             title="Matter From"
                                             isButton
                                             buttonText={values.fromMatter || 'Select...'}

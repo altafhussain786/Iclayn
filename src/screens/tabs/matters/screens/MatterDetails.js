@@ -15,7 +15,8 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import httpRequest from '../../../../api/apiHandler'
 
 
-const { height } = Dimensions.get('window');
+const { height, width } = Dimensions.get('window');
+const tabSize = width * 0.16; // 16% of screen width -> responsive
 const MatterDetails = ({ navigation, route }) => {
     const matterData = route?.params?.matterData
 
@@ -101,9 +102,26 @@ const MatterDetails = ({ navigation, route }) => {
         {
             id: 7,
             title: 'Transactions',
-
             onPress: () => { navigation.navigate("Transaction", { matterDetails: matterData }) },
             iconUri: IconUri?.documents
+        },
+        {
+            id: 12,
+            title: 'Client Fund',
+            onPress: () => { navigation.navigate("CreateTransaction", { matterDetails: matterData }) },
+            iconUri: IconUri?.client
+        },
+        {
+            id: 13,
+            title: 'Receive Advance',
+            onPress: () => { navigation.navigate("CreateReceiveAdvance", { matterDetails: matterData }) },
+            iconUri: IconUri?.add
+        },
+        {
+            id: 14,
+            title: 'Transfer Advance',
+            onPress: () => { navigation.navigate("CreateTransferAdvance", { matterDetails: matterData }) },
+            iconUri: IconUri?.transaction
         },
 
         {
@@ -117,13 +135,13 @@ const MatterDetails = ({ navigation, route }) => {
             id: 10,
             title: 'Phone log',
             onPress: () => { navigation.navigate("CreatePhoneLog", { matterDetails: matterData }) },
-            iconUri: IconUri?.communication
+            iconUri: IconUri?.phone
         },
         {
             id: 11,
-            title: 'Phone log',
+            title: 'Internal log',
             onPress: () => { navigation.navigate("CreateInternalLogs", { matterDetails: matterData }) },
-            iconUri: IconUri?.communication
+            iconUri: IconUri?.internal
         },
 
 
@@ -292,29 +310,21 @@ const MatterDetails = ({ navigation, route }) => {
                                     horizontal
                                     showsHorizontalScrollIndicator={false}
                                     data={tabList}
-                                    renderItem={({ item, i }) => {
-                                        return (
-                                            <>
-                                                <View style={{}}>
-                                                    <TouchableOpacity
-                                                        key={item}
-                                                        style={[
-                                                            styles.tab,
-                                                        ]}
-                                                        onPress={() => { item?.onPress() }}
-                                                    >
-                                                        <Image source={item?.iconUri} style={{ width: 30, height: 30, resizeMode: "contain" }} />
-                                                    </TouchableOpacity>
-                                                    <MyText
-                                                        style={[styles.tabText, { width: 100, textAlign: "center" }]}
-                                                    // numberOfLines={1}
-                                                    >
-                                                        {item?.title}
-                                                    </MyText>
-                                                </View>
-                                            </>
-                                        )
-                                    }}
+                                    keyExtractor={(item) => item.id.toString()}
+                                    contentContainerStyle={styles.listContainer}
+                                    renderItem={({ item }) => (
+                                        <View style={styles.itemContainer}>
+                                            <TouchableOpacity style={styles.tab} onPress={item.onPress}>
+                                                <Image
+                                                    source={item?.iconUri}
+                                                    style={styles.icon}
+                                                />
+                                            </TouchableOpacity>
+                                            <MyText style={styles.tabText} numberOfLines={1}>
+                                                {item?.title}
+                                            </MyText>
+                                        </View>
+                                    )}
                                 />
                                 <MyText style={{ marginTop: 20, fontWeight: "bold" }}>Matter Content</MyText>
                                 <ContentContainer>
@@ -524,26 +534,42 @@ const MatterDetails = ({ navigation, route }) => {
 export default MatterDetails
 
 const styles = StyleSheet.create({
+
+    listContainer: {
+
+        paddingVertical: 5,
+    },
+    itemContainer: {
+        alignItems: 'center',
+        width: tabSize + 20, // icon width + space for text
+    },
     tab: {
-        // paddingVertical: 6,
-        height: 60,
-        width: 60,
-        // backgroundColor: '#71A24B',
+        height: tabSize,
+        width: tabSize,
         borderWidth: 1,
         borderColor: COLORS?.BORDER_LIGHT_COLOR,
-        // backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT,
-        // paddingHorizontal: 10,
-        borderRadius: 10,
-        marginHorizontal: 5,
+        borderRadius: 12,
+        marginHorizontal: 6,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: COLORS?.whiteColors || '#fff',
+        elevation: 2, // shadow Android
+        shadowColor: '#000', // shadow iOS
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+    },
+    icon: {
+        width: tabSize * 0.5,
+        height: tabSize * 0.5,
+        resizeMode: "contain",
     },
     tabText: {
         marginTop: 5,
         textAlign: 'center',
-        fontWeight: '400',
+        fontWeight: '500',
         color: COLORS?.BLACK_COLOR,
-        fontSize: calculatefontSize(1.7),
+        fontSize: width * 0.032, // responsive font size
     },
     fab: {
         position: 'absolute',
