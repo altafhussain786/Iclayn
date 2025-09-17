@@ -9,11 +9,15 @@ import { calculatefontSize } from '../../../../helper/responsiveHelper'
 import ContentContainer from '../components/ContentContainer'
 
 //
-import AntDesign from 'react-native-vector-icons/AntDesign'
+import AntDesign from 'react-native-vector-icons/AntDesign';
+
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
+import Feather from 'react-native-vector-icons/Feather'
+
 import httpRequest from '../../../../api/apiHandler'
 
+//
 
 const { height, width } = Dimensions.get('window');
 const tabSize = width * 0.16; // 16% of screen width -> responsive
@@ -53,27 +57,30 @@ const MatterDetails = ({ navigation, route }) => {
             id: 1,
             title: 'Time Entry',
             onPress: () => { navigation.navigate("CreateTimeEntry", { matterDetails: matterData }) },
-            iconUri: IconUri?.clock
+            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
         },
         {
             id: 9,
             title: 'New Expense',
             onPress: () => { navigation.navigate("CreateExpense", { matterDetails: matterData }) },
-            iconUri: IconUri?.Activitie
+            iconUri: <FontAwesome5 name="coins" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+
         },
         {
             id: 2,
             value: 'Event',
             title: 'Event',
             onPress: () => { navigation.navigate("EditEvent", { matterDetails: matterData }) },
-            iconUri: IconUri?.Calender
+            iconUri: <MaterialIcons name="event" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+
         },
         {
             id: 3,
             value: 'Task',
             title: 'Task',
             onPress: () => { navigation.navigate("CreateTask", { matterDetails: matterData }) },
-            iconUri: IconUri?.task
+            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+
         },
 
         {
@@ -81,7 +88,8 @@ const MatterDetails = ({ navigation, route }) => {
             title: 'Documents',
 
             onPress: () => { navigation.navigate("Documents", { matterDetails: matterData }) },
-            iconUri: IconUri?.documents
+            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+
         },
 
         {
@@ -89,39 +97,45 @@ const MatterDetails = ({ navigation, route }) => {
             value: 'Note',
             title: 'Note',
             onPress: () => { navigation.navigate("CreateNotes", { matterDetails: matterData }) },
-            iconUri: IconUri?.documents
+            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+
         },
 
         {
             id: 6,
             title: 'Bills',
             onPress: () => { navigation.navigate("CreateBilling", { matterDetails: matterData }) },
-            iconUri: IconUri?.bill
+            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+
         },
 
         {
             id: 7,
             title: 'Transactions',
             onPress: () => { navigation.navigate("Transaction", { matterDetails: matterData }) },
-            iconUri: IconUri?.documents
+            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+
         },
         {
             id: 12,
             title: 'Client Fund',
             onPress: () => { navigation.navigate("CreateTransaction", { matterDetails: matterData }) },
-            iconUri: IconUri?.client
+            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+
         },
         {
             id: 13,
             title: 'Receive Advance',
             onPress: () => { navigation.navigate("CreateReceiveAdvance", { matterDetails: matterData }) },
-            iconUri: IconUri?.add
+            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+
         },
         {
             id: 14,
             title: 'Transfer Advance',
             onPress: () => { navigation.navigate("CreateTransferAdvance", { matterDetails: matterData }) },
-            iconUri: IconUri?.transaction
+            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+
         },
 
         {
@@ -129,19 +143,22 @@ const MatterDetails = ({ navigation, route }) => {
             title: 'Communication logs',
 
             onPress: () => { navigation.navigate("Communications", { matterDetails: matterData }) },
-            iconUri: IconUri?.communication
+            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+
         },
         {
             id: 10,
             title: 'Phone log',
             onPress: () => { navigation.navigate("CreatePhoneLog", { matterDetails: matterData }) },
-            iconUri: IconUri?.phone
+            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+
         },
         {
             id: 11,
             title: 'Internal log',
             onPress: () => { navigation.navigate("CreateInternalLogs", { matterDetails: matterData }) },
-            iconUri: IconUri?.internal
+            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+
         },
 
 
@@ -315,10 +332,12 @@ const MatterDetails = ({ navigation, route }) => {
                                     renderItem={({ item }) => (
                                         <View style={styles.itemContainer}>
                                             <TouchableOpacity style={styles.tab} onPress={item.onPress}>
-                                                <Image
+                                                {item?.iconUri}
+
+                                                {/* <Image
                                                     source={item?.iconUri}
                                                     style={styles.icon}
-                                                />
+                                                /> */}
                                             </TouchableOpacity>
                                             <MyText style={styles.tabText} numberOfLines={1}>
                                                 {item?.title}

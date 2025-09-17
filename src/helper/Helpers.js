@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from "moment";
+import { Image } from 'react-native';
 // utils/parsePhoneNumber.js
 
 
@@ -91,6 +92,74 @@ export const getTotalDuration = (durationStr) => {
 }
 
 
+
+export const checkTypeForIcon = (item, size = 30) => {
+    // agar folder ho to folder icon return kare
+    if (item?.folder) {
+        return (
+            <Image
+                source={{ uri: "https://img.icons8.com/color/48/folder-invoices--v1.png" }} // yellow folder
+                style={{ width: size, height: size, resizeMode: "contain" }}
+            />
+        );
+    }
+
+    const name = item?.name || "";
+    const ext = name.split(".").pop().toLowerCase();
+
+    let iconUri;
+    switch (ext) {
+        case "pdf":
+            iconUri = "https://img.icons8.com/color/48/pdf.png";
+            break;
+        case "doc":
+        case "docx":
+            iconUri = "https://img.icons8.com/color/48/ms-word.png";
+            break;
+        case "xls":
+        case "xlsx":
+            iconUri = "https://img.icons8.com/color/48/ms-excel.png";
+            break;
+        case "ppt":
+        case "pptx":
+            iconUri = "https://img.icons8.com/color/48/ms-powerpoint.png";
+            break;
+        case "jpg":
+        case "jpeg":
+        case "png":
+        case "gif":
+            iconUri = "https://img.icons8.com/color/48/image.png";
+            break;
+        case "mp4":
+        case "mov":
+        case "avi":
+            iconUri = "https://img.icons8.com/color/48/video.png";
+            break;
+        case "mp3":
+        case "wav":
+            iconUri = "https://img.icons8.com/color/48/audio.png";
+            break;
+        case "zip":
+        case "rar":
+            iconUri = "https://img.icons8.com/color/48/zip.png";
+            break;
+        case "html":
+            iconUri = "https://img.icons8.com/color/48/html-5--v1.png";
+            break;
+        case "eml":
+            iconUri = "https://cdn-icons-png.flaticon.com/512/2306/2306077.png"; // email icon
+            break;
+        default:
+            iconUri = "https://cdn-icons-png.freepik.com/512/101/101671.png";
+    }
+
+    return (
+        <Image
+            source={{ uri: iconUri }}
+            style={{ width: size, height: size, resizeMode: "contain" }}
+        />
+    );
+};
 
 // const imageURL = `data:image/jpeg;base64,${userProfileDTO?.image}`;
 

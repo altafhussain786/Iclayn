@@ -24,6 +24,7 @@ import { calculatefontSize } from '../../../helper/responsiveHelper';
 import MyText from '../../../components/MyText';
 import { addDocument } from '../../../store/slices/taskSlice/createItemforDocuments';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { checkTypeForIcon } from '../../../helper/Helpers';
 
 const Documents = ({ navigation, route }) => {
     const matterDetails = route?.params?.matterDetails;
@@ -128,35 +129,6 @@ const Documents = ({ navigation, route }) => {
     }, [searchText, documentData]);
 
     // folder/file icon
-    const checkTypeForIcon = (type) => {
-        console.log(type, 'type');
-
-        if (type == "folder") {
-            return (
-                <Image
-                    source={IconUri?.folder}
-                    style={{ height: 20, width: 20, resizeMode: 'contain' }}
-                />
-            );
-        }
-        else if (type == "image/jpeg") {
-            return (
-                <Image
-                    source={IconUri?.imageType}
-                    style={{ height: 20, width: 20, resizeMode: 'contain' }}
-                />
-            );
-        }
-
-        else {
-            return (
-                <Image
-                    source={IconUri?.word}
-                    style={{ height: 20, width: 20, resizeMode: 'contain' }}
-                />
-            );
-        }
-    };
 
     const renderDocItem = ({ item }) => {
         console.log(item, 'item');
@@ -164,22 +136,48 @@ const Documents = ({ navigation, route }) => {
         return (
             <TouchableOpacity
                 onPress={() => {
+
+                    const { matterAttachmentId, matterId, mimeType, name } = item || {};
+
                     if (item?.folder) {
-                        navigation.navigate('TaskFiles', { indexValue: item?.templateId });
+                        const routeName = tabs === 'Office365' ? 'TaskFileOneDrive' : 'TaskFiles';
+                        const params =
+                            tabs === 'Office365'
+                                ? { indexValue: matterAttachmentId, accessToken: organizationData?.accessToken, fileData: item, activeTab: tabs }
+                                : { indexValue: matterAttachmentId, activeTab: tabs };
+
+                        navigation.navigate(routeName, params);
                     } else {
-                        navigation.navigate("DocumentViewerScreen", {
-                            matterAttachmentId: item?.matterAttachmentId,
-                            matterId: item?.matterId,
-                            mimeType: item?.mimeType,
-                            name: item?.name,
+                        navigation.navigate('DocumentViewerScreen', {
+                            matterAttachmentId,
+                            matterId,
+                            mimeType,
+                            name,
                         });
                     }
+                    // if (item?.folder) {
+                    //     if (tabs === 'Office365') {
+
+                    //         navigation.navigate('TaskFileOneDrive', { indexValue: item?.matterAttachmentId, accessToken: organizationData?.accessToken, fileData: item, activeTab: tabs });
+                    //     }
+                    //     else {
+                    //         navigation.navigate('TaskFiles', { indexValue: item?.matterAttachmentId, activeTab: tabs });
+                    //     }
+
+                    // } else {
+                    //     navigation.navigate("DocumentViewerScreen", {
+                    //         matterAttachmentId: item?.matterAttachmentId,
+                    //         matterId: item?.matterId,
+                    //         mimeType: item?.mimeType,
+                    //         name: item?.name,
+                    //     });
+                    // }
                 }}
                 style={styles.card}
             >
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                    {checkTypeForIcon(item?.mimeType)}
-                    <MyText style={styles.titleText}>{item?.name}</MyText>
+                    {checkTypeForIcon(item)}
+                    <MyText style={[styles.titleText, { ellipsisMode: 'tail', width: '80%' }]}>{item?.name}</MyText>
                 </View>
             </TouchableOpacity>
         );
@@ -262,6 +260,7 @@ const Documents = ({ navigation, route }) => {
                         keyExtractor={(item, index) =>
                             item?.id?.toString() || index.toString()
                         }
+
                         renderItem={renderDocItem}
                         ListFooterComponent={() => <View style={{ height: 100 }} />}
                     />

@@ -1,4 +1,4 @@
-import { FlatList, Image, StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import { FlatList, Image, StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native'
 import React, { useEffect } from 'react'
 import ScreenHeader from '../../../../../components/ScreenHeader'
 import Wrapper from '../../../../../components/Wrapper'
@@ -8,6 +8,7 @@ import { IconUri } from '../../../../../constants'
 import Loader from '../../../../../components/Loader'
 import { addDocument } from '../../../../../store/slices/taskSlice/createItemforDocuments'
 import { useDispatch } from 'react-redux'
+import { calculatefontSize } from '../../../../../helper/responsiveHelper'
 
 const TaskDocuments = ({ navigation, route }) => {
     const indexValue = route?.params?.indexValue
@@ -65,6 +66,12 @@ const TaskDocuments = ({ navigation, route }) => {
                         keyExtractor={(item, index) => item?.id?.toString() || index.toString()}
                         showsVerticalScrollIndicator={false}
                         data={documentData}
+                        ListEmptyComponent={() =>
+                            <View style={{ height: Dimensions.get('window').height, justifyContent: "center", alignItems: "center" }}>
+                                <Image style={{ height: 70, width: 70, tintColor: "gray" }} source={{ uri: 'https://cdn-icons-png.flaticon.com/512/149/149877.png' }} />
+                                <MyText style={{ fontSize: calculatefontSize(1.5), color: "gray" }}>No Folder Found</MyText>
+                            </View>
+                        }
                         renderItem={({ item, index }) => {
                             return (
                                 <TouchableOpacity
