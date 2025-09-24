@@ -9,6 +9,7 @@ const createBillingRate = (payload) => ({
   firmUserObj: payload.firmUserObj || {},
   firmUser: payload.firmUser || '',
   firmUserId: payload.firmUserId || '',
+  serviceItemObj: payload.serviceItemObj || {},
   hourlyRate: payload.hourlyRate || 0,
 });
 
@@ -41,6 +42,13 @@ const billingRateSlice = createSlice({
       }
     },
 
+    updateServiceItem: (state, action) => {
+      const item = state.items.find(item => item.pId === action.payload.pId);
+      if (item) {
+        item.serviceItemObj = action.payload.serviceItemObj;
+      }
+    },
+
     updateHourlyRate: (state, action) => {
       const item = state.items.find(item => item.pId === action.payload.pId);
       if (item) {
@@ -65,6 +73,7 @@ export const {
   updateHourlyRate,
   removeBillingRate,
   resetBillingRates,
+  updateServiceItem
 } = billingRateSlice.actions;
 
 export default billingRateSlice.reducer;

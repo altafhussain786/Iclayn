@@ -1,4 +1,4 @@
-import { Dimensions, FlatList, Image, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Dimensions, FlatList, Image, ScrollView, SectionList, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import ScreenHeader from '../../../../components/ScreenHeader'
 import Wrapper from '../../../../components/Wrapper'
@@ -14,8 +14,13 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import Feather from 'react-native-vector-icons/Feather'
+import Entypo from 'react-native-vector-icons/Entypo'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6'
 
 import httpRequest from '../../../../api/apiHandler'
+import moment from 'moment'
+import { formatNumber } from '../../../../helper/Helpers'
 
 //
 
@@ -26,6 +31,10 @@ const MatterDetails = ({ navigation, route }) => {
 
     const flatListRef = useRef(null);
     const [isAtBottom, setIsAtBottom] = useState(false);
+    const [isShowMore, setIsShowMore] = useState(false);
+    const [user, setUser] = useState([]);
+    const [timeLineData, setTimeLineData] = useState([]);
+    const [partiesData, setPartiesData] = useState({});
 
     const handleScroll = (event) => {
         const offsetY = event.nativeEvent.contentOffset.y;
@@ -57,13 +66,14 @@ const MatterDetails = ({ navigation, route }) => {
             id: 1,
             title: 'Time Entry',
             onPress: () => { navigation.navigate("CreateTimeEntry", { matterDetails: matterData }) },
-            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+            iconUri: <Image tintColor={COLORS?.PRIMARY_COLOR_LIGHT} source={IconUri?.time} style={{ height: 30, width: 30 }} />
+
         },
         {
             id: 9,
             title: 'New Expense',
             onPress: () => { navigation.navigate("CreateExpense", { matterDetails: matterData }) },
-            iconUri: <FontAwesome5 name="coins" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+            iconUri: <Image tintColor={COLORS?.PRIMARY_COLOR_LIGHT} source={IconUri?.expense} style={{ height: 30, width: 30 }} />
 
         },
         {
@@ -71,7 +81,8 @@ const MatterDetails = ({ navigation, route }) => {
             value: 'Event',
             title: 'Event',
             onPress: () => { navigation.navigate("EditEvent", { matterDetails: matterData }) },
-            iconUri: <MaterialIcons name="event" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+            iconUri: <Image tintColor={COLORS?.PRIMARY_COLOR_LIGHT} source={IconUri?.event} style={{ height: 30, width: 30 }} />
+
 
         },
         {
@@ -79,7 +90,8 @@ const MatterDetails = ({ navigation, route }) => {
             value: 'Task',
             title: 'Task',
             onPress: () => { navigation.navigate("CreateTask", { matterDetails: matterData }) },
-            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+            iconUri: <Image tintColor={COLORS?.PRIMARY_COLOR_LIGHT} source={IconUri?.task} style={{ height: 30, width: 30 }} />
+
 
         },
 
@@ -88,7 +100,8 @@ const MatterDetails = ({ navigation, route }) => {
             title: 'Documents',
 
             onPress: () => { navigation.navigate("Documents", { matterDetails: matterData }) },
-            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+            iconUri: <Image tintColor={COLORS?.PRIMARY_COLOR_LIGHT} source={IconUri?.documents} style={{ height: 30, width: 30 }} />
+
 
         },
 
@@ -97,7 +110,8 @@ const MatterDetails = ({ navigation, route }) => {
             value: 'Note',
             title: 'Note',
             onPress: () => { navigation.navigate("CreateNotes", { matterDetails: matterData }) },
-            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+            iconUri: <Image tintColor={COLORS?.PRIMARY_COLOR_LIGHT} source={IconUri?.notes} style={{ height: 30, width: 30 }} />
+
 
         },
 
@@ -105,7 +119,7 @@ const MatterDetails = ({ navigation, route }) => {
             id: 6,
             title: 'Bills',
             onPress: () => { navigation.navigate("CreateBilling", { matterDetails: matterData }) },
-            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+            iconUri: <Image tintColor={COLORS?.PRIMARY_COLOR_LIGHT} source={IconUri?.bill} style={{ height: 30, width: 30 }} />
 
         },
 
@@ -113,51 +127,51 @@ const MatterDetails = ({ navigation, route }) => {
             id: 7,
             title: 'Transactions',
             onPress: () => { navigation.navigate("Transaction", { matterDetails: matterData }) },
-            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+            iconUri: <Image tintColor={COLORS?.PRIMARY_COLOR_LIGHT} source={IconUri?.transaction} style={{ height: 30, width: 30 }} />
+
 
         },
         {
             id: 12,
             title: 'Client Fund',
             onPress: () => { navigation.navigate("CreateTransaction", { matterDetails: matterData }) },
-            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+            iconUri: <Image tintColor={COLORS?.PRIMARY_COLOR_LIGHT} source={IconUri?.clientFund} style={{ height: 30, width: 30 }} />
 
         },
         {
             id: 13,
             title: 'Receive Advance',
             onPress: () => { navigation.navigate("CreateReceiveAdvance", { matterDetails: matterData }) },
-            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+            iconUri: <Image tintColor={COLORS?.PRIMARY_COLOR_LIGHT} source={IconUri?.receiveAdvance} style={{ height: 30, width: 30 }} />
 
         },
         {
             id: 14,
             title: 'Transfer Advance',
             onPress: () => { navigation.navigate("CreateTransferAdvance", { matterDetails: matterData }) },
-            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+            iconUri: <Image tintColor={COLORS?.PRIMARY_COLOR_LIGHT} source={IconUri?.receiveAdvance} style={{ height: 30, width: 30 }} />
 
         },
 
-        {
-            id: 8,
-            title: 'Communication logs',
+        // {
+        //     id: 8,
+        //     title: 'Communication logs',
+        //     onPress: () => { navigation.navigate("Communications", { matterDetails: matterData }) },
+        //     iconUri: <Image tintColor={COLORS?.PRIMARY_COLOR_LIGHT} source={IconUri?.communication} style={{ height: 30, width: 30 }} />
 
-            onPress: () => { navigation.navigate("Communications", { matterDetails: matterData }) },
-            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
-
-        },
+        // },
         {
             id: 10,
             title: 'Phone log',
             onPress: () => { navigation.navigate("CreatePhoneLog", { matterDetails: matterData }) },
-            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+            iconUri: <Image tintColor={COLORS?.PRIMARY_COLOR_LIGHT} source={IconUri?.phoneLogs} style={{ height: 30, width: 30 }} />
 
         },
         {
             id: 11,
             title: 'Internal log',
             onPress: () => { navigation.navigate("CreateInternalLogs", { matterDetails: matterData }) },
-            iconUri: <AntDesign name="eye" size={25} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+            iconUri: <Image tintColor={COLORS?.PRIMARY_COLOR_LIGHT} source={IconUri?.internalLogs} style={{ height: 30, width: 30 }} />
 
         },
 
@@ -179,7 +193,7 @@ const MatterDetails = ({ navigation, route }) => {
             value: "calenderEvent",
             description: "test description",
             onPress: () => { navigation.navigate("MatterCalender", { matterDetails: matterData }) },
-            iconUri: IconUri?.Calender
+            iconUri: IconUri?.event
         },
         {
             id: 7,
@@ -205,7 +219,7 @@ const MatterDetails = ({ navigation, route }) => {
             value: "notes",
             description: "test description",
             onPress: () => { navigation.navigate("Notes", { matterDetails: matterData }) },
-            iconUri: IconUri?.documents
+            iconUri: IconUri?.notes
         },
 
         {
@@ -222,7 +236,7 @@ const MatterDetails = ({ navigation, route }) => {
             value: "documents",
             description: "test description",
             onPress: () => { navigation.navigate("Transaction", { matterDetails: matterData }) },
-            iconUri: IconUri?.documents
+            iconUri: IconUri?.transaction
         },
         {
             id: 5,
@@ -238,28 +252,45 @@ const MatterDetails = ({ navigation, route }) => {
     const financialData = [
         {
             id: 1,
-            title: 'OutstandingBalance',
-            value: "outstandingBalance",
-            description: "0.00 GBP",
+            title: 'Work in progress',
+            value: "workinProgress",
+            description: formatNumber(partiesData?.workInProgress) || "0.00",
             color: '#B6F0E3',
             onPress: () => { },
-            iconUri: IconUri?.Bills
+            iconUri: IconUri?.event
         },
         {
             id: 2,
-            title: 'MatterClientFunds',
-            value: "matterClientFunds",
-            description: "0.00 GBP",
+            title: 'OutstandingBalance',
+            value: "outstandingBalance",
+            description: formatNumber(partiesData?.outstandingBalance) || "0.00 ",
+            color: '#B6F0E3',
             onPress: () => { },
-            iconUri: IconUri?.CalenderColor
+            iconUri: IconUri?.bill
         },
         {
             id: 3,
-            title: 'Work in progress',
-            value: 'workinProgress',
-            description: "0.00 GBP",
+            title: 'ClientFunds',
+            value: "clientFunds",
+            description: formatNumber(partiesData?.receivedClientFund) || "0.00",
             onPress: () => { },
-            iconUri: IconUri?.CalenderColor
+            iconUri: IconUri?.fund
+        },
+        {
+            id: 4,
+            title: 'Requested funds',
+            value: "requestedFunds",
+            description: formatNumber(partiesData?.requestedClientFund) || "0.00",
+            onPress: () => { },
+            iconUri: IconUri?.fund
+        },
+        {
+            id: 5,
+            title: 'Expenses',
+            value: 'Expenses',
+            description: formatNumber(partiesData?.totalExpense) || "0.00",
+            onPress: () => { },
+            iconUri: IconUri?.expense
         },
     ]
 
@@ -267,7 +298,7 @@ const MatterDetails = ({ navigation, route }) => {
     const getContactDetails = async () => {
         const { res, err } = await httpRequest({
             method: 'get',
-            path: `/ic/matter/4/client`,
+            path: `/ic/matter/${matterData?.matterId}/client`,
             navigation: navigation
         })
         if (res) {
@@ -280,6 +311,39 @@ const MatterDetails = ({ navigation, route }) => {
             console.log("err", err);
         }
     }
+    const getTimeLineData = async () => {
+        const { res, err } = await httpRequest({
+            method: 'get',
+            path: `/ic/matter/${matterData?.matterId}/timeline`,
+            navigation: navigation
+        })
+        if (res) {
+            // console.log(res, "CLIENT=d===>");
+
+            setTimeLineData(res?.data);
+
+        }
+        else {
+            console.log("err", err);
+        }
+    }
+    const getUsers = async () => {
+        const { res, err } = await httpRequest({
+            method: 'get',
+            path: `/ic/user/?status=Active`,
+            navigation: navigation
+        })
+        if (res) {
+            // console.log(res, "CLIENT=d===>");
+
+            setUser(res?.data);
+
+        }
+        else {
+            console.log("err", err);
+        }
+    }
+
     const getMatterDetails = async () => {
         setMatterLoading(true)
         const { res, err } = await httpRequest({
@@ -301,12 +365,35 @@ const MatterDetails = ({ navigation, route }) => {
             console.log("err", err);
         }
     }
+    const getPartiesData = async () => {
+
+        const { res, err } = await httpRequest({
+            method: 'get',
+            path: `/ic/matter/${matterData?.matterId}/db`,
+            navigation: navigation
+        })
+        if (res) {
+            // console.log(res, "CLIENT=d===>");
+
+            console.log(res?.data, "MATTER DETAILSd");
+
+            setPartiesData(res?.data);
+
+        }
+        else {
+
+
+            console.log("err", err);
+        }
+    }
 
     useEffect(() => {
+        getPartiesData()
+        getTimeLineData()
+        getUsers()
         getMatterDetails()
         getContactDetails()
     }, [])
-
 
     return (
         <>
@@ -352,14 +439,12 @@ const MatterDetails = ({ navigation, route }) => {
                                         data={matterContentData}
                                         renderItem={({ item, i }) => (
                                             <>
-
-                                                <TouchableOpacity onPress={item?.onPress} style={{ flexDirection: "row", justifyContent: 'space-between', borderBottomWidth: item?.id === 7 ? 0 : 0.5, borderColor: COLORS?.LIGHT_COLOR, alignItems: "center", paddingBottom: 10 }}>
+                                                <TouchableOpacity onPress={item?.onPress} style={{ flexDirection: "row", justifyContent: 'space-between', borderBottomWidth: item?.id === 5 ? 0 : 0.5, borderColor: COLORS?.LIGHT_COLOR, alignItems: "center", paddingBottom: 10 }}>
                                                     <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-                                                        <View style={{ backgroundColor: "#A3DAFF", height: 30, width: 30, padding: 15, justifyContent: "center", alignItems: "center", borderRadius: 30 }}>
-                                                            <Image source={item?.iconUri} style={{ width: 15, height: 15, resizeMode: "contain" }} />
+                                                        <View style={{ borderWidth: 1, borderColor: COLORS?.LIGHT_COLOR, height: 30, width: 30, padding: 15, justifyContent: "center", alignItems: "center", borderRadius: 30 }}>
+                                                            <Image tintColor={COLORS?.PRIMARY_COLOR} source={item?.iconUri} style={{ width: 15, height: 15, resizeMode: "contain" }} />
                                                         </View>
                                                         <View>
-
                                                             <MyText style={{ marginTop: 5, color: COLORS?.BLACK_COLOR, fontWeight: "bold" }}>{item?.title}</MyText>
                                                             <MyText>{item?.description}</MyText>
                                                         </View>
@@ -378,7 +463,8 @@ const MatterDetails = ({ navigation, route }) => {
                                     <View style={{ flexDirection: "row", gap: 10, }} >
                                         <View >
                                             <View style={{ backgroundColor: "#F9D596", height: 30, width: 30, justifyContent: "center", alignItems: "center", borderRadius: 30 }}>
-                                                <MyText style={{ fontWeight: "bold", color: '#641700' }}>U</MyText>
+                                                {/* <Text style={{textTransform:"uppercase"}}>Hdkf</Text> */}
+                                                <MyText style={{ fontWeight: "bold", color: '#641700', }}>{contactdetails[0]?.firstName?.charAt(0) + contactdetails[0]?.lastName?.charAt(0)}</MyText>
                                             </View>
                                         </View>
                                         <View style={{ width: '70%', }}>
@@ -415,26 +501,70 @@ const MatterDetails = ({ navigation, route }) => {
                                         <MyText style={{ fontWeight: "400", color: COLORS?.BLACK_COLOR, fontSize: calculatefontSize(1.5) }}>{matterDetails?.description}</MyText>
                                     </View>
                                     <View style={{ borderBottomWidth: 0.5, borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
-                                        <MyText>Responsible solcitor</MyText>
-                                        <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>-</MyText>
+                                        <MyText>Supervisor Solicitor</MyText>
+                                        <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>{matterDetails?.supervisorSolicitorName || "-"}</MyText>
                                     </View>
                                     <View style={{ borderBottomWidth: 0.5, borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
-                                        <MyText>Originatig solcitor</MyText>
-                                        <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>-</MyText>
+                                        <MyText>Fee Earner Solicitor</MyText>
+                                        <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>{matterDetails?.feeEarnerSolicitorName || "-"}</MyText>
                                     </View>
 
                                     <View style={{ borderBottomWidth: 0.5, borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
-                                        <MyText>Matter notification</MyText>
-                                        <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>-</MyText>
+                                        <MyText>Practice Area</MyText>
+                                        <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>{matterDetails?.practiceAreaName || "-"}</MyText>
                                     </View>
                                     <View style={{ borderBottomWidth: 0.5, borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
-                                        <MyText>Limitation date</MyText>
-                                        <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>-</MyText>
+                                        <MyText>Matter stage</MyText>
+                                        <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>{matterDetails?.stage}</MyText>
                                     </View>
+                                    {isShowMore &&
+                                        <>
+                                            <View style={{ borderBottomWidth: 0.5, borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
+                                                <MyText>Client reference number</MyText>
+                                                <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>{matterDetails?.clientRefNo || "-"}</MyText>
+                                            </View>
+                                            <View style={{ borderBottomWidth: 0.5, borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
+                                                <MyText>Location</MyText>
+                                                <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>{matterDetails?.location || "-"}</MyText>
+                                            </View>
+                                            <View style={{ borderBottomWidth: 0.5, borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
+                                                <MyText>Status</MyText>
+                                                <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>{matterDetails?.status || "-"}</MyText>
+                                            </View>
+                                            <View style={{ borderBottomWidth: 0.5, borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
+                                                <MyText>Open date</MyText>
+                                                <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}> {matterDetails?.openDate ? moment(matterDetails?.openDate).format("DD/MM/YYYY") : "-"}</MyText>
+                                            </View>
+                                            <View style={{ borderBottomWidth: 0.5, borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
+                                                <MyText>Pending date</MyText>
+                                                <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>{matterDetails?.pendingDate ? moment(matterDetails?.pendingDate).format("DD/MM/YYYY") : "-"}</MyText>
+                                            </View>
+                                            <View style={{ borderBottomWidth: 0.5, borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
+                                                <MyText>Closed date</MyText>
+                                                <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>{matterDetails?.closedDate ? moment(matterDetails?.closedDate).format("DD/MM/YYYY") : "-"}</MyText>
+                                            </View>
+                                            <View style={{ borderBottomWidth: 0.5, borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
+                                                <MyText>Billable</MyText>
+                                                {
+                                                    matterDetails?.matterBillingDTOList[0]?.matterBillingItemDTOList?.map((data, i) => {
+                                                        return (
+                                                            <>
+                                                                <View style={{ marginBottom: 10, marginTop: 10 }}>
+                                                                    <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>{user?.find(item => item.userId == data?.userId)?.userProfileDTO?.fullName}</MyText>
+                                                                    <MyText style={{ fontWeight: "300", color: COLORS?.BLACK_COLOR, fontSize: calculatefontSize(1.5) }}>£{data?.rate}/{matterDetails?.matterBillingDTOList[0]?.method}</MyText>
+                                                                </View>
+                                                            </>
+                                                        )
+                                                    })
+                                                }
+                                            </View>
+
+                                        </>
+                                    }
                                     <View style={{ justifyContent: "center", alignItems: "center", paddingVertical: 5 }}>
-                                        <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", top: 5, gap: 10 }}>
-                                            <MyText style={{ color: COLORS?.PRIMARY_COLOR_LIGHT, fontWeight: "bold" }}>View 8 more</MyText>
-                                            <FontAwesome5 name="caret-down" style={{ top: 2 }} size={20} color={COLORS?.PRIMARY_COLOR_LIGHT} />
+                                        <TouchableOpacity onPress={() => setIsShowMore(!isShowMore)} style={{ flexDirection: "row", alignItems: "center", top: 5, gap: 10 }}>
+                                            <MyText style={{ color: COLORS?.PRIMARY_COLOR_LIGHT, fontWeight: "bold" }}>View 7 more</MyText>
+                                            <FontAwesome5 name={isShowMore ? "caret-up" : "caret-down"} style={{ top: 2 }} size={20} color={COLORS?.PRIMARY_COLOR_LIGHT} />
                                         </TouchableOpacity>
                                     </View>
                                 </ContentContainer>
@@ -464,14 +594,14 @@ const MatterDetails = ({ navigation, route }) => {
                                             </>
                                         )}
                                     />
-                                    <View style={{ borderBottomWidth: 0.5, borderTopWidth: 0.5, borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
+                                    {/* <View style={{ borderBottomWidth: 0.5, borderTopWidth: 0.5, borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
                                         <MyText>Total time recorded</MyText>
                                         <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>0.00 GBP</MyText>
                                     </View>
                                     <View style={{ borderTopWidth: 0.5, borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
                                         <MyText>Total expense recorded</MyText>
                                         <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>0.00 GBP</MyText>
-                                    </View>
+                                    </View> */}
                                 </ContentContainer>
                                 {/* //Practice area ============= */}
                                 <MyText style={{ marginTop: 20, fontWeight: "bold" }}>Practice area</MyText>
@@ -517,6 +647,125 @@ const MatterDetails = ({ navigation, route }) => {
                                         <MyText style={{ color: COLORS?.GREY_COLOR, }}>No item</MyText>
                                         <MyText style={{ fontWeight: "500", color: COLORS?.PRIMARY_COLOR_LIGHT, }}>Key Dates</MyText>
                                     </View>
+                                </ContentContainer>
+
+
+                                <MyText style={{ marginTop: 20, fontWeight: "bold" }}>Timeline</MyText>
+                                <ContentContainer style={{ padding: 0 }}>
+                                    <SectionList
+                                        sections={Object.values(
+                                            timeLineData.reduce((acc, item) => {
+                                                const date = moment(item?.createdOn).format("MMM DD, YYYY"); // e.g., Sep 23, 2025
+                                                if (!acc[date]) acc[date] = { title: date, data: [] };
+                                                acc[date].data.push(item);
+                                                return acc;
+                                            }, {})
+                                        )}
+                                        keyExtractor={(item, index) => index.toString()}
+                                        renderSectionHeader={({ section: { title } }) => (
+                                            <View style={{ backgroundColor: "#EDF1F3", padding: 10 }}>
+                                                <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR }}>
+                                                    {title}
+                                                </MyText>
+                                            </View>
+                                        )}
+                                        renderItem={({ item, index }) => (
+                                            <TouchableOpacity
+                                                style={{
+                                                    padding: 10,
+                                                    flexDirection: "row",
+                                                    justifyContent: 'space-between',
+                                                    borderBottomWidth: 0.5,
+                                                    borderColor: COLORS?.LIGHT_COLOR,
+                                                    alignItems: "center",
+                                                    paddingBottom: 10
+                                                }}
+                                            >
+                                                <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                                                    <View style={{ width: "90%" }}>
+                                                        <MyText style={{ marginTop: 5, color: COLORS?.BLACK_COLOR, fontWeight: "bold" }}>
+                                                            {item?.userFullName}
+                                                        </MyText>
+                                                        <MyText style={{ marginTop: 5, color: COLORS?.GREY_COLOR }}>
+                                                            {item?.message}
+                                                        </MyText>
+                                                        <MyText style={{ marginTop: 5, color: COLORS?.GREY_COLOR }}>
+                                                            {moment(item?.createdOn).format("hh:mm A")}
+                                                        </MyText>
+                                                    </View>
+                                                </View>
+                                                <TouchableOpacity>
+                                                    <AntDesign name="right" size={15} color={COLORS?.LIGHT_COLOR} />
+                                                </TouchableOpacity>
+                                            </TouchableOpacity>
+                                        )}
+                                    />
+                                </ContentContainer>
+                                {/* <MyText style={{ marginTop: 20, fontWeight: "bold" }}>Timeline</MyText>
+                                <ContentContainer>
+                                    <FlatList
+                                        showsVerticalScrollIndicator={false}
+                                        data={timeLineData}
+                                        ListHeaderComponent={({ item, index: i }) => <MyText style={{ marginTop: 10, fontWeight: "500", color: COLORS?.PRIMARY_COLOR_LIGHT }}>{moment(item?.createdOn).format("DD-MM-YYYY")}</MyText>}
+                                        renderItem={({ item, index: i }) => (
+                                            <>
+                                                <TouchableOpacity style={{ flexDirection: "row", justifyContent: 'space-between', borderBottomWidth: i === (timeLineData?.length - 1) ? 0 : 0.5, borderColor: COLORS?.LIGHT_COLOR, alignItems: "center", paddingBottom: 10 }}>
+                                                    <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+
+                                                        <View style={{ width: "90%" }}>
+                                                            <MyText style={{ marginTop: 5, color: COLORS?.BLACK_COLOR, fontWeight: "bold" }}>{item?.userFullName}</MyText>
+                                                            <MyText style={{ marginTop: 5, color: COLORS?.GREY_COLOR }}>{item?.message}</MyText>
+                                                            <MyText style={{ marginTop: 5, color: COLORS?.GREY_COLOR }}>{moment(item?.createdOn).format("hh:mm a")}</MyText>
+                                                        </View>
+                                                    </View>
+                                                    <TouchableOpacity >
+                                                        <AntDesign name="right" size={15} color={COLORS?.LIGHT_COLOR} />
+                                                    </TouchableOpacity>
+                                                </TouchableOpacity>
+                                            </>
+                                        )}
+                                    />
+                                </ContentContainer> */}
+
+                                <MyText style={{ marginTop: 20, fontWeight: "bold" }}>Parties</MyText>
+                                <ContentContainer style={{ padding: 0 }}>
+
+                                    {
+
+                                        partiesData?.matterPartyDTOList?.map((item, index) => {
+
+                                            return (
+                                                <>
+                                                    <View style={{ padding: 10, borderBottomWidth: partiesData?.matterPartyDTOList?.length - 1 === index ? 0 : 0.5, borderColor: COLORS?.BLACK_COLOR, }}>
+                                                        <View style={{ borderBottomWidth: 0.5, borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
+                                                            <MyText>Party Name</MyText>
+                                                            <MyText style={{ fontWeight: "bold", color: COLORS?.PRIMARY_COLOR_LIGHT }}>{item?.name}</MyText>
+                                                        </View>
+                                                        <View style={{ borderBottomWidth: 0.5, borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
+                                                            <MyText>Relationship</MyText>
+                                                            <MyText style={{ fontWeight: "400", color: COLORS?.BLACK_COLOR, fontSize: calculatefontSize(1.5) }}>{item?.relationship}</MyText>
+                                                        </View>
+                                                        <View style={{ borderBottomWidth: 0.5, borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
+                                                            <MyText>Address</MyText>
+                                                            <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>{item?.address || "-"}</MyText>
+                                                        </View>
+                                                        <View style={{ borderBottomWidth: 0.5, borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
+                                                            <MyText>Phone</MyText>
+                                                            <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>{item?.phone || "-"}</MyText>
+                                                        </View>
+
+                                                        <View style={{ borderColor: COLORS?.LIGHT_COLOR, paddingVertical: 10 }}>
+                                                            <MyText>Email</MyText>
+                                                            <MyText style={{ fontWeight: "500", color: COLORS?.BLACK_COLOR, }}>{item?.email || "-"}</MyText>
+                                                        </View>
+                                                    </View>
+                                                </>
+                                            )
+                                        })
+                                    }
+
+
+
                                 </ContentContainer>
                                 <View style={{ justifyContent: "center", alignItems: "center", marginVertical: 30 }}>
                                     <TouchableOpacity onPress={scrollToTopOrBottom} style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>

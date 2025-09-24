@@ -61,7 +61,7 @@ const Settings = ({ navigation }) => {
         {
             id: 1,
             title: "Profile",
-            icon: IconUri?.profile,
+            icon: IconUri?.newUserss,
             screen: "Profile",
             onPress: () => navigation.navigate("Profile")
         },
@@ -82,7 +82,7 @@ const Settings = ({ navigation }) => {
         {
             id: 3,
             title: 'Logout',
-            icon: IconUri?.logout,
+            icon: IconUri?.newLogout,
 
             // icon: "log-out-outline",
             screen: "Logout",
@@ -108,8 +108,7 @@ const Settings = ({ navigation }) => {
                             borderColor: COLORS?.BORDER_LIGHT_COLOR
                         }}>
                             <TouchableOpacity onPress={item.onPress} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-                                <Image source={item.icon} style={{ height: 25, width: 25 }} />
-                                {/* <Ionicons name={item.icon} size={25} /> */}
+                                <Image tintColor={COLORS?.PRIMARY_COLOR_LIGHT} source={item.icon} style={{ height: 25, width: 25 }} />
                                 {loader ? <MyText style={{ fontFamily: fontFamily.regulaer, fontSize: calculatefontSize(1.9) }}>Loading....</MyText> : <MyText style={{ fontFamily: fontFamily.regulaer, fontSize: calculatefontSize(1.9) }}>{item.title}</MyText>}
                             </TouchableOpacity>
                         </View>

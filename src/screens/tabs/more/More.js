@@ -15,15 +15,15 @@ import { calculatefontSize } from "../../../helper/responsiveHelper";
 
 const More = ({ navigation }) => {
     const data = [
-        { type: "Client", icon: IconUri?.client, screenName: "Clients" },
+        { type: "Client", icon: IconUri?.newClients, screenName: "Clients" },
         { type: "Billing", icon: IconUri?.bill, screenName: "Bills" },
-        { type: "Parties", icon: IconUri?.parties, screenName: "Parties" },
-        { type: "Activities", icon: IconUri?.Activitie, screenName: "Activities" },
+        { type: "Parties", icon: IconUri?.newParties, screenName: "Parties" },
+        { type: "Activities", icon: IconUri?.newActivities, screenName: "Activities" },
         { type: "Documents", icon: IconUri?.documents, screenName: "Documents" },
         { type: "Communications", icon: IconUri?.communication, screenName: "Communications" },
-        { type: "Reports", icon: IconUri?.report, screenName: "Reports" },
+        { type: "Reports", icon: IconUri?.newReports, screenName: "Reports" },
         { type: "Transaction", icon: IconUri?.transaction, screenName: "Transaction" },
-        { type: "Settings", icon: IconUri?.settings, screenName: "AppSettings" },
+        { type: "Settings", icon: IconUri?.newSettings, screenName: "AppSettings" },
 
     ];
 
@@ -53,7 +53,7 @@ const More = ({ navigation }) => {
                             style={styles.card}
                             onPress={() => navigation.navigate(item.screenName)}
                         >
-                            <Image source={item.icon} style={styles.icon} />
+                            <Image tintColor={COLORS?.PRIMARY_COLOR_LIGHT} source={item.icon} style={styles.icon} />
                             <MyText style={styles.text}  >{item.type}</MyText>
 
                         </TouchableOpacity>
@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
         resizeMode: "contain",
     },
     text: {
+        color: COLORS?.PRIMARY_COLOR_LIGHT,
         marginTop: responsiveHeight(1.5),
         fontWeight: "400",
         fontSize: calculatefontSize(1.9),

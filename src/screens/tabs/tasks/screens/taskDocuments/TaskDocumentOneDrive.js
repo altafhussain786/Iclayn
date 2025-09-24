@@ -99,10 +99,7 @@ const TaskDocumentOneDrive = ({ navigation, route }) => {
                                         }
                                         else {
                                             navigation.navigate('DocumentViewerScreen', {
-                                                matterAttachmentId,
-                                                matterId,
-                                                mimeType,
-                                                name,
+                                                indexValue: indexValue, accessToken: accessToken, fileData: item, activeTab: activeTab
                                             });
                                             // dispatch(addDocument(item));
 

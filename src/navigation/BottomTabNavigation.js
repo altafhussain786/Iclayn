@@ -49,13 +49,13 @@ const BottomTabNavigation = () => {
   const getTabIcon = (routeName, focused) => {
     switch (routeName) {
       case "Home":
-        return IconUri?.Home;
+        return IconUri?.newHome;
       case "More":
-        return IconUri?.more;
+        return IconUri?.newMore;
       case "Calender":
-        return IconUri?.Calender;
+        return IconUri?.event;
       case "Matters":
-        return IconUri?.matter;
+        return IconUri?.newMatter;
       case "Tasks":
         return IconUri?.task;
       default:
@@ -81,7 +81,7 @@ const BottomTabNavigation = () => {
                   width: 30,
                   height: 30,
                   opacity: focused ? 1 : 0.4,
-                  // tintColor: focused ? COLORS.PRIMARY_COLOR_LIGHT : '#a1a1a1',
+                  tintColor: focused ? COLORS.PRIMARY_COLOR_LIGHT : '#555555ff',
                 }}
                 resizeMode="contain"
               />

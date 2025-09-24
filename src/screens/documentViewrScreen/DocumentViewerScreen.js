@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { View, ActivityIndicator, StyleSheet, Text } from "react-native";
+import { View, ActivityIndicator, StyleSheet, Text, Image } from "react-native";
 import ImageViewing from "react-native-image-viewing";
 import ScreenHeader from "../../components/ScreenHeader";
 import Wrapper from "../../components/Wrapper";
 import MyText from "../../components/MyText";
 import httpRequest from "../../api/apiHandler";
 
-const FileViewerScreen = ({ route }) => {
+const FileViewerScreen = ({ navigation, route }) => {
     const { matterAttachmentId, matterId, mimeType } = route.params;
+    const { indexValue, accessToken, fileData, activeTab } = route.params
     const [fileUrl, setFileUrl] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showImage, setShowImage] = useState(false);
@@ -15,65 +16,59 @@ const FileViewerScreen = ({ route }) => {
 
 
 
+    console.log(matterAttachmentId, matterId, mimeType, "route.params");
+
     const getFinancialData = async () => {
         const { res, err } = await httpRequest({
             method: 'get',
-            path: `/ic/matter/attachment/1/18/public-url`,
-            navigation: navigation
+            path: mimeType ? `/ic/matter/attachment/1/${matterId}/public-url` : `/ic/matter/attachment/5/22/public-url`,
+            navigation: navigation,
+
         })
         if (res) {
-            console.log(res, "APPI RESPONSE ========================>");
-            // setFileUrl(res?.data);
-            // if (mimeType?.includes("image/jpeg")) {
-            //     setShowImage(true);
-            // }
+            console.log(res?.data, "APPI RESPONSE ==========FINANCIAL DATA==============>");
+
+            setFileUrl(res?.data); // direct image url
+            setLoading(false);
+            setShowImage(true);
         }
         else {
             console.log(err, "GET CUSTOMER RESPONSE===>err");
         }
     }
 
+    const getDocumentPreview = async () => {
+        try {
+            const response = await fetch(
+                `https://graph.microsoft.com/v1.0/drives/b!xO5SWHW3aUqC8o1TfAqDDQyrwgwM8edCq4nn2WKncPALyPhtkY_JSqnGbT1kS1Gt/items/${fileData?.id}/thumbnails/0/large`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                }
+            );
+
+            const data = await response.json();
+            console.log("thumbnail response ==>", data);
+
+            setFileUrl(data?.url); // direct image url
+            setLoading(false);
+            setShowImage(true);
+        } catch (error) {
+            console.error("Error fetching thumbnail:", error);
+        }
+    };
+
 
     useEffect(() => {
-        // const fetchFileUrl = async () => {
-        //     const { res, err } = await httpRequest({
-        //         method: 'get',
-        //         // path: `/ic/matter/attachment/${matterAttachmentId}/${matterId}/public-url`,
-        //         path: `/ic/matter/attachment/1/18/public-url`,
-        //         navigation: navigation
-        //     })
-        //     if (res) {
-        //         console.log(res, "APPI RESPONddSE =====>");
+        if (activeTab === "Office365") {
+            getDocumentPreview();
+        }
+        else {
+            getFinancialData();
 
-        //         // setFileUrl(res?.data);
-        //         // if (mimeType?.includes("image/jpeg")) {
-        //         //     setShowImage(true);
-        //         // }
-        //     }
-        //     else {
-        //         console.log(err, "GET CUSTOMER RESPONSE===>err");
-        //     }
-        //     // try {    
-        //     //     const response = await fetch(
-        //     //         `https://api.iclayn.com:8443/ic/matter/attachment/${matterAttachmentId}/${matterId}/public-url`
-        //     //     );
-        //     //     const json = await response.json();
-        //     //     if (json?.data) {
-        //     //         setFileUrl(json.data);
-
-        //     //         // agar file image hai to image viewer dikhado
-        //     //         if (mimeType?.includes("image/jpeg")) {
-        //     //             setShowImage(true);
-        //     //         }
-        //     //     }
-        //     // } catch (error) {
-        //     //     console.error("Error fetching file url:", error);
-        //     // } finally {
-        //     //     setLoading(false);
-        //     // }
-        // };
-
-        getFinancialData();
+        }
     }, [matterAttachmentId]);
 
     if (loading) {
@@ -85,24 +80,25 @@ const FileViewerScreen = ({ route }) => {
     }
 
     // Agar file image nahi hai
-    if (!mimeType?.includes("image/jpeg")) {
-        return (
-            <View style={styles.loader}>
-                <Text>⚠️ This file type{mimeType} is not supported in app. </Text>
-            </View>
-        );
-    }
+    // if (!mimeType?.includes("image/jpeg")) {
+    //     return (
+    //         <View style={styles.loader}>
+    //             <Text>⚠️ This file type{mimeType} is not supported in app. </Text>
+    //         </View>
+    //     );
+    // }
 
     return (
         <>
             <ScreenHeader />
             {/* <Wrapper> */}
             <MyText>fiel url herer ===={fileUrl}</MyText>
+
             <ImageViewing
                 images={[{ uri: fileUrl }]}
                 imageIndex={0}
                 visible={showImage}
-                onRequestClose={() => setShowImage(false)}
+                onRequestClose={() => navigation.goBack()}
             />
             {/* </Wrapper> */}
         </>

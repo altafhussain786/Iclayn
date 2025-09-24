@@ -1,5 +1,4 @@
 
-
 import {
     Alert,
     FlatList,
@@ -10,7 +9,6 @@ import {
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import LinearGradient from 'react-native-linear-gradient';
-import moment from 'moment';
 import { useDispatch } from 'react-redux';
 
 import Wrapper from '../../../components/Wrapper';
@@ -23,120 +21,102 @@ import { COLORS, fontFamily, IconUri } from '../../../constants';
 import { calculatefontSize } from '../../../helper/responsiveHelper';
 import MyText from '../../../components/MyText';
 import { addDocument } from '../../../store/slices/taskSlice/createItemforDocuments';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { checkTypeForIcon } from '../../../helper/Helpers';
 
 const Documents = ({ navigation, route }) => {
     const matterDetails = route?.params?.matterDetails;
     const dispatch = useDispatch();
 
-    const [tabs, setTabs] = React.useState('Documents');
-    const [documentData, setDocumentData] = React.useState([]);
-    const [filteredData, setFilteredData] = React.useState([]);
+    const [tabs, setTabs] = useState('Documents');
+    const [documentData, setDocumentData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
     const [searchText, setSearchText] = useState('');
-    const [loader, setLoader] = React.useState(false);
-
+    const [loader, setLoader] = useState(false);
 
     // new states @=====> 
     const [organizationData, setOrganizationData] = useState({});
 
+    useEffect(() => {
+        if (tabs === 'Documents') {
+            getDocuments();
+        } else {
+            getOrgaanizationData(); // first fetch org data, then Office365 data
+        }
+    }, [tabs]);
 
     const getOrgaanizationData = async () => {
+        setLoader(true);
         const { res, err } = await httpRequest({
             method: 'get',
             path: `/ic/organization/?orgCode=5024000001`,
             navigation: navigation
-        })
+        });
         if (res) {
             setOrganizationData(res?.data);
-        }
-        else {
+            getOffice365Data(res?.data?.accessToken); // fetch Office365 data with token
+        } else {
             console.log(err);
+            setLoader(false);
         }
-    }
+    };
 
-    useEffect(() => {
-        if (tabs === 'Office365') {
-            getOrgaanizationData();
-        }
-    }, [tabs])
-
-    const getOffice365Data = async () => {
+    const getOffice365Data = async (token) => {
         try {
-            const token = organizationData?.accessToken;
-            console.log(token, 'token');
-
-            const response = await fetch("https://graph.microsoft.com/v1.0/users/info@iclayn.com/drive/root/children?$orderby=lastModifiedDateTime%20desc", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`, // token added here
-                },
-            });
+            const response = await fetch(
+                "https://graph.microsoft.com/v1.0/users/info@iclayn.com/drive/root/children?$orderby=lastModifiedDateTime%20desc",
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    },
+                }
+            );
 
             const data = await response.json();
-            console.log("API Response:==>", data?.value);
+            console.log("API Response to get OFFICE 365 DATA:==>", data?.value);
             setDocumentData(data?.value || []);
-            return data;
+            setFilteredData(data?.value || []);
         } catch (error) {
             console.error("Error fetching data:", error);
+        } finally {
+            setLoader(false);
         }
-
-    }
+    };
 
     const getDocuments = async () => {
-
-
         setLoader(true);
         const { res, err } = await httpRequest({
             method: 'get',
             navigation: navigation,
             path: `/ic/matter/attachment/folder/${matterDetails?.matterId || 0}`
-
         });
         if (res) {
             setFilteredData(res?.data || []);
             setDocumentData(res?.data || []);
-            setLoader(false);
         } else {
             setDocumentData([]);
             console.log('err', err);
-            setLoader(false);
         }
+        setLoader(false);
     };
-
-    useEffect(() => {
-        if (tabs === 'Documents') {
-
-            getDocuments();
-        }
-        else {
-            getOffice365Data();
-        }
-    }, [tabs]);
 
     useEffect(() => {
         if (searchText === '') {
             setFilteredData(documentData);
         } else {
             const filtered = documentData.filter((item) =>
-                (item?.name || '')
-                    .toLowerCase()
-                    .includes(searchText.toLowerCase())
+                (item?.name || '').toLowerCase().includes(searchText.toLowerCase())
             );
             setFilteredData(filtered);
         }
     }, [searchText, documentData]);
 
     // folder/file icon
-
     const renderDocItem = ({ item }) => {
-        console.log(item, 'item');
-
         return (
             <TouchableOpacity
                 onPress={() => {
-
                     const { matterAttachmentId, matterId, mimeType, name } = item || {};
 
                     if (item?.folder) {
@@ -154,30 +134,33 @@ const Documents = ({ navigation, route }) => {
                             mimeType,
                             name,
                         });
+
+                        //                     // if (item?.folder) {
+                        //                     //     if (tabs === 'Office365') {
+
+                        //                     //         navigation.navigate('TaskFileOneDrive', { indexValue: item?.matterAttachmentId, accessToken: organizationData?.accessToken, fileData: item, activeTab: tabs });
+                        //                     //     }
+                        //                     //     else {
+                        //                     //         navigation.navigate('TaskFiles', { indexValue: item?.matterAttachmentId, activeTab: tabs });
+                        //                     //     }
+
+                        //                     // } else {
+                        //                     //     navigation.navigate("DocumentViewerScreen", {
+                        //                     //         matterAttachmentId: item?.matterAttachmentId,
+                        //                     //         matterId: item?.matterId,
+                        //                     //         mimeType: item?.mimeType,
+                        //                     //         name: item?.name,
+                        //                     //     });
+                        //                     // }
                     }
-                    // if (item?.folder) {
-                    //     if (tabs === 'Office365') {
-
-                    //         navigation.navigate('TaskFileOneDrive', { indexValue: item?.matterAttachmentId, accessToken: organizationData?.accessToken, fileData: item, activeTab: tabs });
-                    //     }
-                    //     else {
-                    //         navigation.navigate('TaskFiles', { indexValue: item?.matterAttachmentId, activeTab: tabs });
-                    //     }
-
-                    // } else {
-                    //     navigation.navigate("DocumentViewerScreen", {
-                    //         matterAttachmentId: item?.matterAttachmentId,
-                    //         matterId: item?.matterId,
-                    //         mimeType: item?.mimeType,
-                    //         name: item?.name,
-                    //     });
-                    // }
                 }}
                 style={styles.card}
             >
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                     {checkTypeForIcon(item)}
-                    <MyText style={[styles.titleText, { ellipsisMode: 'tail', width: '80%' }]}>{item?.name}</MyText>
+                    <MyText style={[styles.titleText, { ellipsisMode: 'tail', width: '80%' }]}>
+                        {item?.name}
+                    </MyText>
                 </View>
             </TouchableOpacity>
         );
@@ -195,6 +178,7 @@ const Documents = ({ navigation, route }) => {
             />
 
             {/* 🔹 Tabs */}
+
             <LinearGradient
                 colors={[COLORS?.PRIMARY_COLOR, COLORS?.PRIMARY_COLOR_LIGHT]}
                 start={{ x: 0, y: 0 }}
@@ -260,7 +244,6 @@ const Documents = ({ navigation, route }) => {
                         keyExtractor={(item, index) =>
                             item?.id?.toString() || index.toString()
                         }
-
                         renderItem={renderDocItem}
                         ListFooterComponent={() => <View style={{ height: 100 }} />}
                     />
@@ -319,10 +302,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
     },
     card: {
-        // backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
-        // marginVertical: 6,
-        // marginHorizontal: 10,
-        // borderRadius: 10,
         borderBottomWidth: 1,
         borderColor: COLORS?.BORDER_LIGHT_COLOR,
         padding: 10,

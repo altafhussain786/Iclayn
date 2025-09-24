@@ -102,7 +102,7 @@ export const IconUri = {
 
     //3d icons
     bill: require('../assets/Icons/bill.png'),
-    Calender: require('../assets/Icons/calendarN.png'),
+    Calender: require('../assets/Icons/newIcons/event.png'),
     clock: require('../assets/Icons/clock.png'),
     task: require('../assets/Icons/task.png'),
     more: require('../assets/Icons/more.png'),
@@ -128,6 +128,40 @@ export const IconUri = {
     Activitie: require('../assets/Icons/Activitie.png'),
     settings: require('../assets/Icons/settings.png'),
     imageType: require('../assets/Icons/imageType.png'),
+
+    //new
+    clientFund: require('../assets/Icons/newIcons/clientFund.png'),
+    communication: require('../assets/Icons/newIcons/communication.png'),
+    fund: require('../assets/Icons/newIcons/fund.png'),
+    internalLogs: require('../assets/Icons/newIcons/internalLogs.png'),
+    phoneLogs: require('../assets/Icons/newIcons/phoneLogs.png'),
+    receiveAdvance: require('../assets/Icons/newIcons/receiveAdvance.png'),
+
+    time: require('../assets/Icons/newIcons/time.png'),
+    expense: require('../assets/Icons/newIcons/expense.png'),
+    event: require('../assets/Icons/newIcons/event.png'),
+    task: require('../assets/Icons/newIcons/task.png'),
+    documents: require('../assets/Icons/newIcons/documents.png'),
+    notes: require('../assets/Icons/newIcons/notes.png'),
+    bill: require('../assets/Icons/newIcons/bill.png'),
+    transaction: require('../assets/Icons/newIcons/transaction.png'),
+
+    newHome: require('../assets/Icons/newIcons/home.png'),
+    newMatter: require('../assets/Icons/newIcons/matter.png'),
+    newMore: require('../assets/Icons/newIcons/more.png'),
+
+    newClients: require('../assets/Icons/newIcons/clients.png'),
+    newParties: require('../assets/Icons/newIcons/parties.png'),
+    newActivities: require('../assets/Icons/newIcons/activities.png'),
+    newReports: require('../assets/Icons/newIcons/reports.png'),
+    newSettings: require('../assets/Icons/newIcons/settings.png'),
+
+    newLogout: require('../assets/Icons/newIcons/logout.png'),
+    newUserss: require('../assets/Icons/newIcons/userss.png'),
+    newSearch: require('../assets/Icons/newIcons/search.png'),
+    menu: require('../assets/Icons/newIcons/menu.png'),
+
+
 }
 
 

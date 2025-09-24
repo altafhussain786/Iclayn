@@ -14,22 +14,23 @@ import { calculatefontSize } from '../../../../helper/responsiveHelper'
 import { COLORS } from '../../../../constants'
 import AddButton from '../../../../components/AddButton'
 import { useDispatch, useSelector } from 'react-redux'
-import { addRelatedContact } from '../../../../store/slices/matterSlice/createItemforRelateParties'
+import { addRelatedContact, resetRelatedContacts } from '../../../../store/slices/matterSlice/createItemforRelateParties'
 import RelatedPartiesItems from '../components/RelatedPartiesItems'
 import BillingRateItem from '../components/BillingRateItem'
-import { addBillingRate } from '../../../../store/slices/matterSlice/createItemForBillingRate'
+import { addBillingRate, resetBillingRates } from '../../../../store/slices/matterSlice/createItemForBillingRate'
 import httpRequest from '../../../../api/apiHandler'
 import BottomModalListWithSearch from '../../../../components/BottomModalListWithSearch'
 import DatePicker from 'react-native-date-picker';
 import { useToast } from 'react-native-toast-notifications'
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry'
+import LoaderModal from '../../../../components/LoaderModal'
+import Loader from '../../../../components/Loader'
 
 
 
 
 const EditMatter = ({ navigation, route }) => {
   const matterDetails = route?.params?.matterDetails
-  console.log(matterDetails, "MATTER DETAILS-------------->");
 
   const dispatch = useDispatch()
   const toast = useToast();
@@ -44,6 +45,8 @@ const EditMatter = ({ navigation, route }) => {
   const [practiceAreaId, setPracticeAreaId] = React.useState('');
   const [taskGroupData, setTaskGroupData] = React.useState([]);
   const [referalData, setReferalData] = React.useState([]);
+  const [serviceItemData, setserviceItemData] = useState([]);
+  const [loader, setLoader] = useState(false);
 
   //
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -53,7 +56,13 @@ const EditMatter = ({ navigation, route }) => {
 
   // console.log(userDetails, "USER DETAILS=======>");
 
+
+
+
+
+
   const getDefaultData = async () => {
+
     const { res, err } = await httpRequest({
       method: `get`,
       path: `/ic/matter/${matterDetails?.matterId}`,
@@ -75,22 +84,28 @@ const EditMatter = ({ navigation, route }) => {
           relationship: data?.relationship || '',
         }));
 
+
       });
 
-      res?.data?.matterBillingDTOList?.forEach(billing => {
-        billing?.matterBillingItemDTOList?.forEach(item => {
-          dispatch(addBillingRate({
-            pId: Math.floor(Math.random() * 1000),
-            firmUserObj: item || {},
-            firmUser: item?.userId?.toString() || '', // assuming userId is used as firmUser
-            firmUserId: item?.userId || '',
-            hourlyRate: item?.rate || 0,
-          }));
-        });
-      });
+      // res?.data?.matterBillingDTOList?.forEach(billing => {
+      //   billing?.matterBillingItemDTOList?.forEach(item => {
+      //     console.log(item, "==================================--------------------------------44444444444444444444555555d55555555556666666666666666666666666666");
+
+      //     dispatch(addBillingRate({
+      //       pId: Math.floor(Math.random() * 1000),
+      //       firmUserObj: item || {},
+      //       firmUser: item?.userId?.toString() || '', // assuming userId is used as firmUser
+      //       firmUserId: item?.userId || '',
+      //       serviceItemObj: serviceItemData?.find(si => si?.serviceItemId === item?.serviceItemId) || {},
+      //       hourlyRate: item?.rate || 0,
+      //     }));
+      //   });
+      // });
 
     }
     else {
+
+
       console.log(err, "GET CUSTOMER RESPONSE===>err");
     }
   }
@@ -178,19 +193,70 @@ const EditMatter = ({ navigation, route }) => {
     }
   }
   useEffect(() => {
-
     getTaskGroupData();
   }, [practiceAreaId])
 
 
-  useEffect(() => {
-    getDefaultData();
-    getReferalData();
-    getPracticeArea();
-    getBillingData();
-    getClientData();
-  }, [])
+  const getServiceItem = async () => {
+    const { res, err } = await httpRequest({
+      method: `get`,
+      path: `/ic/si/?status=Active`,
+      navigation: navigation
+    })
 
+    if (res) {
+      setserviceItemData(res?.data);
+    }
+    else {
+      console.log(err, "GET CUSTOMER RESPONSE===>err");
+    }
+  }
+
+
+  useEffect(() => {
+
+    if (serviceItemData?.length > 0 && defaultData?.matterBillingDTOList) {
+      defaultData?.matterBillingDTOList?.forEach(billing => {
+        billing?.matterBillingItemDTOList?.forEach(item => {
+          dispatch(addBillingRate({
+            pId: Math.floor(Math.random() * 1000),
+            firmUserObj: item || {},
+            firmUser: item?.userId?.toString() || '',
+            firmUserId: item?.userId || '',
+            serviceItemObj: serviceItemData.find(si => si?.serviceItemId === item?.serviceItemId) || {},
+            hourlyRate: item?.rate || 0,
+          }));
+        });
+      });
+
+
+    }
+
+
+  }, [serviceItemData, defaultData]);
+
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoader(true);
+
+        await getServiceItem();
+        await getDefaultData();
+        await getReferalData();
+        await getPracticeArea();
+        await getBillingData();
+        await getClientData();
+
+      } catch (error) {
+        console.log(error, "LOAD DATA ERROR");
+      } finally {
+        setLoader(false); // ab sahi jagah
+      }
+    };
+
+    loadData();
+  }, []);
 
   const matterStatus = [
     {
@@ -232,11 +298,11 @@ const EditMatter = ({ navigation, route }) => {
       name: 'Hourly',
       value: 'hourly'
     },
-    // {
-    //     id: 2,
-    //     name: 'Fixed fee details',
-    //     value: 'fixedfeedetails'
-    // },
+    {
+      id: 2,
+      name: 'Fixed fee details',
+      value: 'fixedfeedetails'
+    },
     {
       id: 3,
       name: 'Contingency fee default',
@@ -270,7 +336,7 @@ const EditMatter = ({ navigation, route }) => {
     .map(id => Number(id.trim()))
     .filter(id => !isNaN(id));
 
-  console.log(clientIds, "client ids ====>");
+
 
   // 2. Filter client items
   const clientItems = clientData?.filter(item =>
@@ -279,11 +345,11 @@ const EditMatter = ({ navigation, route }) => {
 
   // 3. Extract first email
   const client = clientItems?.[0]?.clientEmailAddressDTOList?.[0]?.email || '';
-  console.log(client, "client ids ====>");
+
 
   // 4. First client object
   const clientObj = clientItems?.[0] || {};
-  console.log(clientObj, "client ids ====>");
+
 
   const getUserData = (id) => {
     return billingData?.find(user => user.userId === id);
@@ -299,7 +365,6 @@ const EditMatter = ({ navigation, route }) => {
   // console.log(billingData,"BILLING DATA",defaultData?.feeEarnerSolicitorId);
 
 
-  console.log(defaultData, '===========itemsForBillindg===================================================TASK GROUD============>');
 
 
 
@@ -402,9 +467,14 @@ const EditMatter = ({ navigation, route }) => {
             isBillable: defaultData?.billable || false,
 
             //Billing Method
-            billingMethod: '',
+            billingMethod: defaultData?.matterBillingDTOList?.length > 0 ? (defaultData?.matterBillingDTOList[0]?.method === 'HOURLY'
+              ? 'Hourly'
+              : defaultData?.matterBillingDTOList[0]?.method === 'FIXEDFEEDETAILS'
+                ? 'Fixed fee details'
+                : 'Contingency fee default') : '',
+            // billingMethod: defaultData?.matterBillingDTOList[0]?.method === 'HOURLY' ? 'Hourly' ? 'fixedfeedetails' : 'Fixed fee details' : 'Contingency fee default',
             billingMethodObj: {},
-            billingMethodValue: '',
+            billingMethodValue: defaultData?.matterBillingDTOList?.length > 0 ? defaultData?.matterBillingDTOList[0]?.method : '',
             isOpenBillingMethod: false,
 
             //Matter budger
@@ -432,18 +502,18 @@ const EditMatter = ({ navigation, route }) => {
             isOpenSelectReferal: false,
 
             //loader
-            loader: false
+            loader: false,
+            isDataLoader: loader || false,
           }
         }
         // validationSchema={validationSchema}
         onSubmit={async (values, { setFieldValue }) => {
-          console.log(values?.matterNotificationItem, "ITEMS FOR BILLING");
+
+
 
 
           const mappedData = itemsForBilling?.map((item, index) => {
-            console.log(item, "MAPPED DATA ++++++++++++++++++++++++++++");
-
-            return {
+            const baseObj = {
               createdOn: item?.firmUserObj?.createdOn || "",
               updatedOn: item?.updatedOn || null,
               createdBy: null,
@@ -453,7 +523,26 @@ const EditMatter = ({ navigation, route }) => {
               userId: item?.firmUserObj?.userId || 0,
               rate: item?.hourlyRate || 0,
               fixedFeeCategory: null,
+            };
+
+            // conditionally serviceItemId add karo
+            if (values?.billingMethod === "Fixed fee details") {
+              baseObj.serviceItemId = item?.serviceItemObj?.serviceItemId; // ya jo id chahiye
             }
+
+            return baseObj;
+
+            // return {
+            // createdOn: item?.firmUserObj?.createdOn || "",
+            // updatedOn: item?.updatedOn || null,
+            // createdBy: null,
+            // updatedBy: null,
+            // revision: null,
+            // matterBillingItemId: item?.firmUserObj?.matterBillingItemId || null,
+            // userId: item?.firmUserObj?.userId || 0,
+            // rate: item?.hourlyRate || 0,
+            // fixedFeeCategory: null,
+            // }
           })
 
           const mappedPerUser = values?.addUserItems?.map((item, index) => {
@@ -530,7 +619,7 @@ const EditMatter = ({ navigation, route }) => {
             description: values?.description,
             docProcessed: false,
             feeEarnerSolicitorId: values?.feeEarnerSolicitorObj?.userId || 0,
-            feeEarnerSolicitorName: values?.feeEarnerSolicitorObj?.userProfileDTO.fullName || "",
+            feeEarnerSolicitorName: values?.feeEarnerSolicitorObj?.userProfileDTO ? values?.feeEarnerSolicitorObj?.userProfileDTO.fullName : "",
             location: values?.location,
             matterBillingDTOList: [{
               createdOn: "",
@@ -556,7 +645,7 @@ const EditMatter = ({ navigation, route }) => {
             stage: values?.matterStage || "New",
             status: values?.matterStatus || "Open",
             supervisorSolicitorId: values?.supervisorSolicitorObj?.userId || 0,
-            supervisorSolicitorName: values?.supervisorSolicitorObj?.userProfileDTO.fullName || "",
+            supervisorSolicitorName: values?.supervisorSolicitorObj?.userProfileDTO ? values?.supervisorSolicitorObj?.userProfileDTO.fullName : "",
             taskGroupId: values?.taskGroupObj?.taskGroupId || null,
 
 
@@ -564,7 +653,7 @@ const EditMatter = ({ navigation, route }) => {
             updatedOn: moment().toISOString() || null
           };
 
-          // console.log(payload,"PAYLOAD EDIT ==================>");
+          console.log(payload, "PAYLOAD EDIT ==================>");
 
           setFieldValue('loader', true)
           const { res, err, status } = await httpRequest({
@@ -576,6 +665,8 @@ const EditMatter = ({ navigation, route }) => {
           if (res) {
             toast.show('Matter Updated successfully', { type: 'success' })
             setFieldValue('loader', false)
+            dispatch(resetBillingRates())
+            dispatch(resetRelatedContacts())
             navigation.goBack()
           } else {
             setFieldValue('loader', false)
@@ -588,7 +679,14 @@ const EditMatter = ({ navigation, route }) => {
         {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
 
           <>
-            <ScreenHeader isLoading={values?.loader} onPressSave={handleSubmit} isShowSave={true} extraStyle={{ backgroundColor: '#F5F6F8' }} isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title="Edit Matter" />
+            <LoaderModal visible={loader} />
+            {/* <MyText>{values?.isDataLoader ? "TRUE" : "FLASE"}</MyText> */}
+            <ScreenHeader isLoading={values?.loader} onPressSave={handleSubmit} isShowSave={true} extraStyle={{ backgroundColor: '#F5F6F8' }} isGoBack={true} onPress={() => {
+              dispatch(resetBillingRates())
+              dispatch(resetRelatedContacts())
+              navigation.goBack()
+            }
+            } isShowTitle={true} title="Edit Matter" />
             <Wrapper>
               <KeyboardAvoidingView
                 style={{ flex: 1 }}
@@ -760,7 +858,6 @@ const EditMatter = ({ navigation, route }) => {
                             (
                               <View style={{ marginTop: 10 }}>
                                 {arrayValue.map((item, index) => (
-                                  console.log(item), "CUSTOM VIEWd =d==>",
 
                                   <View
                                     key={item.userId}
@@ -873,12 +970,12 @@ const EditMatter = ({ navigation, route }) => {
 
                   {/* =============================Billing rates  */}
                   <View style={{ borderBottomWidth: 1, borderColor: COLORS?.LIGHT_COLOR, marginVertical: 10, }}>
-                    <MyText style={styles.title}>{values?.billingMethod !== "Hourly" ? `Contingency fee defaults` : `Billing rates`}</MyText>
+                    <MyText style={styles.title}>{values?.billingMethod !== "Hourly" ? `Contingency fee defaults` : `Billing rates`} </MyText>
                     {
                       itemsForBilling?.map((item, index) => {
                         return (
                           <>
-                            <BillingRateItem item={item} navigation={navigation} />
+                            <BillingRateItem billingMethod={values?.billingMethod} item={item} navigation={navigation} />
 
                           </>
                         )
@@ -1099,7 +1196,6 @@ const EditMatter = ({ navigation, route }) => {
                 <BottomModalListWithSearch
                   onClose={() => setFieldValue('isOpenAddUserPermission', false)}
                   renderItem={({ item }) => (
-                    console.log(item, "dfdljhfkj===>"),
 
                     <TouchableOpacity
                       onPress={() => {
@@ -1133,7 +1229,6 @@ const EditMatter = ({ navigation, route }) => {
                 <BottomModalListWithSearch
                   onClose={() => setFieldValue('isOpenMatterNotificationUser', false)}
                   renderItem={({ item }) => (
-                    console.log(item, "dfdljhfkj===>"),
 
                     <TouchableOpacity
                       onPress={() => {
@@ -1189,7 +1284,6 @@ const EditMatter = ({ navigation, route }) => {
                 <BottomModalListWithSearch
                   onClose={() => setFieldValue('isOpenSelectReferal', false)}
                   renderItem={({ item }) => (
-                    console.log(item, "dfdljhfkj===>"),
 
                     <TouchableOpacity
                       onPress={() => {

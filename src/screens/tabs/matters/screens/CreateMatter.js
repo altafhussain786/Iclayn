@@ -183,11 +183,11 @@ const CreateMatter = ({ navigation }) => {
             name: 'Hourly',
             value: 'hourly'
         },
-        // {
-        //     id: 2,
-        //     name: 'Fixed fee details',
-        //     value: 'fixedfeedetails'
-        // },
+        {
+            id: 2,
+            name: 'Fixed fee details',
+            value: 'fixedfeedetails'
+        },
         {
             id: 3,
             name: 'Contingency fee default',
@@ -315,10 +315,9 @@ const CreateMatter = ({ navigation }) => {
                 }
                 validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
-                    console.log(values?.selectedDate, "========================================== selectReferalItems");
 
                     const mappedData = itemsForBilling?.map((item, index) => {
-                        return {
+                        const baseObj = {
                             createdOn: "",
                             updatedOn: null,
                             createdBy: null,
@@ -328,8 +327,18 @@ const CreateMatter = ({ navigation }) => {
                             userId: item?.firmUserObj?.userId || 0,
                             rate: item?.hourlyRate || 0,
                             fixedFeeCategory: null,
+                        };
+
+                        // conditionally serviceItemId add karo
+                        if (values?.billingMethod === "Fixed fee details") {
+                            baseObj.serviceItemId = item?.serviceItemObj?.serviceItemId; // ya jo id chahiye
                         }
-                    })
+
+                        return baseObj;
+                    });
+
+                    console.log(mappedData, "mappedData", itemsForBilling, "itemsForBilling", "billing mehod==>", values.billingMethod);
+
 
                     const mappedPerUser = values?.addUserItems?.map((item, index) => {
                         return {
@@ -400,9 +409,9 @@ const CreateMatter = ({ navigation }) => {
                         code: null,
                         description: values?.description,
                         supervisorSolicitorId: values?.supervisorSolicitorObj?.userId || 0,
-                        supervisorSolicitorName: values?.supervisorSolicitorObj?.userProfileDTO.fullName || "",
+                        supervisorSolicitorName: values?.supervisorSolicitorObj?.userProfileDTO ? values?.supervisorSolicitorObj?.userProfileDTO.fullName : "",
                         feeEarnerSolicitorId: values?.feeEarnerSolicitorObj?.userId || 0,
-                        feeEarnerSolicitorName: values?.feeEarnerSolicitorObj?.userProfileDTO.fullName || "",
+                        feeEarnerSolicitorName: values?.feeEarnerSolicitorObj?.userProfileDTO ? values?.feeEarnerSolicitorObj?.userProfileDTO.fullName : "",
                         clientRefNo: values?.clientRefNumber || "",
                         location: values?.location || "",
                         status: values?.matterStatus || "Open",
@@ -747,7 +756,7 @@ const CreateMatter = ({ navigation }) => {
                                             itemsForBilling?.map((item, index) => {
                                                 return (
                                                     <>
-                                                        <BillingRateItem item={item} navigation={navigation} />
+                                                        <BillingRateItem billingMethod={values?.billingMethod} item={item} navigation={navigation} />
 
                                                     </>
                                                 )

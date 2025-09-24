@@ -30,14 +30,14 @@ const TimekeeperModal = ({ visible, onClose, navigation }) => {
     const [startTime, setStartTime] = useState(null);
     const intervalRef = useRef(null);
     const options = [
-        { label: 'Matter', icon: 'briefcase', onPress: () => navigation.navigate("CreateMatter"), iconName: IconUri?.matter },
+        { label: 'Matter', icon: 'briefcase', onPress: () => navigation.navigate("CreateMatter"), iconName: IconUri?.newMatter },
         { label: 'Task', icon: 'check-square', onPress: () => navigation.navigate("CreateTask"), iconName: IconUri?.task },
         { label: 'Event', icon: 'calendar', onPress: () => navigation.navigate("Event"), iconName: IconUri?.Calender },
         { label: 'Billing', icon: 'Bill', onPress: () => navigation.navigate("CreateBilling"), iconName: IconUri?.bill },
-        { label: 'Time entry', icon: 'clock-o', onPress: () => navigation.navigate("CreateTimeEntry"), iconName: IconUri?.clock },
-        { label: 'Expense', icon: 'file-text', onPress: () => navigation.navigate("CreateExpense"), iconName: IconUri?.matter },
-        { label: 'Client', icon: 'file-text', onPress: () => navigation.navigate("CreateClients"), iconName: IconUri?.client },
-        { label: 'Parties', icon: 'file-text', onPress: () => navigation.navigate("CreateParties"), iconName: IconUri?.parties },
+        { label: 'Time entry', icon: 'clock-o', onPress: () => navigation.navigate("CreateTimeEntry"), iconName: IconUri?.event },
+        { label: 'Expense', icon: 'file-text', onPress: () => navigation.navigate("CreateExpense"), iconName: IconUri?.expense },
+        { label: 'Client', icon: 'file-text', onPress: () => navigation.navigate("CreateClients"), iconName: IconUri?.newClients },
+        { label: 'Parties', icon: 'file-text', onPress: () => navigation.navigate("CreateParties"), iconName: IconUri?.newParties },
         { label: 'Transaction', icon: 'file-text', onPress: () => navigation.navigate("CreateTransaction"), iconName: IconUri?.transaction },
         { label: 'Communications', icon: 'file-text', onPress: () => navigation.navigate("Communications"), iconName: IconUri?.communication },
     ];
@@ -184,7 +184,7 @@ const TimekeeperModal = ({ visible, onClose, navigation }) => {
                                     style={styles.optionItem}
                                     > */}
                                 <TouchableOpacity style={styles.optionItem} onPress={() => { onClose(), item.onPress() }} >
-                                    <Image source={item.iconName} style={{ height: 40, width: 50, resizeMode: "contain" }} />
+                                    <Image tintColor={COLORS?.PRIMARY_COLOR_LIGHT} source={item.iconName} style={{ height: 40, width: 50, resizeMode: "contain" }} />
                                     {/* <FontAwesome name={item.icon} size={30} color="#B6F0E2" /> */}
                                 </TouchableOpacity>
                                 {/* </LinearGradient> */}
@@ -274,10 +274,11 @@ const styles = StyleSheet.create({
         // marginRight: 10,
     },
     optionLabel: {
+        color: COLORS?.PRIMARY_COLOR_LIGHT,
         fontSize: calculatefontSize(1.5),
         fontWeight: 'bold',
         marginTop: 4,
-        color: COLORS?.BLACK_COLOR,
+        // color: COLORS?.BLACK_COLOR,
     },
 });
 

@@ -16,6 +16,7 @@ import { calculatefontSize, getResponsiveWidth } from '../../../helper/responsiv
 import MyText from '../../../components/MyText';
 import { Swipeable } from 'react-native-gesture-handler';
 import { useToast } from 'react-native-toast-notifications';
+import moment from 'moment';
 
 
 
@@ -123,26 +124,87 @@ const Communications = ({ navigation, route }) => {
         }
     }, [searchText, tabs, communicationData]);
 
+    // const renderLeftActions = (item) => (
+    //     <View style={{ flexDirection: 'row' }}>
+    //         <TouchableOpacity
+    //             onPress={() => navigation.navigate(item?.type === 'Phone' ? "EditPhoneLog" : "EditInternalLog", { communicationDetails: item })}
+    //             style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+    //         >
+    //             <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
+    //         </TouchableOpacity>
+    //     </View>
+    // );
+    // const renderRightActions = (item) => (
+    //     <View style={{ flexDirection: 'row' }}>
+    //         <TouchableOpacity
+    //             onPress={() => handleDeleteItems(item)}
+    //             style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
+    //         >
+    //             <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
+    //         </TouchableOpacity>
+    //     </View>
+    // );
+
     const renderLeftActions = (item) => (
-        <View style={{ flexDirection: 'row' }}>
-            <TouchableOpacity
-                onPress={() => navigation.navigate(item?.type === 'Phone' ? "EditPhoneLog" : "EditInternalLog", { communicationDetails: item })}
-                style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
-            >
-                <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
-            </TouchableOpacity>
-        </View>
+
+        <TouchableOpacity onPress={() => navigation.navigate(item?.type === 'Phone' ? "EditPhoneLog" : "EditInternalLog", { communicationDetails: item })} style={styles.leftSwipe}>
+            <AntDesign name="edit" size={20} color={COLORS?.BLACK_COLOR} />
+        </TouchableOpacity>
+
     );
     const renderRightActions = (item) => (
-        <View style={{ flexDirection: 'row' }}>
-            <TouchableOpacity
-                onPress={() => handleDeleteItems(item)}
-                style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
-            >
-                <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
-            </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={() => handleDeleteItems(item)} style={[styles.leftSwipe, { backgroundColor: COLORS?.RED_COLOR }]}>
+            <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
+        </TouchableOpacity>
+
     );
+
+    const renderCommunicationItem = ({ item }) => {
+        return (
+            <Swipeable
+                renderLeftActions={() => renderLeftActions(item)}
+                renderRightActions={() => renderRightActions(item)}
+                overshootLeft={false}
+                overshootRight={false}
+            >
+                <TouchableOpacity activeOpacity={0.8} style={styles.card}>
+                    {/* Header Row: Subject & Status */}
+                    <View style={styles.headerRow}>
+                        <MyText style={styles.codeText}>
+                            {item?.subject || "No Subject"}
+                        </MyText>
+                        <View
+                            style={[
+                                styles.statusBadge,
+                                { backgroundColor: item?.status === "DELETED" ? COLORS.RED_COLOR : "#22C55E" },
+                            ]}
+                        >
+                            <MyText style={styles.statusText}>{item?.status}</MyText>
+                        </View>
+                    </View>
+
+                    {/* Type & Description */}
+                    <MyText style={styles.mainText}>{item?.type}</MyText>
+                    {item?.description ? (
+                        <MyText style={styles.descText}>{item?.description}</MyText>
+                    ) : null}
+
+                    {/* Date & Timer */}
+                    <View style={styles.dateRow}>
+                        {item?.createdOn && (
+                            <MyText style={styles.dateText}>
+                                {moment(item?.createdOn).format("DD/MM/YYYY")}
+                            </MyText>
+                        )}
+                        {item?.timer && (
+                            <MyText style={styles.dueText}>{item?.timer}</MyText>
+                        )}
+                    </View>
+                </TouchableOpacity>
+            </Swipeable>
+        );
+    };
+
     return (
         <>
 
@@ -184,8 +246,8 @@ const Communications = ({ navigation, route }) => {
                     <View>
                         <TouchableOpacity onPress={() => setIsShowCreate(!isShowCreate)}>
                             <Image
-                                source={IconUri?.hamBurger}
-                                style={{ height: 30, width: 30, resizeMode: "contain", }}
+                                source={IconUri?.menu}
+                                style={{ height: 40, width: 40, bottom: 10, resizeMode: "contain", }}
                             />
                         </TouchableOpacity>
                         {isShowCreate && <View style={{ backgroundColor: COLORS?.whiteColors, padding: 10, position: "absolute", width: 100, top: 30, right: 10, borderWidth: 0.5, borderRadius: 5, zIndex: 1 }}>
@@ -193,7 +255,7 @@ const Communications = ({ navigation, route }) => {
                                 CreateItem?.map((item, index) => {
                                     return (
                                         <>
-                                            <TouchableOpacity onPress={() => { navigation.navigate(item?.screenName) }}>
+                                            <TouchableOpacity key={index} onPress={() => { navigation.navigate(item?.screenName) }}>
                                                 <MyText style={{ color: COLORS?.BLACK_COLOR, fontSize: calculatefontSize(1.8) }}>{item?.name}</MyText>
                                             </TouchableOpacity>
                                         </>
@@ -207,48 +269,56 @@ const Communications = ({ navigation, route }) => {
                 {loader ? <Loader /> :
 
                     filteredData?.length > 0 ?
+
                         <FlatList
                             showsVerticalScrollIndicator={false}
                             data={filteredData}
                             keyExtractor={(item, index) => index.toString()}
-                            renderItem={({ item, i }) => {
-                                return (
-                                    <Swipeable renderLeftActions={() => renderLeftActions(item)} renderRightActions={() => renderRightActions(item)}>
-                                        <View
-                                            style={{
-                                                flexDirection: "row",
-                                                justifyContent: "space-between",
-                                                alignItems: "center",
-                                                gap: 10,
-                                                borderBottomWidth: 1,
-                                                paddingVertical: 15,
-                                                borderColor: COLORS?.BORDER_LIGHT_COLOR,
-                                            }}
-                                        >
-                                            <View style={{ gap: 5, width: "65%", }}>
-                                                <MyText style={styles.timeColor}>{item?.type}</MyText>
-                                                <MyText style={[styles.txtStyle, { fontWeight: "300" }]}>
-                                                    {item?.subject}
-                                                </MyText>
-                                                {item?.description !== "" && <MyText style={styles.timeColor}>
-                                                    {item?.subject}
-                                                </MyText>}
-                                            </View>
-                                            <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
-                                                {/* <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "right" }]}>${formatNumber(item?.balance)}</MyText> */}
-                                                {item?.timer && <MyText style={[styles.txtStyle,]}>{item?.timer}</MyText>}
-                                                <View style={{ backgroundColor: item?.status == "DELETED" ? COLORS?.RED_COLOR : "#22C55E", alignSelf: "flex-end", width: getResponsiveWidth(20), borderRadius: 5, paddinHorizontal: 30 }}>
-                                                    <MyText style={[styles.timeColor, { fontWeight: "300", textAlign: "center", color: COLORS?.whiteColors }]}>
-                                                        {item?.status}
-                                                    </MyText>
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </Swipeable>
-                                );
-                            }}
+                            renderItem={renderCommunicationItem}
                             ListFooterComponent={() => <View style={{ height: 100 }} />}
                         />
+                        // <FlatList
+                        //     showsVerticalScrollIndicator={false}
+                        //     data={filteredData}
+                        //     keyExtractor={(item, index) => index.toString()}
+                        //     renderItem={({ item, i }) => {
+                        //         return (
+                        //             <Swipeable renderLeftActions={() => renderLeftActions(item)} renderRightActions={() => renderRightActions(item)}>
+                        //                 <View
+                        //                     style={{
+                        //                         flexDirection: "row",
+                        //                         justifyContent: "space-between",
+                        //                         alignItems: "center",
+                        //                         gap: 10,
+                        //                         borderBottomWidth: 1,
+                        //                         paddingVertical: 15,
+                        //                         borderColor: COLORS?.BORDER_LIGHT_COLOR,
+                        //                     }}
+                        //                 >
+                        //                     <View style={{ gap: 5, width: "65%", }}>
+                        //                         <MyText style={styles.timeColor}>{item?.type}</MyText>
+                        //                         <MyText style={[styles.txtStyle, { fontWeight: "300" }]}>
+                        //                             {item?.subject}
+                        //                         </MyText>
+                        //                         {item?.description !== "" && <MyText style={styles.timeColor}>
+                        //                             {item?.subject}
+                        //                         </MyText>}
+                        //                     </View>
+                        //                     <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
+                        //                         {/* <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "right" }]}>${formatNumber(item?.balance)}</MyText> */}
+                        //                         {item?.timer && <MyText style={[styles.txtStyle,]}>{item?.timer}</MyText>}
+                        //                         <View style={{ backgroundColor: item?.status == "DELETED" ? COLORS?.RED_COLOR : "#22C55E", alignSelf: "flex-end", width: getResponsiveWidth(20), borderRadius: 5, paddinHorizontal: 30 }}>
+                        //                             <MyText style={[styles.timeColor, { fontWeight: "300", textAlign: "center", color: COLORS?.whiteColors }]}>
+                        //                                 {item?.status}
+                        //                             </MyText>
+                        //                         </View>
+                        //                     </View>
+                        //                 </View>
+                        //             </Swipeable>
+                        //         );
+                        //     }}
+                        //     ListFooterComponent={() => <View style={{ height: 100 }} />}
+                        // />
                         :
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 10 }}>
                             <Image source={IconUri?.Activitie} style={{ height: 30, width: 30, resizeMode: "contain" }} />
@@ -304,5 +374,64 @@ const styles = StyleSheet.create({
         color: COLORS.PRIMARY_COLOR,
         textAlign: 'center',
         marginTop: 20,
+    },
+    // ==>
+    card: {
+        backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
+        padding: 15,
+        marginVertical: 6,
+        borderRadius: 8,
+        elevation: 1,
+        shadowColor: '#ccc',
+        // marginHorizontal: 10
+    },
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+    },
+    codeText: {
+        color: COLORS.PRIMARY_COLOR,
+        fontWeight: '600',
+        fontSize: calculatefontSize(1.8)
+    },
+    mainText: {
+        fontSize: calculatefontSize(1.7),
+        fontWeight: '500',
+        marginTop: 4
+    },
+    dateRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 4
+    },
+    dateText: {
+        fontSize: calculatefontSize(1.3),
+        color: '#444'
+    },
+    dueText: {
+        fontSize: calculatefontSize(1.3),
+        color: 'red'
+    },
+    statusBadge: {
+        paddingVertical: 4,
+        paddingHorizontal: 10,
+        borderRadius: 6,
+        alignSelf: 'flex-end'
+    },
+    statusText: {
+        fontSize: calculatefontSize(1.3),
+        color: COLORS?.whiteColors
+    },
+    leftSwipe: {
+        backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
+        justifyContent: 'center',
+
+        alignItems: 'flex-start',
+        paddingHorizontal: 20,
+        marginHorizontal: 10,
+        marginVertical: 6,
+        // borderRadius: 8,
+        // flex: 1,
     },
 })

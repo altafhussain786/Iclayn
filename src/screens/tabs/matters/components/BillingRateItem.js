@@ -10,18 +10,22 @@ import BottomModalListWithSearch from '../../../../components/BottomModalListWit
 import httpRequest from '../../../../api/apiHandler';
 import { calculatefontSize } from '../../../../helper/responsiveHelper';
 import TextInputWithTitle from '../../../../components/TextInputWithTitle';
-import { removeBillingRate, updateBillingRate, updateHourlyRate } from '../../../../store/slices/matterSlice/createItemForBillingRate';
+import { removeBillingRate, updateBillingRate, updateHourlyRate, updateServiceItem } from '../../../../store/slices/matterSlice/createItemForBillingRate';
 import { object } from 'yup';
 
-const BillingRateItem = ({ item, navigation }) => {
-    console.log(item?.firmUser?.length > 0 ? item?.firmUser : 'What is the contacts name ?', '??????????????????????????????');
+const BillingRateItem = ({ billingMethod, item, navigation }) => {
+
+    console.log(item, "====?");
 
     //Account name Selections
     const [selectFirmUser, setselectFirmUser] = useState(item?.firmUser || 'What is the contacts name ?');
+    const [selectServiceItem, setselectServiceItem] = useState(item?.serviceItemObj?.name || 'Find Category');
     const [hourlyRate, sethourlyRate] = useState(item?.hourlyRate || null);
     const [isOpenDropDown, setisOpenDropDown] = useState(false);
+    const [isOpenCategory, setIsOpenCategory] = useState(false);
 
     const [billingData, setbillingData] = useState([]);
+    const [serviceItemData, setserviceItemData] = useState([]);
     const dispatch = useDispatch();
     const PID = item?.pId;
 
@@ -31,17 +35,7 @@ const BillingRateItem = ({ item, navigation }) => {
             path: `/ic/user/?status=Active`,
             navigation: navigation
         })
-        // if (res) {
-        //     // console.log(res?.data, "==>BIILLLIND DATA");
 
-        //     setbillingData(res?.data);
-        //     if (Object.keys(item).length > 0) {
-        //           const selectedPartyName = res?.data?.find(pt => pt?.userId === item?.firmUserId);
-        //     //    console.log(selectedPartyName,"===============f============>");
-
-        //         setselectFirmUser(selectedPartyName?.roleNames || 'What is the contacts name ?');
-        //     }
-        // }
         if (res) {
             setbillingData(res?.data);
             if (Object.keys(item).length > 0) {
@@ -53,7 +47,27 @@ const BillingRateItem = ({ item, navigation }) => {
             console.log(err, "GET CUSTOMER RESPONSE===>err");
         }
     }
+    const getServiceItem = async () => {
+        const { res, err } = await httpRequest({
+            method: `get`,
+            path: `/ic/si/?status=Active`,
+            navigation: navigation
+        })
 
+        if (res) {
+            setserviceItemData(res?.data);
+
+        }
+        else {
+            console.log(err, "GET CUSTOMER RESPONSE===>err");
+        }
+    }
+
+
+
+    useEffect(() => {
+        getServiceItem();
+    }, [isOpenCategory])
 
 
 
@@ -89,6 +103,21 @@ const BillingRateItem = ({ item, navigation }) => {
                                         <MyText style={{ color: selectFirmUser === "What is the contacts name ?" ? COLORS?.LIGHT_COLOR : COLORS?.PRIMARY_COLOR }}>{selectFirmUser}</MyText>
                                     </TouchableOpacity>
                                 </View>
+                                {billingMethod == "Fixed fee details" &&
+                                    <>
+                                        <View style={{ marginVertical: 10 }}>
+                                            <MyText style={styles.lables}>
+                                                Service Item
+                                            </MyText>
+                                            <View style={{ flexDirection: "row", gap: 10, alignItems: "center", backgroundColor: COLORS?.BORDER_LIGHT_COLOR, borderWidth: 0.5, padding: 8, borderColor: COLORS?.DIVIDER_BORDER_COLOR, borderRadius: 5, marginTop: 10 }}>
+
+                                                <TouchableOpacity onPress={() => setIsOpenCategory(true)} style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+                                                    <MyText style={{ color: selectServiceItem === "Find Category" ? COLORS?.LIGHT_COLOR : COLORS?.PRIMARY_COLOR }}>{selectServiceItem}</MyText>
+                                                </TouchableOpacity>
+                                            </View>
+                                        </View>
+                                    </>
+                                }
                                 <TextInputWithTitle
                                     keyboardType='numeric'
                                     value={hourlyRate?.toString()}
@@ -98,10 +127,7 @@ const BillingRateItem = ({ item, navigation }) => {
                                     onChangeText={(txt) => { sethourlyRate(txt); dispatch(updateHourlyRate({ pId: PID, hourlyRate: Number(txt) })) }}
                                 />
 
-                                {/* <TouchableOpacity onPress={() => console.log(item)
-                                }>
-                                    <MyText>LOGS</MyText>
-                                </TouchableOpacity> */}
+
                             </>
                         </View>
 
@@ -111,21 +137,7 @@ const BillingRateItem = ({ item, navigation }) => {
                             renderItem={({ item }) => (
 
                                 <TouchableOpacity
-                                    // onPress={() => {
-                                    //     // console.log(item, "item");
-                                    //     dispatch(updateBillingRate(
-                                    //         {
-                                    //             pId: PID,
-                                    //             firmUserObj: item,
-                                    //             firmUser: item.userProfileDTO?.fullName || '',
-                                    //             firmUserId: 9934,
-                                    //             hourlyRate: item.userProfileDTO?.billingRate
-                                    //         }
-                                    //     ));
-                                    //     sethourlyRate(item.userProfileDTO?.billingRate);
-                                    //     setselectFirmUser(item.userProfileDTO?.fullName);
-                                    //     setisOpenDropDown(false);
-                                    // }}
+
                                     onPress={() => {
                                         dispatch(updateBillingRate({
                                             pId: PID,
@@ -156,6 +168,42 @@ const BillingRateItem = ({ item, navigation }) => {
                             visible={isOpenDropDown}
                             data={billingData}
                             searchKey="email"
+                        />
+
+
+                        <BottomModalListWithSearch
+                            onClose={() => setIsOpenCategory(false)}
+                            renderItem={({ item }) => (
+
+                                <TouchableOpacity
+
+                                    onPress={() => {
+                                        dispatch(updateServiceItem({
+                                            pId: PID,
+                                            serviceItemObj: item,
+                                        }));
+                                        // sethourlyRate(item?.userProfileDTO?.billingRate || 0);
+                                        setselectServiceItem(item?.name || 'Unknown User'); // <-- fallback added
+                                        setIsOpenCategory(false);
+                                    }}
+                                    style={{
+                                        borderBottomWidth: 1,
+                                        paddingVertical: 10,
+                                        borderColor: COLORS?.BORDER_LIGHT_COLOR
+                                    }}
+                                >
+                                    <MyText
+                                        style={{
+                                            fontSize: calculatefontSize(1.9)
+                                        }}
+                                    >
+                                        {item?.name}
+                                    </MyText>
+                                </TouchableOpacity>
+                            )}
+                            visible={isOpenCategory}
+                            data={serviceItemData}
+                            searchKey="name"
                         />
                     </View>
                 </View>

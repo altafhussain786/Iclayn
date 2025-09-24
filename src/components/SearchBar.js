@@ -42,7 +42,7 @@ const SearchBar = ({
     };
     return (
         <View style={[styles.container, containerStyle]}>
-            <Image source={IconUri?.search} style={{ height: 20, width: 20, resizeMode: 'contain' }} />
+            <Image tintColor={COLORS?.PRIMARY_COLOR} source={IconUri?.newSearch} style={{ height: 20, width: 20, resizeMode: 'contain' }} />
             {/* <AntDesign name="search1" size={iconSize} color={iconColor} style={styles.icon} /> */}
             <TextInput
                 value={value}
