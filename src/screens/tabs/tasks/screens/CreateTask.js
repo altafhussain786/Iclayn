@@ -307,7 +307,7 @@ const CreateTask = ({ navigation, route }) => {
                                         isButton={true}
                                         buttonText={values.priorityStatus ? values.priorityStatus : 'Normal '}
                                     />
-                                    <TextInputWithTitle onChangeText={(txt) => setFieldValue('description', txt)} title="Matter Description" placeholder={'Enter description'} />
+                                    <TextInputWithTitle onChangeText={(txt) => setFieldValue('description', txt)} title="Description" placeholder={'Enter description'} />
 
 
                                     <TextInputWithTitle

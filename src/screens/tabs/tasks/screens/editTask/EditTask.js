@@ -249,31 +249,33 @@ const EditTask = ({ navigation, route }) => {
                         createdBy: userDetails?.userId,
                         updatedBy: userDetails?.userId || null,
                         revision: null,
+                        required: null,
                         taskId: defaultData?.taskId || values?.taskTypeObj?.taskId || null,
                         name: values?.name,
-                        cod: defaultData?.code || null,
+                        code: defaultData?.code || null,
                         priority: values?.priorityStatus,
                         description: values?.description,
 
                         assignTo: values?.feeEarnerSolicitorObj?.userId,
                         taskPrivate: values.isPrivateTask,
 
-                        typeId: values?.taskTypeObj?.taskTypeId,
+                        typeId: values?.taskTypeObj?.taskTypeId || null,
                         status: "Pending",
-                        document: String(itemsDocuments?.templateId),
+                        document: String(itemsDocuments?.templateId) || '',
                         documentName: itemsDocuments?.name || null,
                         timeEstimate: values.timeEstimateValue,
                         timeEstimateType: values.timeEstimateType,
                         dueDateEnable: true,
                         dueDate: values.selectedDate,
                         dueTime: null,
-                        dueTimeType: values.timeEstimateType || "",
+                        dueTimeType: values.timeEstimateType,
                         afterBefore: "",
+                        matterName: values?.matterSelectedObj?.name || '',
                         matterId: values?.matterSelectedObj?.matterId,
                         matterTaskReminderDTOList: mappedDataForTask,
                         matterTimeEntryDTO: null
                     }
-                    console.log(paylod, "========================================== selectReferalItems");
+                    console.log(paylod, "========================================== selectReferalItems", values?.matterSelectedObj?.name);
                     setFieldValue('loader', true)
                     const { res, err } = await httpRequest({
                         method: `put`,

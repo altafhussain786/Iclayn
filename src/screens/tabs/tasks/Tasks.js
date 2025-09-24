@@ -29,7 +29,7 @@ const Tasks = ({ navigation, route }) => {
   const [tabs, setTabs] = useState('All');
   const [modalVisible, setModalVisible] = useState(false);
   const [loader, setLoader] = useState(false);
-  const tabList = ['All', 'Pending', 'Completed'];
+  const tabList = ['All', 'Pending', 'Completed', 'Required', 'Not Required'];
   const [data, setData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -81,12 +81,37 @@ const Tasks = ({ navigation, route }) => {
     if (tabs !== 'All') {
       filtered = filtered.filter(item => item.status?.toLowerCase() === tabs.toLowerCase());
     }
+    if (tabs === 'Pending') {
+      filtered = filtered.filter(item => item.status?.toLowerCase() === 'pending');
+
+    }
+    if (tabs === 'Completed') {
+      filtered = filtered.filter(item => item.status?.toLowerCase() === 'completed');
+
+    }
+    if (tabs === 'Required') {
+      filtered = filtered.filter(item => item.status?.toLowerCase() === 'required');
+
+    }
+    if (tabs === 'Required' || tabs === 'Not Required') {
+
+      filtered = data.filter(item => item.required === (tabs === 'Required'));
+    }
+    // if (tabs === 'Not Required') {
+    //   filtered = filtered.filter(item => item.required == true);
+
+    // }
+    // if (tabs === 'Not Required') {
+    //   filtered = filtered.filter(item => item.required == false);
+
+    // }
     if (searchText !== '') {
       filtered = filtered.filter(item =>
         (item?.name + item?.code + item?.matterName).toLowerCase().includes(searchText.toLowerCase())
       );
     }
-    setFilteredData(filtered);
+    setFilteredData(filtered.sort((a, b) => new Date(b.openDate) - new Date(a.openDate)));
+    // setFilteredData(filtered);
   }, [searchText, data, tabs]);
 
   const handleDeleteItem = async (item) => {
@@ -109,14 +134,7 @@ const Tasks = ({ navigation, route }) => {
     <TouchableOpacity onPress={() => handleDeleteItem(item)} style={[styles.leftSwipe, { backgroundColor: COLORS?.RED_COLOR }]}>
       <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
     </TouchableOpacity>
-    // <View style={{ flexDirection: 'row' }}>
-    //   <TouchableOpacity
-    //     onPress={() => handleDeleteItem(item)}
-    //     style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
-    //   >
-    //     <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
-    //   </TouchableOpacity>
-    // </View>
+
   );
   const renderLeftActions = (item) => (
 
@@ -124,46 +142,11 @@ const Tasks = ({ navigation, route }) => {
       <AntDesign name="edit" size={20} color={COLORS?.BLACK_COLOR} />
     </TouchableOpacity>
 
-    // <View style={{ flexDirection: 'row' }}>
-    //   <TouchableOpacity
-    //     onPress={() => navigation.navigate("EditTask", { defaultData: item })}
-    //     style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
-    //   >
-    //     <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
-    //   </TouchableOpacity>
-    // </View>
+
   );
 
   const visibleData = filteredData.slice(0, limit);
 
-  // const renderItem = ({ item }) => {
-  //   const isVisible = viewableItems.includes(item._id);
-  //   const TaskContent = (
-  //     <Swipeable renderLeftActions={() => renderLeftActions(item)} renderRightActions={() => renderRightActions(item)}>
-  //       <View style={{ backgroundColor: '#fff' }}>
-  //         <TouchableOpacity
-  //           activeOpacity={0.8}
-  //           onPress={() => navigation.navigate("TaskDetails", { item })}
-  //           style={styles.taskRow}
-  //         >
-  //           <View style={{ gap: 5, width: "65%" }}>
-  //             <MyText style={styles.timeColor}>{item?.code}</MyText>
-  //             <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300' }]}> {item?.name} </MyText>
-  //             <MyText style={styles.timeColor}>{item?.matterName}</MyText>
-  //           </View>
-  //           <View style={styles.statusBox}>
-  //             <View style={{ backgroundColor: checkBGStatusColor(item?.status), borderRadius: 5, paddingHorizontal: 8, paddingVertical: 2 }}>
-  //               <MyText style={{ color: checkTxtStatusColor(item?.status), fontSize: calculatefontSize(1.4) }}>{item?.status}</MyText>
-  //             </View>
-  //           </View>
-  //         </TouchableOpacity>
-  //       </View>
-  //     </Swipeable>
-  //   );
-  //   return isVisible ? (
-  //     { TaskContent }
-  //   ) : TaskContent;
-  // };
 
   const renderItem = ({ item }) => {
     const isVisible = viewableItems.includes(item._id);
@@ -188,11 +171,7 @@ const Tasks = ({ navigation, route }) => {
             borderColor: COLORS?.BORDER_LIGHT_COLOR,
             borderRadius: 10,
             backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
-            // shadowColor: '#000',
-            // shadowOffset: { width: 0, height: 2 },
-            // shadowOpacity: 0.08,
-            // shadowRadius: 4,
-            // elevation: 2,
+
           }}
         >
           {/* Left Side */}
