@@ -1,5 +1,5 @@
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 //Icons
 import AntDesign from "react-native-vector-icons/AntDesign";
@@ -18,6 +18,7 @@ import { calculatefontSize, getResponsiveWidth } from '../../helper/responsiveHe
 import MyText from '../../components/MyText';
 import { Swipeable } from 'react-native-gesture-handler';
 import { useToast } from 'react-native-toast-notifications';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 
@@ -55,9 +56,11 @@ const Clients = ({ navigation }) => {
   }
 
 
-  useEffect(() => {
-    getActivityData();
-  }, [tabs])
+  useFocusEffect(
+    useCallback(() => {
+      getActivityData();
+    }, [tabs]) // tabs bhi dependency me rakho
+  );
   useEffect(() => {
     if (activityData.length > 0) {
       const filteredByType = activityData.filter(item => item?.type === tabs);
@@ -101,6 +104,8 @@ const Clients = ({ navigation }) => {
   }
 
   const renderClientItem = ({ item }) => {
+    console.log(item, "item##########################################################");
+
     return (
       <Swipeable
         renderLeftActions={() => renderLeftActions(item)}
@@ -113,8 +118,8 @@ const Clients = ({ navigation }) => {
           <View style={styles.headerRow}>
             <MyText style={styles.codeText}>
               {item?.type === 'Company'
-                ? item?.companyName
-                : `${item?.firstName || ''} ${item?.lastName || ''}`}
+                ? item?.code + " " + item?.companyName
+                : ` ${item?.code} ${item?.firstName || ''} ${item?.lastName || ''}`}
             </MyText>
             <View style={[styles.statusBadge, { backgroundColor: '#22C55E' }]}>
               <MyText style={styles.statusText}>{item?.status}</MyText>
@@ -133,8 +138,8 @@ const Clients = ({ navigation }) => {
             <MyText style={styles.dateText}>
               {moment(item?.createdOn).format('DD/MM/YYYY')}
             </MyText>
-            <MyText style={styles.dueText}>{item?.duration}</MyText>
           </View>
+          <MyText style={styles.dueText}> {item?.clientAddresseDTOList?.length > 0 ? `${item?.clientAddresseDTOList[0]?.street || ''}, ${item?.clientAddresseDTOList[0]?.city || ''} ${item?.clientAddresseDTOList[0]?.state || ''}, ${item?.clientAddresseDTOList[0]?.country || ''}, ${item?.clientAddresseDTOList[0]?.postCode || ''}` : `Company Number: ${item?.companyNumber}` || ''}</MyText>
         </TouchableOpacity>
       </Swipeable>
     );
@@ -149,7 +154,7 @@ const Clients = ({ navigation }) => {
 
   );
   const renderRightActions = (item) => (
-    <TouchableOpacity onPress={() => handleDeleteItem(item)} style={[styles.leftSwipe, { backgroundColor: COLORS?.RED_COLOR }]}>
+    <TouchableOpacity onPress={() => handleDeleteItem(item)} style={[styles.leftSwipe, { backgroundColor: COLORS?.RED_COLOR, marginLeft: 10, }]}>
       <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
     </TouchableOpacity>
 
@@ -187,7 +192,7 @@ const Clients = ({ navigation }) => {
         ))}
         {/* </View> */}
       </LinearGradient>
-      <Wrapper>
+      <Wrapper style={{ padding: 10 }}>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <SearchBar
             containerStyle={{ width: "90%" }}
@@ -306,7 +311,7 @@ const styles = StyleSheet.create({
   },
   dueText: {
     fontSize: calculatefontSize(1.3),
-    color: 'red'
+    color: '#444'
   },
   statusBadge: {
     paddingVertical: 4,
@@ -324,7 +329,8 @@ const styles = StyleSheet.create({
 
     alignItems: 'flex-start',
     paddingHorizontal: 20,
-    marginHorizontal: 10,
+    // marginHorizontal: 10,
+    marginRight: 10,
     marginVertical: 6,
     // borderRadius: 8,
     // flex: 1,

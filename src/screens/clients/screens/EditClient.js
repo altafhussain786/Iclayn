@@ -34,6 +34,7 @@ import { addContactPerson, resetContactPersons } from '../../../store/slices/cli
 import httpRequest from '../../../api/apiHandler'
 import Loader from '../../../components/Loader'
 import LoaderModal from '../../../components/LoaderModal'
+import ImageViewing from "react-native-image-viewing";
 // import { pick } from '@react-native-documents/picker'
 
 
@@ -214,7 +215,9 @@ const EditClient = ({ navigation, route }) => {
                         commonDocumentFile: defaultData?.photo,
 
                         //loader
-                        loader: false
+                        loader: false,
+
+                        isShowImage: false
                     }
                 }
                 // validationSchema={validationSchema}
@@ -311,7 +314,7 @@ const EditClient = ({ navigation, route }) => {
                         companyName: values?.companyName,
                         companyNumber: values?.companyNumber,
                         prefix: values?.prefix,
-                        code: null,
+                        code: defaultData?.code || null,
                         firstName: values.firstName,
                         middleName: values.middleName,
                         lastName: values.lastName,
@@ -338,7 +341,7 @@ const EditClient = ({ navigation, route }) => {
                         companyName: null,
                         companyNumber: null,
                         prefix: values?.prefix,
-                        code: null,
+                        code: defaultData?.code || null,
                         firstName: values.firstName,
                         middleName: values.middleName,
                         lastName: values.lastName,
@@ -365,6 +368,7 @@ const EditClient = ({ navigation, route }) => {
                         });
                     }
 
+                    console.log("formData", values?.isYourType === "Company" ? payloadForcompany : payload, defaultData);
 
                     setFieldValue('loader', true);
                     try {
@@ -379,6 +383,11 @@ const EditClient = ({ navigation, route }) => {
                         const result = await response.json();
                         if (result?.data) {
                             toast.show('Log created successfully', { type: 'success' })
+                            dispatch(resetEmails())
+                            dispatch(resetPhoneNumbers())
+                            dispatch(resetWebAddresses())
+                            dispatch(resetAddresses())
+                            dispatch(resetContactPersons())
                             navigation.goBack()
                         }
                         else {
@@ -427,6 +436,7 @@ const EditClient = ({ navigation, route }) => {
                                     keyboardShouldPersistTaps="handled"
                                     showsVerticalScrollIndicator={false}
                                 >
+
                                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginVertical: 10 }}>
                                         <MyText style={{ width: "70%" }}>Is the client an individual or a company?</MyText>
                                         <View style={{ alignItems: "center", gap: 10 }}>
@@ -478,10 +488,12 @@ const EditClient = ({ navigation, route }) => {
                                                     style={{
                                                         flexDirection: "row",
                                                         alignItems: "center",
-                                                        backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
+
+
                                                         gap: 10,
                                                         borderStyle: "dashed",
                                                         borderWidth: 1,
+
                                                         padding: 10,
                                                         borderRadius: 30,
                                                     }}
@@ -489,11 +501,25 @@ const EditClient = ({ navigation, route }) => {
                                                     <AntDesign name="camera" size={20} color={COLORS?.PRIMARY_COLOR} />
                                                 </TouchableOpacity>
                                             }
+                                            <View style={{ width: 90, alignItems: "center" }}>
+                                                <MyText style={{ flex: 1, fontSize: calculatefontSize(1.4) }}>
+                                                    Upload photo
+                                                </MyText>
+                                                <TouchableOpacity onPress={() => setFieldValue('isShowImage', true)}>
+                                                    <MyText style={{ fontSize: calculatefontSize(1.4), textDecorationLine: "underline", color: COLORS?.PRIMARY_COLOR }}>
+                                                        View image
+                                                    </MyText>
+                                                </TouchableOpacity>
+                                            </View>
+                                            <ImageViewing
+                                                images={[{ uri: (values?.commonDocumentFile === defaultData?.photo ? `data:image/jpeg;base64,${values?.commonDocumentFile}` : values?.documentFile?.uri) }]}
+                                                imageIndex={0}
+                                                visible={values?.isShowImage}
+                                                onRequestClose={() => setFieldValue('isShowImage', false)}
+                                            />
 
-                                            <MyText style={{ flex: 1, fontSize: calculatefontSize(1.4) }}>
-                                                Upload photo
-                                            </MyText>
                                         </View>
+
                                     </View>
                                     <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                                         {
@@ -501,7 +527,7 @@ const EditClient = ({ navigation, route }) => {
                                                 const isSelected = values.isYourType === item;
                                                 return (
                                                     <>
-                                                        <TouchableOpacity disabled={defaultData?.defaultData?.type !== item} style={{ width: "45%", }} onPress={() => setFieldValue('isYourType', item)}>
+                                                        <TouchableOpacity key={index} disabled={defaultData?.defaultData?.type !== item} style={{ width: "45%", }} onPress={() => setFieldValue('isYourType', item)}>
                                                             <LinearGradient
                                                                 colors={isSelected ? [COLORS?.PRIMARY_COLOR_LIGHT, COLORS?.PRIMARY_COLOR,] : [COLORS?.LIGHT_COLOR, COLORS?.BORDER_LIGHT_COLOR,]}
                                                                 start={{ x: 0, y: 0 }}
