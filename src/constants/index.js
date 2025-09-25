@@ -160,6 +160,7 @@ export const IconUri = {
     newUserss: require('../assets/Icons/newIcons/userss.png'),
     newSearch: require('../assets/Icons/newIcons/search.png'),
     menu: require('../assets/Icons/newIcons/menu.png'),
+    award: require('../assets/Icons/newIcons/award.png'),
 
 
 }

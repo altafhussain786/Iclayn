@@ -124,27 +124,6 @@ const Communications = ({ navigation, route }) => {
         }
     }, [searchText, tabs, communicationData]);
 
-    // const renderLeftActions = (item) => (
-    //     <View style={{ flexDirection: 'row' }}>
-    //         <TouchableOpacity
-    //             onPress={() => navigation.navigate(item?.type === 'Phone' ? "EditPhoneLog" : "EditInternalLog", { communicationDetails: item })}
-    //             style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
-    //         >
-    //             <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
-    //         </TouchableOpacity>
-    //     </View>
-    // );
-    // const renderRightActions = (item) => (
-    //     <View style={{ flexDirection: 'row' }}>
-    //         <TouchableOpacity
-    //             onPress={() => handleDeleteItems(item)}
-    //             style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
-    //         >
-    //             <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
-    //         </TouchableOpacity>
-    //     </View>
-    // );
-
     const renderLeftActions = (item) => (
 
         <TouchableOpacity onPress={() => navigation.navigate(item?.type === 'Phone' ? "EditPhoneLog" : "EditInternalLog", { communicationDetails: item })} style={styles.leftSwipe}>
@@ -271,54 +250,14 @@ const Communications = ({ navigation, route }) => {
                     filteredData?.length > 0 ?
 
                         <FlatList
+                            style={{ padding: 0 }}
                             showsVerticalScrollIndicator={false}
                             data={filteredData}
                             keyExtractor={(item, index) => index.toString()}
                             renderItem={renderCommunicationItem}
                             ListFooterComponent={() => <View style={{ height: 100 }} />}
                         />
-                        // <FlatList
-                        //     showsVerticalScrollIndicator={false}
-                        //     data={filteredData}
-                        //     keyExtractor={(item, index) => index.toString()}
-                        //     renderItem={({ item, i }) => {
-                        //         return (
-                        //             <Swipeable renderLeftActions={() => renderLeftActions(item)} renderRightActions={() => renderRightActions(item)}>
-                        //                 <View
-                        //                     style={{
-                        //                         flexDirection: "row",
-                        //                         justifyContent: "space-between",
-                        //                         alignItems: "center",
-                        //                         gap: 10,
-                        //                         borderBottomWidth: 1,
-                        //                         paddingVertical: 15,
-                        //                         borderColor: COLORS?.BORDER_LIGHT_COLOR,
-                        //                     }}
-                        //                 >
-                        //                     <View style={{ gap: 5, width: "65%", }}>
-                        //                         <MyText style={styles.timeColor}>{item?.type}</MyText>
-                        //                         <MyText style={[styles.txtStyle, { fontWeight: "300" }]}>
-                        //                             {item?.subject}
-                        //                         </MyText>
-                        //                         {item?.description !== "" && <MyText style={styles.timeColor}>
-                        //                             {item?.subject}
-                        //                         </MyText>}
-                        //                     </View>
-                        //                     <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
-                        //                         {/* <MyText style={[styles.timeColor, { fontWeight: "600", textAlign: "right" }]}>${formatNumber(item?.balance)}</MyText> */}
-                        //                         {item?.timer && <MyText style={[styles.txtStyle,]}>{item?.timer}</MyText>}
-                        //                         <View style={{ backgroundColor: item?.status == "DELETED" ? COLORS?.RED_COLOR : "#22C55E", alignSelf: "flex-end", width: getResponsiveWidth(20), borderRadius: 5, paddinHorizontal: 30 }}>
-                        //                             <MyText style={[styles.timeColor, { fontWeight: "300", textAlign: "center", color: COLORS?.whiteColors }]}>
-                        //                                 {item?.status}
-                        //                             </MyText>
-                        //                         </View>
-                        //                     </View>
-                        //                 </View>
-                        //             </Swipeable>
-                        //         );
-                        //     }}
-                        //     ListFooterComponent={() => <View style={{ height: 100 }} />}
-                        // />
+
                         :
                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 10 }}>
                             <Image source={IconUri?.Activitie} style={{ height: 30, width: 30, resizeMode: "contain" }} />

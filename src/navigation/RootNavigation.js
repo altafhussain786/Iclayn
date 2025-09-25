@@ -59,6 +59,9 @@ import EditEvent from '../screens/events/screens/EditEvents';
 import CreateNotes from '../screens/tabs/notes/screens/CreateNotes';
 import TaskFileOneDrive from '../screens/tabs/tasks/screens/taskDocuments/TaskFileOneDrive';
 import TaskDocumentOneDrive from '../screens/tabs/tasks/screens/taskDocuments/TaskDocumentOneDrive';
+import Award from '../screens/more/award/Award';
+import CreateAward from '../screens/more/award/screen/CreateAward';
+import EditAward from '../screens/more/award/screen/EditAward';
 
 
 
@@ -146,6 +149,9 @@ const RootNavigation = () => {
         <Stack.Screen name="Notes" component={Notes} />
         <Stack.Screen name="CreateNotes" component={CreateNotes} />
         <Stack.Screen name="MatterCalender" component={MatterCalender} />
+        <Stack.Screen name="Award" component={Award} />
+        <Stack.Screen name="CreateAward" component={CreateAward} />
+        <Stack.Screen name="EditAward" component={EditAward} />
 
 
 

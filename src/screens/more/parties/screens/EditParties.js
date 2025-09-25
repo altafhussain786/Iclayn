@@ -32,6 +32,7 @@ import AddContactPerson from '../../../clients/components/AddContactPerson'
 import { addContactPerson, resetContactPersons } from '../../../../store/slices/clientSlice/createItemForContactPerson'
 import httpRequest from '../../../../api/apiHandler'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import ImageViewing from "react-native-image-viewing";
 
 
 const EditParties = ({ navigation, route }) => {
@@ -185,7 +186,8 @@ const EditParties = ({ navigation, route }) => {
                         commonDocumentFile: partiesDetails?.photo || null,
 
                         //loader
-                        loader: false
+                        loader: false,
+                        isShowImage: false
                     }
                 }
                 // validationSchema={validationSchema}
@@ -437,9 +439,26 @@ const EditParties = ({ navigation, route }) => {
                                                 </TouchableOpacity>
                                             }
 
-                                            <MyText style={{ flex: 1, fontSize: calculatefontSize(1.4) }}>
+                                            <View style={{ width: 90, alignItems: "center" }}>
+                                                <MyText style={{ flex: 1, fontSize: calculatefontSize(1.4) }}>
+                                                    Upload photo
+                                                </MyText>
+                                                <TouchableOpacity onPress={() => setFieldValue('isShowImage', true)}>
+                                                    <MyText style={{ fontSize: calculatefontSize(1.4), textDecorationLine: "underline", color: COLORS?.PRIMARY_COLOR }}>
+                                                        View image
+                                                    </MyText>
+                                                </TouchableOpacity>
+                                            </View>
+                                            <ImageViewing
+                                                images={[{ uri: (values?.commonDocumentFile === partiesDetails?.photo ? `data:image/jpeg;base64,${values?.commonDocumentFile}` : values?.documentFile?.uri) }]}
+                                                imageIndex={0}
+                                                visible={values?.isShowImage}
+                                                onRequestClose={() => setFieldValue('isShowImage', false)}
+                                            />
+
+                                            {/* <MyText style={{ flex: 1, fontSize: calculatefontSize(1.4) }}>
                                                 Upload photo
-                                            </MyText>
+                                            </MyText> */}
                                         </View>
                                     </View>
                                     <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
@@ -486,7 +505,7 @@ const EditParties = ({ navigation, route }) => {
                                             />
                                             <TextInputWithTitle
                                                 placeholder={"Party Company Number"}
-                                                isRequired={true}
+                                                // isRequired={true}
                                                 value={values.companyNumber}
                                                 onChangeText={(txt) => setFieldValue('companyNumber', txt)}
                                                 title="Party Company Number"

@@ -1,5 +1,5 @@
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import LinearGradient from 'react-native-linear-gradient';
 
 //Screens
@@ -17,6 +17,7 @@ import MyText from '../../../components/MyText';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { Swipeable } from 'react-native-gesture-handler';
 import { useToast } from 'react-native-toast-notifications';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 
@@ -52,10 +53,14 @@ const Parties = ({ navigation }) => {
         }
     }
 
-
-    useEffect(() => {
-        getPartiesData();
-    }, [tabs])
+    useFocusEffect(
+        useCallback(() => {
+            getPartiesData();
+        }, [tabs]) // tabs bhi dependency me rakho
+    );
+    // useEffect(() => {
+    //     getPartiesData();
+    // }, [tabs])
     useEffect(() => {
         if (partiesData.length > 0) {
             const filteredByType = partiesData.filter(item => item?.type === tabs);
@@ -64,27 +69,51 @@ const Parties = ({ navigation }) => {
     }, [tabs, partiesData]);
 
     useEffect(() => {
-        if (tabs === 'All') {
-            setFilteredData(partiesData);
-        }
-        else {
-            let filtered = partiesData.filter(item => item?.type === tabs);
-            if (searchText !== '') {
-                filtered = filtered.filter(item => {
-                    if (tabs === 'Individual') {
-                        const fullName = `${item?.firstName || ''} ${item?.lastName || ''}`.toLowerCase();
-                        return fullName.includes(searchText.toLowerCase());
-                    } else if (tabs === 'Supplier') {
-                        return (item?.companyName || '').toLowerCase().includes(searchText.toLowerCase());
-                    }
+        let filtered = partiesData;
 
-                    return false;
-                });
-            }
-
-            setFilteredData(filtered);
+        if (tabs !== 'All') {
+            filtered = filtered.filter(item => item?.type === tabs);
         }
+
+        if (searchText !== '') {
+            const lowerSearch = searchText.toLowerCase();
+
+            filtered = filtered.filter(item => {
+                if (item?.type === 'Individual') {
+                    const fullName = `${item?.firstName || ''} ${item?.lastName || ''}`.toLowerCase();
+                    return fullName.includes(lowerSearch);
+                } else if (item?.type === 'Supplier') {
+                    return (item?.companyName || '').toLowerCase().includes(lowerSearch);
+                }
+
+                return false;
+            });
+        }
+
+        setFilteredData(filtered);
     }, [searchText, tabs, partiesData]);
+    // useEffect(() => {
+    //     if (tabs === 'All') {
+    //         setFilteredData(partiesData);
+    //     }
+    //     else {
+    //         let filtered = partiesData.filter(item => item?.type === tabs);
+    //         if (searchText !== '') {
+    //             filtered = filtered.filter(item => {
+    //                 if (tabs === 'Individual') {
+    //                     const fullName = `${item?.firstName || ''} ${item?.lastName || ''}`.toLowerCase();
+    //                     return fullName.includes(searchText.toLowerCase());
+    //                 } else if (tabs === 'Supplier') {
+    //                     return (item?.companyName || '').toLowerCase().includes(searchText.toLowerCase());
+    //                 }
+
+    //                 return false;
+    //             });
+    //         }
+
+    //         setFilteredData(filtered);
+    //     }
+    // }, [searchText, tabs, partiesData]);
 
     const handleDeleteItem = async (item) => {
         console.log(item, "DEETE ITEM");

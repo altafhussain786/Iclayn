@@ -218,6 +218,7 @@ const EditExpense = ({ navigation, route }) => {
                         revision: null,
                         matterExpenseEntryId: 0,
                         matterId: values?.matterObj?.matterId || null,
+                        matterName: values?.matterObj?.name || null,
                         expDate: values?.selectedDate,
                         categoryId: values?.expenseObj?.expCategoryId || null,
                         category: values?.expenseObj?.name || null,
@@ -261,6 +262,8 @@ const EditExpense = ({ navigation, route }) => {
                         toast.show('Expense added successfully', { type: 'success' })
                     }
                     else {
+                        console.log(err, "====================EERRRO");
+
                         toast.show(err?.message, { type: 'danger' })
                     }
 

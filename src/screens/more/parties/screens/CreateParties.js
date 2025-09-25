@@ -32,6 +32,8 @@ import AddContactPerson from '../../../clients/components/AddContactPerson'
 import { addContactPerson } from '../../../../store/slices/clientSlice/createItemForContactPerson'
 import httpRequest from '../../../../api/apiHandler'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import ImageViewing from "react-native-image-viewing";
+
 
 
 const CreateParties = ({ navigation }) => {
@@ -105,7 +107,8 @@ const CreateParties = ({ navigation }) => {
                         documentFile: [],
 
                         //loader
-                        loader: false
+                        loader: false,
+                        isShowImage: false
                     }
                 }
                 // validationSchema={validationSchema}
@@ -312,13 +315,28 @@ const CreateParties = ({ navigation }) => {
                                                     borderRadius: 30,
                                                 }}
                                             >
-                                                {values?.documentFile?.length > 0 ? <Image source={{ uri: values?.documentFile?.[0]?.uri }} style={{ height: 30, width: 30, resizeMode: "cover" }} /> : <AntDesign name="camera" size={20} color={COLORS?.PRIMARY_COLOR} />}
+                                                {values?.documentFile?.length > 0 ? <Image source={{ uri: values?.documentFile?.[0]?.uri }} style={{ height: 40, width: 40, resizeMode: "cover", borderRadius: 30 }} /> : <AntDesign name="camera" size={20} color={COLORS?.PRIMARY_COLOR} />}
 
                                             </TouchableOpacity>
-
-                                            <MyText style={{ flex: 1, fontSize: calculatefontSize(1.4) }}>
+                                            <View style={{ width: 90, alignItems: "center" }}>
+                                                <MyText style={{ flex: 1, fontSize: calculatefontSize(1.4) }}>
+                                                    Upload photo
+                                                </MyText>
+                                                <TouchableOpacity onPress={() => setFieldValue('isShowImage', true)}>
+                                                    <MyText style={{ fontSize: calculatefontSize(1.4), textDecorationLine: "underline", color: COLORS?.PRIMARY_COLOR }}>
+                                                        View image
+                                                    </MyText>
+                                                </TouchableOpacity>
+                                            </View>
+                                            <ImageViewing
+                                                images={[{ uri: values?.documentFile?.[0]?.uri || `data:image/jpeg;base64,${values?.documentFile?.[0]?.uri}` }]}
+                                                imageIndex={0}
+                                                visible={values?.isShowImage}
+                                                onRequestClose={() => setFieldValue('isShowImage', false)}
+                                            />
+                                            {/* <MyText style={{ flex: 1, fontSize: calculatefontSize(1.4) }}>
                                                 Upload photo
-                                            </MyText>
+                                            </MyText> */}
                                         </View>
                                     </View>
                                     <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
