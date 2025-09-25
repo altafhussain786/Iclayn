@@ -1,4 +1,4 @@
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, Text, TextInputComponent, TouchableOpacity, View } from 'react-native'
+import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, Text, TextInputComponent, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
@@ -49,7 +49,7 @@ const EditBilling = ({ navigation, route }) => {
     const [matterSelected, setMatterSelected] = useState('')
 
 
-    console.log(matterData, "Matter data =====================>");
+
 
     const getDefaultData = async () => {
         const { res, err } = await httpRequest({
@@ -121,7 +121,7 @@ const EditBilling = ({ navigation, route }) => {
             navigation: navigation
         })
         if (res) {
-            console.log(res, "Matter DATA =======================================>");
+            // console.log(res, "Matter DATA =======================================>");
             setMatterSelected(res?.data?.find(item => item?.matterId === defaultData?.matterId)?.name)
             setmatterData(res?.data);
         }
@@ -134,12 +134,12 @@ const EditBilling = ({ navigation, route }) => {
         setToClientLoader(true)
         const { res, err } = await httpRequest({
             method: `get`,
-            path: `/ic/matter/${clientId}/client`,
+            path: `/ic/matter/${billingDetails?.matterId}/client`,
             navigation: navigation
         })
         if (res) {
 
-            console.log(res, "GET TO CLEINT =======================================>");
+            // console.log(res, "GET TO CLEINT =======================================>", `/ic/matter/${clientId}/client`);
             setToClientData(res?.data);
             setToClientLoader(false)
         }
@@ -284,19 +284,26 @@ const EditBilling = ({ navigation, route }) => {
                                                 color={COLORS?.LIGHT_COLOR} // Optional: color can be: 'red', 'green',... or '#ddd', '#ffffff',...
                                             /> :
                                                 toClientData.map((d, i) => {
+                                                    const imageURL = `data:image/jpeg;base64,${d?.photo || ''}`;
+
                                                     return (
                                                         <>
-                                                            <View style={{ marginVertical: 10, flexDirection: "row", gap: 10 }}>
-                                                                <View style={{ height: 35, width: 35, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT, justifyContent: "center", alignItems: "center", borderRadius: 30 }}>
-                                                                    {d?.companyName ?
-                                                                        <MyText style={{ color: COLORS?.whiteColors }}>{d?.companyName?.split('')[0]}</MyText> : <MyText style={{ color: COLORS?.whiteColors }}>{d?.firstName?.split('')[0] + '' + d?.lastName?.split('')[0]}</MyText>}
-                                                                </View>
+                                                            <View key={i} style={{ marginVertical: 10, flexDirection: "row", gap: 10 }}>
+                                                                {d?.photo ?
+
+                                                                    <View>
+                                                                        <Image source={{ uri: imageURL }} style={{ height: 35, width: 35, borderRadius: 30 }} />
+                                                                    </View>
+                                                                    : <View style={{ height: 35, width: 35, backgroundColor: COLORS?.PRIMARY_COLOR_LIGHT, justifyContent: "center", alignItems: "center", borderRadius: 30 }}>
+                                                                        {d?.companyName ?
+                                                                            <MyText style={{ color: COLORS?.whiteColors }}>{d?.companyName?.split('')[0]}</MyText> : <MyText style={{ color: COLORS?.whiteColors }}>{d?.firstName?.split('')[0] + '' + d?.lastName?.split('')[0]}</MyText>}
+                                                                    </View>}
 
                                                                 <View>
                                                                     <MyText style={{ fontWeight: 'bold' }}>{d?.companyName ? d?.companyName : d?.firstName + ' ' + d?.lastName}</MyText>
-                                                                    {d?.clientAddresseDTOList[0]?.city && d?.clientAddresseDTOList[0]?.country && <MyText>{d?.clientAddresseDTOList[0]?.city + ', ' + d?.clientAddresseDTOList[0]?.country}</MyText>}
-                                                                    {d?.clientEmailAddressDTOList[0]?.email && <MyText>{d?.clientEmailAddressDTOList[0]?.email}</MyText>}
-                                                                    {d?.clientPhoneNumberDTOList[0]?.phoneNo && <MyText>{d?.clientPhoneNumberDTOList[0]?.phoneNo}</MyText>}
+                                                                    {d?.clientAddresseDTOList?.length > 0 && d?.clientAddresseDTOList[0]?.city && d?.clientAddresseDTOList[0]?.country && <MyText>{d?.clientAddresseDTOList[0]?.city + ', ' + d?.clientAddresseDTOList[0]?.country}</MyText>}
+                                                                    {d?.clientEmailAddressDTOList?.length > 0 && d?.clientEmailAddressDTOList[0]?.email && <MyText>{d?.clientEmailAddressDTOList[0]?.email}</MyText>}
+                                                                    {d?.clientPhoneNumberDTOList?.length > 0 && d?.clientPhoneNumberDTOList[0]?.phoneNo && <MyText>{d?.clientPhoneNumberDTOList[0]?.phoneNo}</MyText>}
                                                                 </View>
                                                             </View>
                                                         </>

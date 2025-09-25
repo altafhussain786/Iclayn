@@ -25,12 +25,14 @@ import { addTimeEntry } from '../../../../store/slices/billingSlice/createBillin
 import BillingTimeEntry from '../components/BillingTimeEntry'
 import BillingExpenseEntry from '../components/BillingExpenseEntry'
 import { addExpenseEntry } from '../../../../store/slices/billingSlice/createBillingExpenseEntryItem'
+import { getTotalDuration } from '../../../../helper/Helpers'
 
 
 
 const CreateBilling = ({ navigation, route }) => {
     const matterDetails = route?.params?.matterDetails
     const dispatch = useDispatch()
+
     const toast = useToast();
     const [firmUserData, setFirmUserData] = useState([])
     const items = useSelector(state => state.createBillingTimeEntryItem.items);
@@ -44,6 +46,7 @@ const CreateBilling = ({ navigation, route }) => {
     const [clientId, setClientId] = React.useState("");
     const [billingData, setBillingData] = React.useState([]);
     const [toClientLoader, setToClientLoader] = React.useState(false);
+    const [selectedMatter, setSelectedMatter] = useState(null);
 
 
     const getMatterData = async () => {
@@ -101,33 +104,139 @@ const CreateBilling = ({ navigation, route }) => {
     //get users 
 
     useEffect(() => {
-
         getMatterData()
-
     }, [])
 
+    const getHourlyData = async () => {
+        const { res, err, status } = await httpRequest({
+            method: `get`,
+            path: `/ic/matter/time-entry/mat/${selectedMatter?.matterId}`,
+            navigation: navigation
+        })
+        if (status == 204) {
+            console.log(res, "getHourlData dentries 204");
 
-    // const calculateAmounts = () => {
-    //     let subtotal = 0
-    //     let totalTax = 0
-    //     let netTotal = 0
+            return
+        }
+        else {
+            if (res) {
+                const data = res?.data
+                console.log(res, "getHourlyData entries");
+                dispatch(addTimeEntry({
+                    id: Math.floor(Math.random() * 1000),
+
+                    date: moment(data?.createdOn).format('YYYY-MM-DD') || '',
+
+                    //user
+                    user: 'user' || '',
+                    userObj: 'data?.userObj' || {},
+                    description: data?.description || '',
+                    duration: data?.duration,
+                    totalDuration: "getTotalDuration(data?.duration)" || '',
+                    hourlyRate: data?.rate || 0,
+                    //tax
+                    tax: "data?.taxPer",
+                    taxObj: {},
+                    taxAmount: "data?.taxAmount" || 0,
+                }))
+            }
+            else {
+                console.log(err, "getHourlyData===>err CLIENT");
+
+            }
+        }
+    }
+
+    const getContigencyData = async () => {
+        const { res, err, status } = await httpRequest({
+            method: `get`,
+            path: `/ic/matter/award/mat/${selectedMatter?.matterId}`,
+            navigation: navigation
+        })
+        if (status == 204) {
+            console.log(res, "getContigencyData entries 204");
+            return
+        }
+        else {
+            if (res) {
+                console.log(res, "getContigencyData entries");
+            }
+            else {
+                console.log(err, "getContigencyData===>err CLIENT");
+
+            }
+        }
+    }
+    const getFixedData = async () => {
+        const { res, err, status } = await httpRequest({
+            method: `get`,
+            path: `/ic/matter/bill/mat/${selectedMatter?.matterId}/billing-item`,
+            navigation: navigation
+        })
+        if (status == 204) {
+            console.log(res, "getFixedData entries 204");
+            return
+        }
+        else {
+            if (res) {
+                console.log(res, "getFixedData entries");
+            }
+            else {
+                console.log(err, "getFixedData===>err CLIENT");
+
+            }
+        }
+    }
+
+    const getExpenseEntrties = async () => {
+        const { res, err, status } = await httpRequest({
+            method: `get`,
+            path: `/ic/matter/exp-entry/mat/${selectedMatter?.matterId}`,
+            navigation: navigation
+        })
+        if (status == 204) {
+            console.log(res, "getExpense entries entries 204");
+            return
+        }
+        else {
+            if (res) {
+                console.log(res, "getExpense entries entries");
+            }
+            else {
+                console.log(err, "getExpense entries===>err CLIENT");
+
+            }
+        }
+    }
 
 
-    //     items?.forEach(item => {
+    // console.log(selectedMatter, "=====================MATTER DATA");
+    useEffect(() => {
+        if (!selectedMatter) return; // agar selectedMatter hi nahi hai to kuch mat karo
+        // ye function hamesha chalega
+        getExpenseEntrties();
 
-    //         subtotal += Number(item?.hourlyRate) * item?.totalDuration
-    //         totalTax += (Number(item?.hourlyRate) / 100) * item?.taxAmount
-    //         // netTotal += Number(subtotal) + Number(totalTax)
-
-    //     })
-    //     netTotal = subtotal + totalTax
+        const method = selectedMatter?.matterBillingDTOList?.[0]?.method;
+        console.log(method, "method");
 
 
+        switch (method) {
+            case "HOURLY":
+                getHourlyData();
+                break;
+            case "CONTINGENCYFEEDEFAULTS":
+                getContigencyData();
+                break;
+            case "FIXEDFEEDETAILS":
+                getFixedData();
+                break;
+            default:
+                break;
+        }
+    }, [selectedMatter]);
 
-    //     return { subtotal, totalTax, netTotal };
-    // };
 
-    // const { subtotal, totalTax, netTotal, } = calculateAmounts();
+
     const calculateAmounts = () => {
         let subtotal = 0;
         let totalTax = 0;
@@ -155,7 +264,8 @@ const CreateBilling = ({ navigation, route }) => {
 
 
     const validationSchema = Yup.object().shape({
-        title: Yup.string().required('title is required'),
+        matterSelected: Yup.string().required('Matter is required'),
+
     })
     return (
         <>
@@ -189,92 +299,96 @@ const CreateBilling = ({ navigation, route }) => {
                         loader: false
                     }
                 }
-                // validationSchema={validationSchema}
+                validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
-                    console.log(items, "items");
-
-                    const mappedData = expenseEntryItem?.map((d, i) => {
-                        return {
-                            createdOn: "",
-                            updatedOn: null,
-                            createdBy: userDetails?.userId || null,
-                            updatedBy: null,
-                            revision: null,
-                            matterBillExpenseId: null,
-                            expEntryId: null,
-                            expDate: moment(d?.date, 'MM/DD/YYYY').toISOString(),
-                            userId: d?.userObj?.userId || 0,
-                            description: d?.description || '',
-                            rate: d?.hourlyRate || "0",
-                            taxRate: 0,
-                            quantity: 1,
-                            taxId: d?.taxObj?.taxId || 1,
-                            taxPer: Number(d?.taxAmount),
-                            taxAmount: (Number(d?.hourlyRate) / 100) * Number(d?.taxAmount) || 0,
-                            totalAmount: Number(d?.hourlyRate) || 0,
-                            nonBillable: false,
-                            visibleBill: false
-                        }
-                    })
-                    const mappedMatterBillingDTOList = items?.map((d, i) => {
-                        return {
-                            createdOn: "",
-                            updatedOn: null,
-                            createdBy: null,
-                            updatedBy: null,
-                            revision: null,
-                            matterBillTimeId: null,
-                            matterTimeEntryId: null,
-                            billDate: "2025-08-16T08:07:44.164Z",
-                            userId: d?.userObj?.userId || 0,
-                            description: d?.description || '',
-                            duration: d?.duration,
-                            hourlyRate: d?.hourlyRate,
-                            rate: 0,
-                            taxId: d?.taxObj?.taxId || 1,
-                            taxPer: Number(d?.taxAmount),
-                            taxAmount: (Number(d?.hourlyRate) / 100) * Number(d?.taxAmount) || 0,
-                            totalAmount: Number(d?.hourlyRate) || 0,
-                            nonBillable: false,
-                            visibleBill: false
-                        }
-                    })
-                    const payload = {
-
-                        createdOn: "",
-                        updatedOn: null,
-                        createdBy: userDetails?.userId || 0,
-                        updatedBy: null,
-                        revision: null,
-                        matterBillId: null,
-                        dueDate: values?.selecteddueDate || "",
-                        invoiceDate: values?.selecteddueDate || "",
-                        matterId: values?.matterSelectedObj?.matterId || 0,
-                        matterDescription: values.matterSelectedObj?.description || '',
-                        subTotal: subtotal || 0,
-                        taxTotal: totalTax || 0,
-                        netTotal: netTotal || 0,
-                        paidTotal: 0,
-                        status: "UNPAID",
-                        matterBillingDTOList: mappedMatterBillingDTOList || [],
-                        matterBillExpenseDTOList: mappedData || [],
-                        clientIds: toClientData?.map(item => item?.clientId).join(",") || "",
+                    console.log(items?.length, "items");
+                    if (items?.length < 1) {
+                        toast.show('At least one Entry is required.', { type: 'warning' })
+                        return
                     }
 
-                    console.log(payload, "PAYLOADd ", expenseEntryItem);
-                    const { res, err } = await httpRequest({
-                        method: `post`,
-                        path: `/ic/matter/bill/`,
-                        body: payload,
-                        navigation: navigation
-                    })
-                    if (res) {
-                        toast.show('Billing created successfully', { type: 'success' })
-                        navigation.goBack()
-                    }
-                    else {
-                        console.log("err", err);
-                    }
+                    // const mappedData = expenseEntryItem?.map((d, i) => {
+                    //     return {
+                    //         createdOn: "",
+                    //         updatedOn: null,
+                    //         createdBy: userDetails?.userId || null,
+                    //         updatedBy: null,
+                    //         revision: null,
+                    //         matterBillExpenseId: null,
+                    //         expEntryId: null,
+                    //         expDate: moment(d?.date, 'MM/DD/YYYY').toISOString(),
+                    //         userId: d?.userObj?.userId || 0,
+                    //         description: d?.description || '',
+                    //         rate: d?.hourlyRate || "0",
+                    //         taxRate: 0,
+                    //         quantity: 1,
+                    //         taxId: d?.taxObj?.taxId || 1,
+                    //         taxPer: Number(d?.taxAmount),
+                    //         taxAmount: (Number(d?.hourlyRate) / 100) * Number(d?.taxAmount) || 0,
+                    //         totalAmount: Number(d?.hourlyRate) || 0,
+                    //         nonBillable: false,
+                    //         visibleBill: false
+                    //     }
+                    // })
+                    // const mappedMatterBillingDTOList = items?.map((d, i) => {
+                    //     return {
+                    //         createdOn: "",
+                    //         updatedOn: null,
+                    //         createdBy: null,
+                    //         updatedBy: null,
+                    //         revision: null,
+                    //         matterBillTimeId: null,
+                    //         matterTimeEntryId: null,
+                    //         billDate: "2025-08-16T08:07:44.164Z",
+                    //         userId: d?.userObj?.userId || 0,
+                    //         description: d?.description || '',
+                    //         duration: d?.duration,
+                    //         hourlyRate: d?.hourlyRate,
+                    //         rate: 0,
+                    //         taxId: d?.taxObj?.taxId || 1,
+                    //         taxPer: Number(d?.taxAmount),
+                    //         taxAmount: (Number(d?.hourlyRate) / 100) * Number(d?.taxAmount) || 0,
+                    //         totalAmount: Number(d?.hourlyRate) || 0,
+                    //         nonBillable: false,
+                    //         visibleBill: false
+                    //     }
+                    // })
+                    // const payload = {
+
+                    //     createdOn: "",
+                    //     updatedOn: null,
+                    //     createdBy: userDetails?.userId || 0,
+                    //     updatedBy: null,
+                    //     revision: null,
+                    //     matterBillId: null,
+                    //     dueDate: values?.selecteddueDate || "",
+                    //     invoiceDate: values?.selecteddueDate || "",
+                    //     matterId: values?.matterSelectedObj?.matterId || 0,
+                    //     matterDescription: values.matterSelectedObj?.description || '',
+                    //     subTotal: subtotal || 0,
+                    //     taxTotal: totalTax || 0,
+                    //     netTotal: netTotal || 0,
+                    //     paidTotal: 0,
+                    //     status: "UNPAID",
+                    //     matterBillingDTOList: mappedMatterBillingDTOList || [],
+                    //     matterBillExpenseDTOList: mappedData || [],
+                    //     clientIds: toClientData?.map(item => item?.clientId).join(",") || "",
+                    // }
+
+                    // console.log(payload, "PAYLOADd ", expenseEntryItem);
+                    // const { res, err } = await httpRequest({
+                    //     method: `post`,
+                    //     path: `/ic/matter/bill/`,
+                    //     body: payload,
+                    //     navigation: navigation
+                    // })
+                    // if (res) {
+                    //     toast.show('Billing created successfully', { type: 'success' })
+                    //     navigation.goBack()
+                    // }
+                    // else {
+                    //     console.log("err", err);
+                    // }
 
 
 
@@ -437,6 +551,7 @@ const CreateBilling = ({ navigation, route }) => {
                                     <TouchableOpacity
                                         onPress={() => {
                                             setClientId(item?.matterId);
+                                            setSelectedMatter(item);
                                             setFieldValue('matterSelected', item?.name);
                                             setFieldValue('matterSelectedObj', item);
                                             setFieldValue('isOpenMatterSelected', false)

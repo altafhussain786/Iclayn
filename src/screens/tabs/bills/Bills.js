@@ -115,17 +115,16 @@ const Bills = ({ navigation, route }) => {
               styles.statusBadge,
               {
                 backgroundColor:
-                  item?.status === 'Open' ? '#EFE4FF' :
-                    item?.status === 'COMPLETED' ? '#7C4EC9' : '#ffc2cd'
+                  item?.status === 'PAID' ? COLORS?.COMPLETE_BG : '#FBF2D2'
               }]}>
               <MyText
                 style={[
                   styles.statusText,
                   {
                     color:
-                      item?.status === 'COMPLETED'
-                        ? COLORS?.whiteColors
-                        : '#6c0014'
+                      item?.status === 'PAID'
+                        ? COLORS?.COMPLETD_TXT
+                        : '#000000ff'
                   }
                 ]}
               >
@@ -178,26 +177,6 @@ const Bills = ({ navigation, route }) => {
     </TouchableOpacity>
   );
 
-  // const renderLeftActions = (item) => (
-  //   <View style={{ flexDirection: 'row' }}>
-  //     <TouchableOpacity
-  //       onPress={() => navigation.navigate("EditBilling", { billingDetails: item })}
-  //       style={{ backgroundColor: COLORS?.LIGHT_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
-  //     >
-  //       <AntDesign name="edit" size={20} color={COLORS?.whiteColors} />
-  //     </TouchableOpacity>
-  //   </View>
-  // );
-  // const renderRightActions = (item) => (
-  //   <View style={{ flexDirection: 'row' }}>
-  //     <TouchableOpacity
-  //       onPress={() => handleDeleteItem(item)}
-  //       style={{ backgroundColor: COLORS?.RED_COLOR, justifyContent: 'center', padding: 10, width: 100, alignItems: "center" }}
-  //     >
-  //       <AntDesign name="delete" size={20} color={COLORS?.whiteColors} />
-  //     </TouchableOpacity>
-  //   </View>
-  // );
 
   return (
     <>
@@ -221,7 +200,7 @@ const Bills = ({ navigation, route }) => {
             onChangeText={text => setSearchText(text)}
           />
           <Image
-            source={IconUri?.CalenderSearch}
+            source={IconUri?.event}
             style={{ height: 30, width: 30, resizeMode: 'contain' }}
           />
         </View>
@@ -278,64 +257,15 @@ const Bills = ({ navigation, route }) => {
           keyExtractor={(item, index) => index.toString()}
           contentContainerStyle={{ paddingBottom: 100 }}
           renderItem={renderBillItem}
-          // renderItem={({ item, index }) => {
-          //   return (
-          //     <Swipeable renderLeftActions={() => renderLeftActions(item)} >
-          //       <TouchableOpacity onPress={() => navigation.navigate('MatterDetails', { matterData: item })}
-          //         style={{
-          //           flexDirection: 'row',
-          //           justifyContent: 'space-between',
-          //           alignItems: 'center',
-          //           gap: 10,
-          //           borderBottomWidth: 1,
-          //           paddingVertical: 15,
-          //           borderColor: COLORS?.BORDER_LIGHT_COLOR,
-          //         }}
-          //       >
-          //         <View style={{ gap: 5, width: "65%" }}>
-          //           <MyText style={styles.timeColor}>Open {moment(item?.openDate).format('DD-MM-YYYY')}</MyText>
-          //           <MyText numberOfLines={2} ellipsizeMode={'tail'} style={[styles.txtStyle, { fontWeight: '300', }]}>
-          //             {item?.matterName}
-          //           </MyText>
-          //           <MyText style={styles.timeColor}>{item?.code}</MyText>
-          //         </View>
-          //         <View style={{ gap: 5, width: "35%", justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 10, }}>
 
-          //           <View
-          //             style={{
-          //               backgroundColor: item?.status == "Open" ? '#EFE4FF' : '#ffc2cd',
-          //               borderWidth: 1,
-          //               borderColor: item?.status == "COMPLETED" ? '#7C4EC9' : '#6c0014',
-          //               // alignSelf: 'flex-end',
-          //               borderRadius: 5,
-          //               paddingHorizontal: 8,
-          //               paddingVertical: 2,
-          //             }}
-          //           >
-          //             <MyText
-          //               style={{
-          //                 // fontWeight: '600',
-          //                 // textAlign: 'center',
-          //                 color: item?.status == "COMPLETED" ? COLORS?.whiteColors : '#6c0014',
-          //                 fontSize: calculatefontSize(1.4),
-          //               }}
-          //             >
-          //               {item?.status}
-          //             </MyText>
-          //           </View>
-          //         </View>
-          //       </TouchableOpacity>
-          //     </Swipeable>
-          //   );
-          // }}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={getBills} />
           }
         />
           :
           <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 10 }}>
-            <Image source={IconUri?.task} style={{ height: 50, width: 50, resizeMode: "contain" }} />
-            <MyText style={{ fontSize: calculatefontSize(1.5), color: COLORS.PRIMARY_COLOR }}>No Data Found</MyText>
+            <Image tintColor={COLORS?.LIGHT_COLOR} source={IconUri?.bill} style={{ height: 50, width: 50, resizeMode: "contain" }} />
+            <MyText style={{ fontSize: calculatefontSize(1.5), color: COLORS?.LIGHT_COLOR }}>No Data Found</MyText>
           </View>
         }
 
