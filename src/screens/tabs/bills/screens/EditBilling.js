@@ -47,7 +47,24 @@ const EditBilling = ({ navigation, route }) => {
     //
     const [defaultData, setDefaultData] = useState(billingDetails)
     const [matterSelected, setMatterSelected] = useState('')
+    ///////new states
+    const [userData, setUserData] = useState([]);
 
+
+    const getUserData = async () => {
+        const { res, err } = await httpRequest({
+            method: 'get',
+            path: `/ic/user/?status=Active`,
+            navigation: navigation
+        })
+        if (res) {
+            setUserData(res?.data);
+        }
+        else {
+            console.log(err, "GET USER DATA RES=====================>", res);
+            console.log("errd", err);
+        }
+    }
 
 
 
@@ -62,13 +79,16 @@ const EditBilling = ({ navigation, route }) => {
             setClientId(res?.data?.clientIds)
             if (res?.data?.matterBillingDTOList?.length > 0) {
                 res?.data?.matterBillingDTOList?.forEach(item => {
+                    console.log(item, "itemEDIT BILLIND ====d====d====>");
+
                     dispatch(addTimeEntry({
                         id: Math.floor(Math.random() * 1000),
                         date: moment(item.billDate).format('YYYY-MM-DD') || '',
 
                         //user
-                        user: 'user' || '',
-                        userObj: 'item.userObj' || {},
+                        user: userData?.find(user => user?.userId == item?.firmUserId)?.userProfileDTO?.fullName || '',
+
+                        userObj: userData?.find(user => user?.userId == item?.firmUserId) || {},
                         description: item.description || '',
                         duration: item.duration,
                         totalDuration: getTotalDuration(item.duration) || '',
@@ -88,8 +108,8 @@ const EditBilling = ({ navigation, route }) => {
                         date: moment(item.expDate).format('YYYY-MM-DD') || '',
 
                         //user
-                        user: 'user' || '',
-                        userObj: 'item.userObj' || {},
+                        user: userData?.find(user => user?.userId == item?.firmUserId)?.userProfileDTO?.fullName || '',
+                        userObj: userData?.find(user => user?.userId == item?.firmUserId) || {},
                         description: item.description || '',
                         hourlyRate: item.rate || 0,
                         //tax
@@ -160,7 +180,7 @@ const EditBilling = ({ navigation, route }) => {
     //get users 
 
     useEffect(() => {
-
+        getUserData()
         getMatterData()
 
     }, [])
@@ -384,11 +404,11 @@ const EditBilling = ({ navigation, route }) => {
                                         </View>
                                         <View style={{ width: "40%", flexDirection: "row", justifyContent: "space-between", marginVertical: 5 }}>
                                             <MyText style={{ fontWeight: "bold" }}>Tax Amount :</MyText>
-                                            <MyText > {totalTax?.toFixed(2)}</MyText>
+                                            <MyText > {totalTax}</MyText>
                                         </View>
                                         <View style={{ width: "40%", flexDirection: "row", justifyContent: "space-between", marginVertical: 5 }}>
                                             <MyText style={{ fontWeight: "bold" }}>Net Total :</MyText>
-                                            <MyText >{netTotal?.toFixed(2)}</MyText>
+                                            <MyText >{netTotal}</MyText>
                                         </View>
 
                                     </View>

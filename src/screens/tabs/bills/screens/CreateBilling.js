@@ -48,6 +48,25 @@ const CreateBilling = ({ navigation, route }) => {
     const [toClientLoader, setToClientLoader] = React.useState(false);
     const [selectedMatter, setSelectedMatter] = useState(null);
 
+    ///////new states
+    const [userData, setUserData] = useState([]);
+
+
+    const getUserData = async () => {
+        const { res, err } = await httpRequest({
+            method: 'get',
+            path: `/ic/user/?status=Active`,
+            navigation: navigation
+        })
+        if (res) {
+            setUserData(res?.data);
+        }
+        else {
+            console.log(err, "GET USER DATA RES=====================>", res);
+            console.log("errd", err);
+        }
+    }
+
 
     const getMatterData = async () => {
         const { res, err } = await httpRequest({
@@ -104,6 +123,7 @@ const CreateBilling = ({ navigation, route }) => {
     //get users 
 
     useEffect(() => {
+        getUserData()
         getMatterData()
     }, [])
 
@@ -120,25 +140,30 @@ const CreateBilling = ({ navigation, route }) => {
         }
         else {
             if (res) {
+
                 const data = res?.data
-                console.log(res, "getHourlyData entries");
-                dispatch(addTimeEntry({
-                    id: Math.floor(Math.random() * 1000),
 
-                    date: moment(data?.createdOn).format('YYYY-MM-DD') || '',
 
-                    //user
-                    user: 'user' || '',
-                    userObj: 'data?.userObj' || {},
-                    description: data?.description || '',
-                    duration: data?.duration,
-                    totalDuration: "getTotalDuration(data?.duration)" || '',
-                    hourlyRate: data?.rate || 0,
-                    //tax
-                    tax: "data?.taxPer",
-                    taxObj: {},
-                    taxAmount: "data?.taxAmount" || 0,
-                }))
+                data?.forEach(item => {
+
+                    if (!item?.billed) {
+                        dispatch(addTimeEntry({
+                            id: Math.floor(Math.random() * 1000),
+                            date: moment(item.billDate).format('YYYY-MM-DD') || '',
+                            user: userData?.find(user => user?.userId == item?.firmUserId)?.userProfileDTO?.fullName || '',
+                            userObj: userData?.find(user => user?.userId == item?.firmUserId) || {},
+                            description: item.description || '',
+                            duration: item.duration,
+                            totalDuration: getTotalDuration(item.duration) || '',
+                            hourlyRate: item.rate || 0,
+                            //tax
+                            tax: item.taxRate || 20,
+                            taxObj: {},
+                            taxAmount: item.taxRate || 20,
+                        }));
+                    }
+                })
+
             }
             else {
                 console.log(err, "getHourlyData===>err CLIENT");
@@ -179,7 +204,29 @@ const CreateBilling = ({ navigation, route }) => {
         }
         else {
             if (res) {
-                console.log(res, "getFixedData entries");
+                const data = res?.data
+                console.log(data, "FIXED DATA");
+
+
+                // data?.forEach(item => {
+
+                //     if (!item?.billed) {
+                //         dispatch(addTimeEntry({
+                //             id: Math.floor(Math.random() * 1000),
+                //             date: moment(item.billDate).format('YYYY-MM-DD') || '',
+                //             user: userData?.find(user => user?.userId == item?.firmUserId)?.userProfileDTO?.fullName || '',
+                //             userObj: userData?.find(user => user?.userId == item?.firmUserId) || {},
+                //             description: item.description || '',
+                //             duration: item.duration,
+                //             totalDuration: getTotalDuration(item.duration) || '',
+                //             hourlyRate: item.rate || 0,
+                //             //tax
+                //             tax: 20,
+                //             taxObj: {},
+                //             taxAmount: 20 || 0,
+                //         }));
+                //     }
+                // })
             }
             else {
                 console.log(err, "getFixedData===>err CLIENT");
@@ -200,10 +247,32 @@ const CreateBilling = ({ navigation, route }) => {
         }
         else {
             if (res) {
-                console.log(res, "getExpense entries entries");
+                const data = res?.data
+                console.log(data, "Expense Data-------------------------------------------------------------->");
+
+                data?.forEach(item => {
+
+                    if (!item?.billed) {
+                        dispatch(addExpenseEntry({
+                            id: Math.floor(Math.random() * 1000),
+                            date: moment(item.expDate).format('YYYY-MM-DD') || '',
+
+                            //user
+                            user: userData?.find(user => user?.userId == item?.firmUserId)?.userProfileDTO?.fullName || '',
+                            userObj: userData?.find(user => user?.userId == item?.firmUserId) || {},
+                            description: item.description || '',
+                            hourlyRate: String(item.amount) || 0,
+                            //tax
+                            tax: item.taxRate || 20,
+                            taxObj: {},
+                            taxAmount: item.taxRate || 20,
+                        }));
+                    }
+                })
+
             }
             else {
-                console.log(err, "getExpense entries===>err CLIENT");
+                console.log(err, "getExpenseEntrties===>err CLIENT");
 
             }
         }
@@ -246,12 +315,14 @@ const CreateBilling = ({ navigation, route }) => {
 
         allItems.forEach(item => {
             const duration = item?.totalDuration ?? 1; // If totalDuration not present (i.e., expense), assume 1
-
             const rate = Number(item?.hourlyRate || 0);
-            const tax = Number(item?.taxAmount || 0);
+            const taxPercentage = Number(item?.taxAmount || 0); // this is tax percentage %
 
-            subtotal += rate * duration;
-            totalTax += (rate / 100) * tax;
+            const lineTotal = rate * duration;
+            const lineTax = (lineTotal * taxPercentage) / 100;
+
+            subtotal += lineTotal;
+            totalTax += lineTax;
         });
 
         netTotal = subtotal + totalTax;
@@ -267,6 +338,8 @@ const CreateBilling = ({ navigation, route }) => {
         matterSelected: Yup.string().required('Matter is required'),
 
     })
+    console.log(matterDetails, "matterDetails====================d>");
+
     return (
         <>
 
@@ -552,6 +625,7 @@ const CreateBilling = ({ navigation, route }) => {
                                         onPress={() => {
                                             setClientId(item?.matterId);
                                             setSelectedMatter(item);
+                                            setFieldValue('description', item?.description);
                                             setFieldValue('matterSelected', item?.name);
                                             setFieldValue('matterSelectedObj', item);
                                             setFieldValue('isOpenMatterSelected', false)

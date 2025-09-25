@@ -245,10 +245,30 @@ const BillingTimeEntry = ({ item, navigation }) => {
                 </TouchableOpacity>
             </View>
 
-            <View style={{ alignItems: "flex-end" }}>
+            {/* <View style={{ alignItems: "flex-end" }}>
                 <View style={{ marginVertical: 10 }}>
                     <MyText style={[styles.totalTaxt, {}]}>Tax Amount : {((item?.hourlyRate / 100 || 0) * item?.taxAmount).toFixed(2)}</MyText>
+                    <MyText style={[styles.totalTaxt, {}]}>Tax Amount : {((item?.totalDuration * item?.hourlyRate) * item?.taxAmount) / 100}</MyText>
+                    <MyText style={[styles.totalTaxt, {}]}>Tax Amount : {item?.taxAmount}</MyText>
                     <MyText style={[styles.totalTaxt, {}]}>Total : {(item?.hourlyRate * item?.totalDuration).toFixed(2)}</MyText>
+                </View>
+            </View> */}
+
+            <View style={{ alignItems: "flex-end" }}>
+                <View style={{ marginVertical: 10 }}>
+                    {/* Total amount before tax */}
+                    <MyText style={styles.totalTaxt}>
+                        Total : {(item?.hourlyRate * item?.totalDuration).toFixed(2)}
+                    </MyText>
+
+                    {/* Tax amount */}
+                    <MyText style={styles.totalTaxt}>
+                        Tax Amount : {(((item?.hourlyRate * item?.totalDuration) * item?.taxAmount) / 100).toFixed(2)}
+                    </MyText>
+
+                    {/* Grand total (with tax) */}
+                    <MyText style={[styles.totalTaxt, {}]}>Total : {(item?.hourlyRate * item?.totalDuration).toFixed(2)}</MyText>
+
                 </View>
             </View>
 

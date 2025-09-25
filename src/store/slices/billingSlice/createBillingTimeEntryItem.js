@@ -19,7 +19,8 @@ const createTimeEntry = (payload) => ({
     tax: payload.tax,
     taxObj: payload.taxObj || {},
     taxAmount: payload.taxAmount || 0,
-    taxTotal: ((payload?.hourlyRate / 100 || 0) * payload?.taxAmount).toFixed(2),
+    // taxTotal: ((payload?.hourlyRate / 100 || 0) * payload?.taxAmount).toFixed(2),
+    taxTotal: (((payload?.hourlyRate * payload?.totalDuration) * payload?.taxAmount) / 100).toFixed(2),
     total: (payload?.hourlyRate * payload?.totalDuration).toFixed(2) || 0,
 });
 
