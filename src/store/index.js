@@ -6,6 +6,8 @@ import createItemForBillingRateReducer from "./slices/matterSlice/createItemForB
 import createItemforReminderReducer from "./slices/taskSlice/createItemforReminder";
 import createItemforDocumentsReducer from "./slices/taskSlice/createItemforDocuments";
 import createBillingTimeEntryItemReducer from "./slices/billingSlice/createBillingTimeEntryItem";
+import createFixedFeeDetailItemReducer from "./slices/billingSlice/createFixedFeeDetailItem";
+import createContingencyFeeEntryItemReducer from "./slices/billingSlice/createContingencyFeeEntryItem";
 import createBillingExpenseEntryItemReducer from "./slices/billingSlice/createBillingExpenseEntryItem";
 import createItemForAddEmailReducer from "./slices/clientSlice/createItemForAddEmail";
 import createItemForAddPhoneReducer from "./slices/clientSlice/createItemForAddPhone";
@@ -22,6 +24,8 @@ const store = configureStore({
     createItemforDocuments: createItemforDocumentsReducer,
     //billing
     createBillingTimeEntryItem: createBillingTimeEntryItemReducer,
+    createFixedFeeDetailItem: createFixedFeeDetailItemReducer,
+    createContingencyFeeEntryItem: createContingencyFeeEntryItemReducer,
     createBillingExpenseEntryItem: createBillingExpenseEntryItemReducer,
     //Client
     createItemForAddEmail: createItemForAddEmailReducer,

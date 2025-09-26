@@ -21,11 +21,15 @@ import ReminderItems from '../../tasks/components/ReminderItems'
 import { addReminderItem } from '../../../../store/slices/taskSlice/createItemforReminder'
 import Loader from '../../../../components/Loader'
 import LoaderKitView from 'react-native-loader-kit'
-import { addTimeEntry } from '../../../../store/slices/billingSlice/createBillingTimeEntryItem'
+import { addTimeEntry, resetTimeEntries } from '../../../../store/slices/billingSlice/createBillingTimeEntryItem'
 import BillingTimeEntry from '../components/BillingTimeEntry'
 import BillingExpenseEntry from '../components/BillingExpenseEntry'
-import { addExpenseEntry } from '../../../../store/slices/billingSlice/createBillingExpenseEntryItem'
+import { addExpenseEntry, resetExpenseEntries } from '../../../../store/slices/billingSlice/createBillingExpenseEntryItem'
 import { getTotalDuration } from '../../../../helper/Helpers'
+import { addFixedFee, resetFixedFees } from '../../../../store/slices/billingSlice/createFixedFeeDetailItem'
+import FixedFeeDetails from '../components/FixedFeeDetails'
+import { addContingencyFee, resetContingencyFees } from '../../../../store/slices/billingSlice/createContingencyFeeEntryItem'
+import ContigencyFeeDetails from '../components/ContigencyFeeDetails'
 
 
 
@@ -36,6 +40,8 @@ const CreateBilling = ({ navigation, route }) => {
     const toast = useToast();
     const [firmUserData, setFirmUserData] = useState([])
     const items = useSelector(state => state.createBillingTimeEntryItem.items);
+    const fixedFeeItem = useSelector(state => state.createFixedFeeDetailItem.items);
+    const contingencyFeeItem = useSelector(state => state.createContingencyFeeEntryItem.items);
     const expenseEntryItem = useSelector(state => state.createBillingExpenseEntryItem.items);
     const userDetails = useSelector(state => state?.userDetails?.userDetails);
 
@@ -91,7 +97,7 @@ const CreateBilling = ({ navigation, route }) => {
             navigation: navigation
         })
         if (res) {
-
+            console.log(res);
 
             setToClientData(res?.data);
             setToClientLoader(false)
@@ -128,6 +134,7 @@ const CreateBilling = ({ navigation, route }) => {
     }, [])
 
     const getHourlyData = async () => {
+
         const { res, err, status } = await httpRequest({
             method: `get`,
             path: `/ic/matter/time-entry/mat/${selectedMatter?.matterId}`,
@@ -135,7 +142,7 @@ const CreateBilling = ({ navigation, route }) => {
         })
         if (status == 204) {
             console.log(res, "getHourlData dentries 204");
-
+            dispatch(resetTimeEntries());
             return
         }
         else {
@@ -173,6 +180,8 @@ const CreateBilling = ({ navigation, route }) => {
     }
 
     const getContigencyData = async () => {
+
+        dispatch(resetContingencyFees());
         const { res, err, status } = await httpRequest({
             method: `get`,
             path: `/ic/matter/award/mat/${selectedMatter?.matterId}`,
@@ -184,7 +193,48 @@ const CreateBilling = ({ navigation, route }) => {
         }
         else {
             if (res) {
-                console.log(res, "getContigencyData entries");
+                const data = res?.data
+                console.log(data, "CONTIGENCYf DATA=========");
+
+
+                data?.forEach(item => {
+                    if (!item?.billed) {
+                        // const awardedAmount = Number(item?.amount || 0);       // API ka "amount" = Awarded Amount
+                        // const contingencyRate = Number(item?.rate || 0);       // API ka "rate" = Contingency %
+                        // const calculatedAmount = (awardedAmount * contingencyRate) / 100;
+
+                        // const taxPercentage = 20; // abhi hardcoded, baad me taxObj se laa sakte ho
+                        // const taxAmount = (Number(calculatedAmount) / 100) * taxPercentage;
+
+                        // // Agar API ne totalAmount diya hai, toh use karo warna calculate karo
+                        // const total = item?.totalAmount || (calculatedAmount + taxAmount);
+
+                        // console.log(calculatedAmount, taxAmount, total, '========================', 6.3);
+
+
+                        dispatch(addContingencyFee({
+                            id: Math.floor(Math.random() * 100000),
+                            date: moment(item?.awardDate).format('YYYY-MM-DD') || '',
+                            user: userData?.find(user => user?.userId == item?.feeRecipientId)?.userProfileDTO?.fullName || '',
+                            userObj: userData?.find(user => user?.userId == item?.feeRecipientId) || {},
+                            description: item?.description || '',
+
+                            // important fields
+                            awardedAmount: item?.amount,              // Awarded Amount
+                            contingencyRate: item?.rate,          // Contingency %
+                            // Contingency * AwardedAmount / 100
+
+                            // tax fields
+                            tax: 20,
+                            taxObj: {},                                // future expansion
+
+
+                            // final total
+
+                        }));
+                    }
+
+                })
             }
             else {
                 console.log(err, "getContigencyData===>err CLIENT");
@@ -193,6 +243,7 @@ const CreateBilling = ({ navigation, route }) => {
         }
     }
     const getFixedData = async () => {
+        dispatch(resetFixedFees());
         const { res, err, status } = await httpRequest({
             method: `get`,
             path: `/ic/matter/bill/mat/${selectedMatter?.matterId}/billing-item`,
@@ -205,28 +256,26 @@ const CreateBilling = ({ navigation, route }) => {
         else {
             if (res) {
                 const data = res?.data
-                console.log(data, "FIXED DATA");
+                console.log(data, "FIXED DATA=========");
 
 
-                // data?.forEach(item => {
+                data?.forEach(item => {
 
-                //     if (!item?.billed) {
-                //         dispatch(addTimeEntry({
-                //             id: Math.floor(Math.random() * 1000),
-                //             date: moment(item.billDate).format('YYYY-MM-DD') || '',
-                //             user: userData?.find(user => user?.userId == item?.firmUserId)?.userProfileDTO?.fullName || '',
-                //             userObj: userData?.find(user => user?.userId == item?.firmUserId) || {},
-                //             description: item.description || '',
-                //             duration: item.duration,
-                //             totalDuration: getTotalDuration(item.duration) || '',
-                //             hourlyRate: item.rate || 0,
-                //             //tax
-                //             tax: 20,
-                //             taxObj: {},
-                //             taxAmount: 20 || 0,
-                //         }));
-                //     }
-                // })
+                    if (!item?.billed) {
+                        dispatch(addFixedFee({
+                            id: Math.floor(Math.random() * 1000),
+                            date: moment(item.createdOn).format('YYYY-MM-DD') || '',
+                            user: userData?.find(user => user?.userId == item?.userId)?.userProfileDTO?.fullName || '',
+                            userObj: userData?.find(user => user?.userId == item?.userId) || {},
+                            description: '',
+                            hourlyRate: item.rate || 0,
+                            //tax
+                            tax: 20,
+                            taxObj: {},
+                            taxAmount: 20 || 0,
+                        }));
+                    }
+                })
             }
             else {
                 console.log(err, "getFixedData===>err CLIENT");
@@ -236,6 +285,7 @@ const CreateBilling = ({ navigation, route }) => {
     }
 
     const getExpenseEntrties = async () => {
+        dispatch(resetExpenseEntries());
         const { res, err, status } = await httpRequest({
             method: `get`,
             path: `/ic/matter/exp-entry/mat/${selectedMatter?.matterId}`,
@@ -243,6 +293,7 @@ const CreateBilling = ({ navigation, route }) => {
         })
         if (status == 204) {
             console.log(res, "getExpense entries entries 204");
+            dispatch(resetExpenseEntries());
             return
         }
         else {
@@ -304,6 +355,7 @@ const CreateBilling = ({ navigation, route }) => {
         }
     }, [selectedMatter]);
 
+    const method = selectedMatter?.matterBillingDTOList?.[0]?.method;
 
 
     const calculateAmounts = () => {
@@ -311,24 +363,72 @@ const CreateBilling = ({ navigation, route }) => {
         let totalTax = 0;
         let netTotal = 0;
 
-        const allItems = [...(items || []), ...(expenseEntryItem || [])];
+        // const allItems = [
+        //     ...(items || []),            // time entries
+        //     ...(expenseEntryItem || []), // expenses
+        //     ...(fixedFeeItem || []),     // fixed fee
+        //     ...(contingencyFeeItem || []) // contingency fee ✅
+        // ];
 
-        allItems.forEach(item => {
-            const duration = item?.totalDuration ?? 1; // If totalDuration not present (i.e., expense), assume 1
-            const rate = Number(item?.hourlyRate || 0);
-            const taxPercentage = Number(item?.taxAmount || 0); // this is tax percentage %
+        let allItems = [];
 
-            const lineTotal = rate * duration;
-            const lineTax = (lineTotal * taxPercentage) / 100;
+        // ✅ Method based items
+        switch (method) {
+            case "HOURLY":
+                allItems = [...(items || []), ...(expenseEntryItem || [])];
+                break;
+            case "FIXEDFEEDETAILS":
+                allItems = [...(fixedFeeItem || []), ...(expenseEntryItem || [])];
+                break;
+            case "CONTINGENCYFEEDEFAULTS":
+                allItems = [...(contingencyFeeItem || []), ...(expenseEntryItem || [])];
+                break;
+            default:
+                allItems = [];
+                break;
+        }
 
-            subtotal += lineTotal;
-            totalTax += lineTax;
+        allItems?.forEach(item => {
+            if (item?.awardedAmount !== undefined && item?.contingencyRate !== undefined) {
+                // ✅ Contingency fee calculation (based on awardedAmount & contingencyRate)
+                //==========================================================>
+                const awardedAmount = Number(item?.awardedAmount || 0);
+                const contingencyRate = Number(item?.contingencyRate || 0);
+                const amount = (awardedAmount * contingencyRate) / 100;
+
+                const taxPercentage = 20;
+                const lineTax = (amount * taxPercentage) / 100;
+
+
+                subtotal += amount;
+                totalTax += lineTax;
+
+            } else {
+                // ✅ Time entry + Fixed fee + Expense case
+                const rate = Number(item?.hourlyRate || 0);
+                const taxPercentage = Number(item?.taxAmount || 0);
+
+                const duration = item?.totalDuration !== undefined
+                    ? Number(item?.totalDuration)
+                    : null;
+
+                const lineTotal = duration !== null ? rate * duration : rate;
+                const lineTax = (lineTotal * taxPercentage) / 100;
+
+                subtotal += lineTotal;
+                totalTax += lineTax;
+            }
         });
 
         netTotal = subtotal + totalTax;
 
         return { subtotal, totalTax, netTotal };
     };
+
+    useEffect(() => {
+        calculateAmounts();
+    }, [items, expenseEntryItem, fixedFeeItem, contingencyFeeItem]);
+
 
     const { subtotal, totalTax, netTotal } = calculateAmounts();
 
@@ -338,7 +438,7 @@ const CreateBilling = ({ navigation, route }) => {
         matterSelected: Yup.string().required('Matter is required'),
 
     })
-    console.log(matterDetails, "matterDetails====================d>");
+
 
     return (
         <>
@@ -509,7 +609,7 @@ const CreateBilling = ({ navigation, route }) => {
                                                 animationSpeedMultiplier={1.0} // speed up/slow down animation, default: 1.0, larger is faster
                                                 color={COLORS?.LIGHT_COLOR} // Optional: color can be: 'red', 'green',... or '#ddd', '#ffffff',...
                                             /> :
-                                                toClientData.map((d, i) => {
+                                                toClientData?.map((d, i) => {
                                                     return (
                                                         <>
                                                             <View style={{ marginVertical: 10, flexDirection: "row", gap: 10 }}>
@@ -520,9 +620,16 @@ const CreateBilling = ({ navigation, route }) => {
 
                                                                 <View>
                                                                     <MyText style={{ fontWeight: 'bold' }}>{d?.companyName ? d?.companyName : d?.firstName + ' ' + d?.lastName}</MyText>
-                                                                    {d?.clientAddresseDTOList[0]?.city && d?.clientAddresseDTOList[0]?.country && <MyText>{d?.clientAddresseDTOList[0]?.city + ', ' + d?.clientAddresseDTOList[0]?.country}</MyText>}
-                                                                    {d?.clientEmailAddressDTOList[0]?.email && <MyText>{d?.clientEmailAddressDTOList[0]?.email}</MyText>}
-                                                                    {d?.clientPhoneNumberDTOList[0]?.phoneNo && <MyText>{d?.clientPhoneNumberDTOList[0]?.phoneNo}</MyText>}
+                                                                    {
+                                                                        d?.clientAddresseDTOList?.length > 0 &&
+                                                                        d?.clientAddresseDTOList[0]?.city && d?.clientAddresseDTOList[0]?.country && <MyText>{d?.clientAddresseDTOList[0]?.city + ', ' + d?.clientAddresseDTOList[0]?.country}</MyText>}
+                                                                    {
+                                                                        d?.clientEmailAddressDTOList?.length > 0 &&
+                                                                        d?.clientEmailAddressDTOList[0]?.email && <MyText>{d?.clientEmailAddressDTOList[0]?.email}</MyText>}
+                                                                    {
+                                                                        d?.clientPhoneNumberDTOList?.length > 0 &&
+
+                                                                        d?.clientPhoneNumberDTOList[0]?.phoneNo && <MyText>{d?.clientPhoneNumberDTOList[0]?.phoneNo}</MyText>}
                                                                 </View>
                                                             </View>
                                                         </>
@@ -548,29 +655,86 @@ const CreateBilling = ({ navigation, route }) => {
                                     />
 
                                     {/* //item =====================================> */}
-                                    <View style={{ marginVertical: 10 }}>
-                                        <MyText style={[styles.btnTextStyle, { fontSize: calculatefontSize(2) }]}>Time Entries</MyText>
-                                        <MyText style={{ fontSize: calculatefontSize(1.4) }}>Any modifications made to the current time entries will be updated in the matter.
-                                        </MyText>
-                                        <View style={{ borderBottomWidth: 1, borderColor: COLORS?.LIGHT_COLOR, marginVertical: 10, }}>
+                                    {
+                                        selectedMatter?.matterBillingDTOList?.length > 0 &&
+                                        (
+                                            method == "HOURLY" ?
+                                                <View style={{ marginVertical: 10 }}>
+                                                    <MyText style={[styles.btnTextStyle, { fontSize: calculatefontSize(2) }]}>Time Entries</MyText>
+                                                    <MyText style={{ fontSize: calculatefontSize(1.4) }}>Any modifications made to the current time entries will be updated in the matter.
+                                                    </MyText>
+                                                    <View style={{ borderBottomWidth: 1, borderColor: COLORS?.LIGHT_COLOR, marginVertical: 10, }}>
 
-                                            {
-                                                items?.map((item, index) => {
-                                                    return (
-                                                        <>
+                                                        {
+                                                            items?.map((item, index) => {
+                                                                return (
+                                                                    <>
 
-                                                            <BillingTimeEntry item={item} index={index} navigation={navigation} />
+                                                                        <BillingTimeEntry item={item} index={index} navigation={navigation} />
 
-                                                        </>
-                                                    )
-                                                })
+                                                                    </>
+                                                                )
+                                                            })
 
-                                            }
-                                            <AddButton onPress={() => dispatch(addTimeEntry({
-                                                id: Math.floor(Math.random() * 1000),
-                                            }))} title='Add a time entry' />
-                                        </View>
-                                    </View>
+                                                        }
+                                                        <AddButton onPress={() => dispatch(addTimeEntry({
+                                                            id: Math.floor(Math.random() * 1000),
+                                                        }))} title='Add a time entry' />
+                                                    </View>
+                                                </View>
+                                                :
+                                                method == "CONTINGENCYFEEDEFAULTS" ?
+                                                    <View style={{ marginVertical: 10 }}>
+                                                        <MyText style={[styles.btnTextStyle, { fontSize: calculatefontSize(2) }]}>Contingency Fee
+                                                        </MyText>
+                                                        <MyText style={{ fontSize: calculatefontSize(1.4) }}>Any modifications made to the current fee entries will be updated in the matter.
+                                                        </MyText>
+                                                        <View style={{ borderBottomWidth: 1, borderColor: COLORS?.LIGHT_COLOR, marginVertical: 10, }}>
+
+                                                            {
+                                                                contingencyFeeItem?.map((item, index) => {
+                                                                    return (
+                                                                        <>
+
+                                                                            <ContigencyFeeDetails item={item} index={index} navigation={navigation} />
+
+                                                                        </>
+                                                                    )
+                                                                })
+
+                                                            }
+                                                            <AddButton onPress={() => dispatch(addContingencyFee({
+                                                                id: Math.floor(Math.random() * 1000),
+                                                            }))} title='Add a Contingency fee entry' />
+                                                        </View>
+                                                    </View>
+                                                    :
+                                                    <View style={{ marginVertical: 10 }}>
+                                                        <MyText style={[styles.btnTextStyle, { fontSize: calculatefontSize(2) }]}>Fixed Fee Detail</MyText>
+                                                        <MyText style={{ fontSize: calculatefontSize(1.4) }}>Any modifications made to the current time entries will be updated in the matter.
+                                                        </MyText>
+
+                                                        <View style={{ borderBottomWidth: 1, borderColor: COLORS?.LIGHT_COLOR, marginVertical: 10, }}>
+
+                                                            {
+                                                                fixedFeeItem?.map((item, index) => {
+                                                                    return (
+                                                                        <>
+
+                                                                            <FixedFeeDetails item={item} index={index} navigation={navigation} />
+
+                                                                        </>
+                                                                    )
+                                                                })
+
+                                                            }
+                                                            <AddButton onPress={() => dispatch(addFixedFee({
+                                                                id: Math.floor(Math.random() * 1000),
+                                                            }))} title='Add a fixed fee entry' />
+                                                        </View>
+                                                    </View>)
+
+                                    }
                                     {/* //item =====================================> */}
                                     <View style={{ marginVertical: 10 }}>
                                         <MyText style={[styles.btnTextStyle, { fontSize: calculatefontSize(2) }]}>Expense Entries</MyText>
@@ -597,15 +761,15 @@ const CreateBilling = ({ navigation, route }) => {
                                         </View>
                                     </View>
                                     <View style={{ alignItems: "flex-end", backgroundColor: COLORS?.BORDER_LIGHT_COLOR, padding: 10 }}>
-                                        <View style={{ width: "40%", flexDirection: "row", justifyContent: "space-between", marginVertical: 5 }}>
+                                        <View style={{ width: "70%", flexDirection: "row", justifyContent: "space-between", marginVertical: 5 }}>
                                             <MyText style={{ fontWeight: "bold" }}>Subtotal :</MyText>
                                             <MyText > {subtotal?.toFixed(2)}</MyText>
                                         </View>
-                                        <View style={{ width: "40%", flexDirection: "row", justifyContent: "space-between", marginVertical: 5 }}>
+                                        <View style={{ width: "70%", flexDirection: "row", justifyContent: "space-between", marginVertical: 5 }}>
                                             <MyText style={{ fontWeight: "bold" }}>Tax Amount :</MyText>
                                             <MyText > {totalTax?.toFixed(2)}</MyText>
                                         </View>
-                                        <View style={{ width: "40%", flexDirection: "row", justifyContent: "space-between", marginVertical: 5 }}>
+                                        <View style={{ width: "70%", flexDirection: "row", justifyContent: "space-between", marginVertical: 5 }}>
                                             <MyText style={{ fontWeight: "bold" }}>Net Total :</MyText>
                                             <MyText >{netTotal?.toFixed(2)}</MyText>
                                         </View>
