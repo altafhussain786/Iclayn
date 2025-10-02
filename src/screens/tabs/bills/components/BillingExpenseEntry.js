@@ -37,6 +37,8 @@ const BillingExpenseEntry = ({ item, navigation }) => {
         )
         if (res) {
             setUserData(res?.data);
+            dispatch(updateExpenseEntryField({ id: id, field: 'userObj', value: res?.data[0] || {} }));
+            dispatch(updateExpenseEntryField({ id: id, field: 'user', value: res?.data[0]?.userProfileDTO?.fullName || '' }));
         }
         else {
             console.log(err, "GET USER DATA RES=====================>", res);
@@ -178,6 +180,7 @@ const BillingExpenseEntry = ({ item, navigation }) => {
                 date={new Date()}
                 onConfirm={date => {
                     dispatch(updateExpenseEntryField({ id: id, field: 'date', value: moment(date).format('MM/DD/YYYY') }));
+                    dispatch(updateExpenseEntryField({ id: id, field: 'selectedDate', value: moment(date).format().toString() }));
                     setSelectedDate(moment(date).format('MM/DD/YYYY'));
                     setIsDateOpen(false);
 

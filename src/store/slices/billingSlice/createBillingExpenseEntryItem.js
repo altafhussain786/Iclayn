@@ -7,7 +7,7 @@ const initialState = {
 const createExpenseEntry = (payload) => ({
     id: payload.id || '',
     date: payload.date || '',
-
+    dataObj: payload.dataObj || {},
     // user
     user: payload.user || '',
     userObj: payload.userObj || {},

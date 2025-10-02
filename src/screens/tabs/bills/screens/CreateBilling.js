@@ -25,7 +25,7 @@ import { addTimeEntry, resetTimeEntries } from '../../../../store/slices/billing
 import BillingTimeEntry from '../components/BillingTimeEntry'
 import BillingExpenseEntry from '../components/BillingExpenseEntry'
 import { addExpenseEntry, resetExpenseEntries } from '../../../../store/slices/billingSlice/createBillingExpenseEntryItem'
-import { getTotalDuration } from '../../../../helper/Helpers'
+import { formatNumber, getTotalDuration } from '../../../../helper/Helpers'
 import { addFixedFee, resetFixedFees } from '../../../../store/slices/billingSlice/createFixedFeeDetailItem'
 import FixedFeeDetails from '../components/FixedFeeDetails'
 import { addContingencyFee, resetContingencyFees } from '../../../../store/slices/billingSlice/createContingencyFeeEntryItem'
@@ -44,6 +44,7 @@ const CreateBilling = ({ navigation, route }) => {
     const contingencyFeeItem = useSelector(state => state.createContingencyFeeEntryItem.items);
     const expenseEntryItem = useSelector(state => state.createBillingExpenseEntryItem.items);
     const userDetails = useSelector(state => state?.userDetails?.userDetails);
+
 
 
     const [matterData, setmatterData] = React.useState([]);
@@ -149,6 +150,7 @@ const CreateBilling = ({ navigation, route }) => {
             if (res) {
 
                 const data = res?.data
+                console.log(data, "HOURLY DATA=========>");
 
 
                 data?.forEach(item => {
@@ -156,7 +158,9 @@ const CreateBilling = ({ navigation, route }) => {
                     if (!item?.billed) {
                         dispatch(addTimeEntry({
                             id: Math.floor(Math.random() * 1000),
-                            date: moment(item.billDate).format('YYYY-MM-DD') || '',
+                            dataObj: item,
+                            selectedDate: item.createdOn || '',
+                            date: moment(item.createdOn).format('YYYY-MM-DD') || '',
                             user: userData?.find(user => user?.userId == item?.firmUserId)?.userProfileDTO?.fullName || '',
                             userObj: userData?.find(user => user?.userId == item?.firmUserId) || {},
                             description: item.description || '',
@@ -198,19 +202,9 @@ const CreateBilling = ({ navigation, route }) => {
 
 
                 data?.forEach(item => {
+                    console.log(item, "item for contigency ================================");
+
                     if (!item?.billed) {
-                        // const awardedAmount = Number(item?.amount || 0);       // API ka "amount" = Awarded Amount
-                        // const contingencyRate = Number(item?.rate || 0);       // API ka "rate" = Contingency %
-                        // const calculatedAmount = (awardedAmount * contingencyRate) / 100;
-
-                        // const taxPercentage = 20; // abhi hardcoded, baad me taxObj se laa sakte ho
-                        // const taxAmount = (Number(calculatedAmount) / 100) * taxPercentage;
-
-                        // // Agar API ne totalAmount diya hai, toh use karo warna calculate karo
-                        // const total = item?.totalAmount || (calculatedAmount + taxAmount);
-
-                        // console.log(calculatedAmount, taxAmount, total, '========================', 6.3);
-
 
                         dispatch(addContingencyFee({
                             id: Math.floor(Math.random() * 100000),
@@ -226,7 +220,11 @@ const CreateBilling = ({ navigation, route }) => {
 
                             // tax fields
                             tax: 20,
-                            taxObj: {},                                // future expansion
+                            taxObj: {},
+
+                            dataObj: item,
+                            selectedDate: moment(item?.awardDate).format('YYYY-MM-DD') || '',
+                            // future expansion
 
 
                             // final total
@@ -268,6 +266,7 @@ const CreateBilling = ({ navigation, route }) => {
                             user: userData?.find(user => user?.userId == item?.userId)?.userProfileDTO?.fullName || '',
                             userObj: userData?.find(user => user?.userId == item?.userId) || {},
                             description: '',
+                            selectedDate: item?.createdOn || '',
                             hourlyRate: item.rate || 0,
                             //tax
                             tax: 20,
@@ -307,7 +306,7 @@ const CreateBilling = ({ navigation, route }) => {
                         dispatch(addExpenseEntry({
                             id: Math.floor(Math.random() * 1000),
                             date: moment(item.expDate).format('YYYY-MM-DD') || '',
-
+                            dataObj: item || {},
                             //user
                             user: userData?.find(user => user?.userId == item?.firmUserId)?.userProfileDTO?.fullName || '',
                             userObj: userData?.find(user => user?.userId == item?.firmUserId) || {},
@@ -474,94 +473,158 @@ const CreateBilling = ({ navigation, route }) => {
                 }
                 validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
-                    console.log(items?.length, "items");
-                    if (items?.length < 1) {
-                        toast.show('At least one Entry is required.', { type: 'warning' })
-                        return
+
+
+
+                    const mappedForContigency = contingencyFeeItem?.map((d, i) => {
+                        const awardedAmount = Number(d?.awardedAmount || 0);
+                        const contingencyRate = Number(d?.contingencyRate || 0); // percentage
+                        const amount = (awardedAmount * contingencyRate) / 100;
+
+                        const taxPercentage = 20;
+                        const taxTotal = ((amount * taxPercentage) / 100);
+                        const total = (amount + (amount * taxPercentage) / 100);
+                        return {
+
+                            createdOn: d?.dataObj?.createdOn,
+                            matterBillAwardId: null,
+                            matterAwardId: d?.dataObj?.matterAwardId,
+                            billDate: new Date(d?.date).toISOString() || '',
+                            feeRecipientId: d?.dataObj?.feeRecipientId,
+                            description: d?.description || '',
+                            amount: awardedAmount,
+                            rate: Number(d?.contingencyRate),
+                            taxId: d?.dataObj?.taxId || 1,
+                            taxPer: taxPercentage,
+                            taxAmount: taxTotal,
+                            totalAmount: total
+                        }
+                    })
+
+
+
+                    const mappedFixFeeDetails = fixedFeeItem?.map((d, i) => {
+                        const rate = Number(d?.hourlyRate || 0);
+                        const taxPercentage = Number(d?.taxAmount || 0);
+
+                        // agar totalDuration available hai to timeEntry hai, warna fixed fee
+                        const duration = d?.totalDuration !== undefined ? Number(d?.totalDuration) : null;
+
+                        const lineTotal = duration !== null ? rate * duration : rate;
+                        const lineTax = (lineTotal * taxPercentage) / 100;
+                        const grandTotal = lineTotal + lineTax;
+
+                        return {
+                            amount: 0,
+                            billDate: new Date(d?.selectedDate).toISOString().replace('Z', '+05:00') || '',
+                            description: "",
+                            matterBillServiceItemId: null,
+                            matterServiceItemId: d?.serviceItemObj?.serviceItemId || null,
+                            rate: rate,
+                            taxAmount: lineTax,
+                            taxId: d?.dataObj?.taxId || 1,
+                            taxPer: taxPercentage || 20,
+                            totalAmount: lineTotal,
+                            userId: d?.userObj?.userId,
+                        }
+                    })
+
+
+                    const mappedData = expenseEntryItem?.map((d, i) => {
+                        return {
+                            createdOn: d?.dataObj?.createdOn || '',
+                            updatedOn: d?.dataObj?.createdOn || null,
+                            createdBy: userDetails?.userId || null,
+                            updatedBy: null,
+                            revision: null,
+                            matterBillExpenseId: null,
+                            expEntryId: d?.dataObj?.matterExpenseEntryId || null,
+                            expDate: moment(d?.date, 'MM/DD/YYYY').toISOString() || '',
+                            userId: d?.userObj?.userId || 0,
+                            description: d?.description || '',
+                            rate: d?.hourlyRate || "0",
+                            taxRate: 0,
+                            quantity: 1,
+                            taxId: d?.taxObj?.taxId || 1,
+                            taxPer: Number(d?.taxAmount),
+                            taxAmount: (Number(d?.hourlyRate) / 100) * Number(d?.taxAmount) || 0,
+                            totalAmount: Number(d?.hourlyRate) || 0,
+                            nonBillable: false,
+                            visibleBill: false
+                        }
+                    })
+
+                    // HOURLY PAY KAM KRNA PARY GA ================ >
+                    const mappedMatterBillingDTOList = items?.map((d, i) => {
+                        return {
+                            createdOn: d?.dataObj?.createdOn || null,
+                            updatedOn: d?.dataObj?.updatedOn || null,
+                            createdBy: userDetails?.userId || 0,
+                            updatedBy: null,
+                            revision: null,
+                            matterBillTimeId: null,
+                            matterTimeEntryId: d?.dataObj?.matterTimeEntryId || null,
+                            billDate: d?.selectedDate ? new Date(d?.selectedDate).toISOString().replace('Z', '+05:00') : null,
+                            userId: d?.userObj?.userId || 0,
+                            description: d?.description || '',
+                            duration: d?.duration,
+                            hourlyRate: d?.hourlyRate,
+                            rate: d?.hourlyRate || 0,
+                            taxId: d?.taxObj?.taxId || 1,
+                            taxPer: Number(d?.taxAmount),
+                            taxAmount: Number(((d?.hourlyRate * d?.totalDuration) * d?.taxAmount) / 100) || 0,
+                            totalAmount: (d?.hourlyRate * d?.totalDuration) || 0,
+                            nonBillable: false,
+                            visibleBill: false
+                        }
+                    })
+
+
+                    const payload = {
+
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: userDetails?.userId || 0,
+                        updatedBy: null,
+                        revision: null,
+                        matterBillId: null,
+                        dueDate: new Date(values.selecteddueDate).toISOString() || '' || "",
+                        invoiceDate: new Date(values.selecteddueDate).toISOString() || '' || "",
+                        matterId: values?.matterSelectedObj?.matterId || 0,
+                        matterDescription: values.matterSelectedObj?.description || '',
+                        subTotal: subtotal || 0,
+                        taxTotal: totalTax || 0,
+                        netTotal: netTotal || 0,
+                        paidTotal: 0,
+                        status: "UNPAID",
+
+                        matterBillingDTOList: mappedMatterBillingDTOList || [],
+                        matterBillAwardDTOList: mappedForContigency || [],
+                        matterBillServiceItemDTOList: mappedFixFeeDetails || [],
+                        matterBillExpenseDTOList: mappedData || [],
+
+                        clientIds: toClientData?.map(item => item?.clientId).join(",") || "",
+                        type: method || "HOURLY"
                     }
 
-                    // const mappedData = expenseEntryItem?.map((d, i) => {
-                    //     return {
-                    //         createdOn: "",
-                    //         updatedOn: null,
-                    //         createdBy: userDetails?.userId || null,
-                    //         updatedBy: null,
-                    //         revision: null,
-                    //         matterBillExpenseId: null,
-                    //         expEntryId: null,
-                    //         expDate: moment(d?.date, 'MM/DD/YYYY').toISOString(),
-                    //         userId: d?.userObj?.userId || 0,
-                    //         description: d?.description || '',
-                    //         rate: d?.hourlyRate || "0",
-                    //         taxRate: 0,
-                    //         quantity: 1,
-                    //         taxId: d?.taxObj?.taxId || 1,
-                    //         taxPer: Number(d?.taxAmount),
-                    //         taxAmount: (Number(d?.hourlyRate) / 100) * Number(d?.taxAmount) || 0,
-                    //         totalAmount: Number(d?.hourlyRate) || 0,
-                    //         nonBillable: false,
-                    //         visibleBill: false
-                    //     }
-                    // })
-                    // const mappedMatterBillingDTOList = items?.map((d, i) => {
-                    //     return {
-                    //         createdOn: "",
-                    //         updatedOn: null,
-                    //         createdBy: null,
-                    //         updatedBy: null,
-                    //         revision: null,
-                    //         matterBillTimeId: null,
-                    //         matterTimeEntryId: null,
-                    //         billDate: "2025-08-16T08:07:44.164Z",
-                    //         userId: d?.userObj?.userId || 0,
-                    //         description: d?.description || '',
-                    //         duration: d?.duration,
-                    //         hourlyRate: d?.hourlyRate,
-                    //         rate: 0,
-                    //         taxId: d?.taxObj?.taxId || 1,
-                    //         taxPer: Number(d?.taxAmount),
-                    //         taxAmount: (Number(d?.hourlyRate) / 100) * Number(d?.taxAmount) || 0,
-                    //         totalAmount: Number(d?.hourlyRate) || 0,
-                    //         nonBillable: false,
-                    //         visibleBill: false
-                    //     }
-                    // })
-                    // const payload = {
+                    console.log(payload, '=======================ddd=====>Payload');
 
-                    //     createdOn: "",
-                    //     updatedOn: null,
-                    //     createdBy: userDetails?.userId || 0,
-                    //     updatedBy: null,
-                    //     revision: null,
-                    //     matterBillId: null,
-                    //     dueDate: values?.selecteddueDate || "",
-                    //     invoiceDate: values?.selecteddueDate || "",
-                    //     matterId: values?.matterSelectedObj?.matterId || 0,
-                    //     matterDescription: values.matterSelectedObj?.description || '',
-                    //     subTotal: subtotal || 0,
-                    //     taxTotal: totalTax || 0,
-                    //     netTotal: netTotal || 0,
-                    //     paidTotal: 0,
-                    //     status: "UNPAID",
-                    //     matterBillingDTOList: mappedMatterBillingDTOList || [],
-                    //     matterBillExpenseDTOList: mappedData || [],
-                    //     clientIds: toClientData?.map(item => item?.clientId).join(",") || "",
-                    // }
 
-                    // console.log(payload, "PAYLOADd ", expenseEntryItem);
-                    // const { res, err } = await httpRequest({
-                    //     method: `post`,
-                    //     path: `/ic/matter/bill/`,
-                    //     body: payload,
-                    //     navigation: navigation
-                    // })
-                    // if (res) {
-                    //     toast.show('Billing created successfully', { type: 'success' })
-                    //     navigation.goBack()
-                    // }
-                    // else {
-                    //     console.log("err", err);
-                    // }
+
+                    const { res, err } = await httpRequest({
+                        method: "post",
+                        path: "/ic/matter/bill/",
+                        params: payload,
+                        header: { "Content-Type": "application/json" },
+                        navigation
+                    });
+                    if (res) {
+                        toast.show('Billing created successfully', { type: 'success' })
+                        navigation.goBack()
+                    }
+                    else {
+                        console.log("err", err);
+                    }
 
 
 
@@ -763,15 +826,15 @@ const CreateBilling = ({ navigation, route }) => {
                                     <View style={{ alignItems: "flex-end", backgroundColor: COLORS?.BORDER_LIGHT_COLOR, padding: 10 }}>
                                         <View style={{ width: "70%", flexDirection: "row", justifyContent: "space-between", marginVertical: 5 }}>
                                             <MyText style={{ fontWeight: "bold" }}>Subtotal :</MyText>
-                                            <MyText > {subtotal?.toFixed(2)}</MyText>
+                                            <MyText >£ {formatNumber(subtotal)}</MyText>
                                         </View>
                                         <View style={{ width: "70%", flexDirection: "row", justifyContent: "space-between", marginVertical: 5 }}>
                                             <MyText style={{ fontWeight: "bold" }}>Tax Amount :</MyText>
-                                            <MyText > {totalTax?.toFixed(2)}</MyText>
+                                            <MyText >£ {formatNumber(totalTax)}</MyText>
                                         </View>
                                         <View style={{ width: "70%", flexDirection: "row", justifyContent: "space-between", marginVertical: 5 }}>
                                             <MyText style={{ fontWeight: "bold" }}>Net Total :</MyText>
-                                            <MyText >{netTotal?.toFixed(2)}</MyText>
+                                            <MyText >£ {formatNumber(netTotal)}</MyText>
                                         </View>
 
                                     </View>

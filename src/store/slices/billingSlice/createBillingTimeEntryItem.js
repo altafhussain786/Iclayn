@@ -7,7 +7,8 @@ const initialState = {
 const createTimeEntry = (payload) => ({
     id: payload.id, // unique ID
     date: payload.date || '',
-
+    dataObj: payload.dataObj || {},
+    selectedDate: payload.selectedDate || '',
     //user
     user: payload.user || '',
     userObj: payload.userObj || {},
@@ -19,8 +20,8 @@ const createTimeEntry = (payload) => ({
     tax: payload.tax,
     taxObj: payload.taxObj || {},
     taxAmount: payload.taxAmount || 0,
-    // taxTotal: ((payload?.hourlyRate / 100 || 0) * payload?.taxAmount).toFixed(2),
-    taxTotal: (((payload?.hourlyRate * payload?.totalDuration) * payload?.taxAmount) / 100).toFixed(2),
+    taxTotal: ((payload?.hourlyRate / 100 || 0) * payload?.taxAmount).toFixed(2),
+    // taxTotal: payload?.taxAmount?.toFixed(2) || 0,
     total: (payload?.hourlyRate * payload?.totalDuration).toFixed(2) || 0,
 });
 

@@ -15,11 +15,13 @@ import { removeFixedFee, updateFixedFeeField } from '../../../../store/slices/bi
 
 const FixedFeeDetails = ({ item, navigation }) => {
     const [isOpenUser, setisOpenUser] = useState(false);
+    const [isOpenServiceItem, setisOpenServiceItem] = useState(false);
     const [isOpenTax, setisOpenTax] = useState(false);
     const [isDateOpen, setIsDateOpen] = useState(false);
     const [userData, setUserData] = useState([]);
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [taxData, setTaxData] = useState([]);
+    const [serviceData, setServiceData] = useState([]);
 
     const dispatch = useDispatch();
     const id = item?.id;
@@ -34,6 +36,27 @@ const FixedFeeDetails = ({ item, navigation }) => {
         )
         if (res) {
             setUserData(res?.data);
+            dispatch(updateFixedFeeField({ id: id, field: 'userObj', value: res?.data[0] || {} }));
+            dispatch(updateFixedFeeField({ id: id, field: 'user', value: res?.data[0]?.userProfileDTO?.fullName }));
+        }
+        else {
+            console.log(err, "GET USER DATA RES=====================>", res);
+
+            console.log("errd", err);
+
+        }
+    }
+
+    const getServiceData = async () => {
+        const { res, err } = await httpRequest(
+            {
+                method: 'get',
+                path: `/ic/si/?status=Active`,
+                navigation: navigation
+            }
+        )
+        if (res) {
+            setServiceData(res?.data);
         }
         else {
             console.log(err, "GET USER DATA RES=====================>", res);
@@ -61,7 +84,7 @@ const FixedFeeDetails = ({ item, navigation }) => {
         }
     }
     useEffect(() => {
-
+        getServiceData();
         getUserData();
         getTaxData();
     }, [])
@@ -95,6 +118,13 @@ const FixedFeeDetails = ({ item, navigation }) => {
                 <TouchableOpacity style={{ width: '85%' }} onPress={() => setisOpenUser(true)}>
                     <MyText style={{ color: item.user ? COLORS?.PRIMARY_COLOR : COLORS?.LIGHT_COLOR }}>
                         {item?.user || 'User'}
+                    </MyText>
+                </TouchableOpacity>
+            </View>
+            <View style={{ flexDirection: "row", gap: 10, alignItems: "center", backgroundColor: COLORS?.BORDER_LIGHT_COLOR, borderWidth: 0.5, padding: 8, borderColor: '#ddd', borderRadius: 5, marginTop: 10 }}>
+                <TouchableOpacity style={{ width: '85%' }} onPress={() => setisOpenServiceItem(true)}>
+                    <MyText style={{ color: item.user ? COLORS?.PRIMARY_COLOR : COLORS?.LIGHT_COLOR }}>
+                        {item?.serviceItem || 'Service Item'}
                     </MyText>
                 </TouchableOpacity>
             </View>
@@ -195,6 +225,24 @@ const FixedFeeDetails = ({ item, navigation }) => {
                     </TouchableOpacity>
                 )}
             />
+            <BottomModalListWithSearch
+                onClose={() => setisOpenServiceItem(false)}
+                visible={isOpenServiceItem}
+                data={serviceData}
+                searchKey="name"
+                renderItem={({ item: option }) => (
+                    <TouchableOpacity
+                        onPress={() => {
+                            dispatch(updateFixedFeeField({ id: id, field: 'serviceItem', value: option?.name }));
+                            dispatch(updateFixedFeeField({ id: id, field: 'serviceItemObj', value: option }));
+                            setisOpenServiceItem(false);
+                        }}
+                        style={{ paddingVertical: 10, borderBottomWidth: 1, borderColor: COLORS.BORDER_LIGHT_COLOR }}
+                    >
+                        <MyText style={{ fontSize: calculatefontSize(1.9) }}>{option?.name}</MyText>
+                    </TouchableOpacity>
+                )}
+            />
             <DatePicker
                 modal
                 mode='date'
@@ -202,6 +250,7 @@ const FixedFeeDetails = ({ item, navigation }) => {
                 date={new Date()}
                 onConfirm={date => {
                     dispatch(updateFixedFeeField({ id: id, field: 'date', value: moment(date).format('MM/DD/YYYY') }));
+                    dispatch(updateFixedFeeField({ id: id, field: 'selectedDate', value: moment(date).format().toString() }));
                     setSelectedDate(moment(date).format('MM/DD/YYYY'));
                     setIsDateOpen(false);
 

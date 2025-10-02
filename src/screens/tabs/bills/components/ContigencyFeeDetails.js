@@ -256,7 +256,6 @@ import httpRequest from '../../../../api/apiHandler';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import { removeContingencyFee, updateContingencyFeeField } from '../../../../store/slices/billingSlice/createContingencyFeeEntryItem';
-// import { removeContingencyFee, updateContingencyFeeField } from '../../../../store/slices/billingSlice/createContingencyFeeDetailItem';
 
 const ContingencyFeeDetails = ({ item, navigation }) => {
     const [isOpenUser, setisOpenUser] = useState(false);
@@ -274,8 +273,16 @@ const ContingencyFeeDetails = ({ item, navigation }) => {
             path: `/ic/user/?status=Active`,
             navigation
         });
-        if (res) setUserData(res?.data);
+        if (res) {
+
+            setUserData(res?.data)
+            dispatch(updateContingencyFeeField({ id, field: 'userObj', value: res?.data[0] || {} }));
+            dispatch(updateContingencyFeeField({ id, field: 'user', value: res?.data[0]?.userProfileDTO?.fullName || '' }));
+
+
+        }
     };
+
 
     const getTaxData = async () => {
         const { res } = await httpRequest({

@@ -52,6 +52,7 @@ const Home = ({ navigation }) => {
       }
     )
     if (res) {
+      console.log(res, "GET USER DATA RES=====================>");
 
       dispatch(adduserDetails(res?.data))
 

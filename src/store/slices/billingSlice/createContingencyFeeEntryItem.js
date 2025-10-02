@@ -10,7 +10,7 @@ const createContingencyFeeEntry = (payload) => {
     return {
         id: payload.id, // unique ID
         date: payload.date || '',
-
+        selectedDate: payload.selectedDate || '',
         // user
         user: payload.user || '',
         userObj: payload.userObj || {},
@@ -26,6 +26,7 @@ const createContingencyFeeEntry = (payload) => {
         taxObj: payload.taxObj || {},
         taxAmount: payload.taxAmount || 0,
 
+        dataObj: payload.dataObj || {},
 
     };
 };

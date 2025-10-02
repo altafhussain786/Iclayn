@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import moment from 'moment';
 
 const initialState = {
     items: [],
@@ -12,10 +13,13 @@ const createFixedFeeEntry = (payload) => ({
     user: payload.user || '',
     userObj: payload.userObj || {},
     description: payload.description || '',
-
+    selectedDate: payload.selectedDate || '',
     // fixed amount
     hourlyRate: payload.hourlyRate || 0, // yaha hourlyRate ko hi fixed fee amount treat kar rahe hain
 
+    //serviceItem
+    serviceItem: "",
+    serviceItemObj: payload.serviceItemObj || {},
     // tax
     tax: payload.tax,
     taxObj: payload.taxObj || {},

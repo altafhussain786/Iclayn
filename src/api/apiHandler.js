@@ -98,7 +98,6 @@ const httpRequest = async ({
         }
         return { res: response?.data, status: response.status };
     } catch (err) {
-        console.log(err, "Catchddddddd error==========================================d========>", `${baseUrl}${path} ${newToken}`);
 
         if (err.status === 401) {
             removeToken();

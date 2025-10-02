@@ -37,6 +37,13 @@ const BillingTimeEntry = ({ item, navigation }) => {
         )
         if (res) {
             setUserData(res?.data);
+            console.log(res?.data, "GET USER DATA RES======d===============>");
+
+            dispatch(updateTimeEntryField({ id: id, field: 'userObj', value: res?.data[0] || {} }));
+            dispatch(updateTimeEntryField({ id: id, field: 'user', value: res?.data[0]?.userProfileDTO?.fullName || '' }));
+
+            // dispatch(updateTimeEntryField({ id: id, field: 'userObj', value: res?.data[0] }));
+            // dispatch(updateTimeEntryField({ id: id, field: 'user', value: res?.data[0]?.userProfileDTO?.fullName }));
         }
         else {
             console.log(err, "GET USER DATA RES=====================>", res);
@@ -94,53 +101,8 @@ const BillingTimeEntry = ({ item, navigation }) => {
     };
 
 
-    //   const calculateAmounts = () => {
-    //    let duration=0
-    //    let hourlyRate=0
-    //    let taxAmount=0
-    //    let toalTax=0
-    //    let totalAmount
-
-    //    item?.items?.forEach(item => {
-
-    //     duration += item?.duration
-    //     hourlyRate += item?.hourlyRate
-    //     taxAmount += item?.taxAmount
-    //     toalTax += item?.toalTax
-    //     totalAmount += item?.totalAmount
-
-    //    })
 
 
-    //     const toalTaxOnAmt=
-
-
-
-    // let grossAmount = 0;
-    // let totalDiscount = 0;
-    // let totalTax = 0;
-    // let totalFinalAmount = 0;
-
-    // items.forEach(item => {
-    //     const basePrice =item?.productRate?.rate || item?.pSaleRatePlan?.sRPRate || 0;
-    //     const quantity = item?.quantity == 0 ? 1 : item?.quantity || 1;
-    //     const discount = item?.discount || 0;
-
-    //     const grossItemPrice = basePrice * quantity;
-    //     const itemDiscount = (grossItemPrice * discount) / 100;
-    //     const discountedPrice = grossItemPrice - itemDiscount;
-    //     const taxAmount = (discountedPrice * (item?.pTax?.taxAmount ? (item?.pTax?.taxAmount * 100 / discountedPrice) : 0)) / 100;
-    //     const finalTaxAmount = taxAmount * quantity
-    //     grossAmount += grossItemPrice;
-    //     totalDiscount += itemDiscount;
-    //     totalTax += finalTaxAmount;
-    //     totalFinalAmount += discountedPrice + finalTaxAmount;
-    // });
-
-    //     return { grossAmount, totalDiscount, totalTax, totalFinalAmount };
-    // };
-
-    // const { grossAmount, totalDiscount, totalTax, totalFinalAmount } = calculateAmounts();
 
     return (
         <View style={{ borderBottomWidth: 0.5, borderColor: COLORS?.BORDER_LIGHT_COLOR, paddingBottom: 15 }}>
@@ -161,6 +123,9 @@ const BillingTimeEntry = ({ item, navigation }) => {
             {/* Reminder Type Dropdown */}
             <View style={{ flexDirection: "row", gap: 10, alignItems: "center", backgroundColor: COLORS?.BORDER_LIGHT_COLOR, borderWidth: 0.5, padding: 8, borderColor: '#ddd', borderRadius: 5, marginTop: 10 }}>
                 <TouchableOpacity style={{ width: '85%' }} onPress={() => setisOpenUser(true)}>
+                    {/* <MyText style={{ color: item.user ? COLORS?.PRIMARY_COLOR : COLORS?.LIGHT_COLOR }}>
+                        {typeof item?.user === 'string' ? item.user : 'User'}
+                    </MyText> */}
                     <MyText style={{ color: item.user ? COLORS?.PRIMARY_COLOR : COLORS?.LIGHT_COLOR }}>
                         {item?.user || 'User'}
                     </MyText>
