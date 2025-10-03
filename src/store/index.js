@@ -14,6 +14,8 @@ import createItemForAddPhoneReducer from "./slices/clientSlice/createItemForAddP
 import createItemForWebAddressReducer from "./slices/clientSlice/createItemForWebAddress";
 import createItemForAddAddressReducer from "./slices/clientSlice/createItemForAddAddress";
 import createItemForContactPerson from "./slices/clientSlice/createItemForContactPerson";
+
+import createItemForAddRepeatReducer from "./slices/eventSlice/createItemForAddRepeat";
 const store = configureStore({
   reducer: {
     userDetails: userDetailsReducer,
@@ -32,7 +34,9 @@ const store = configureStore({
     createItemForAddPhone: createItemForAddPhoneReducer,
     createItemForWebAddress: createItemForWebAddressReducer,
     createItemForAddAddress: createItemForAddAddressReducer,
-    createItemForContactPerson: createItemForContactPerson
+    createItemForContactPerson: createItemForContactPerson,
+    createItemForAddRepeat: createItemForAddRepeatReducer,
+
   },
 });
 

@@ -19,7 +19,9 @@ const ReminderItems = ({ item }) => {
 
     const reminderThroughOptions = [
         { label: 'Email', value: 'Email' },
-        { label: 'Call', value: 'Call' }
+        { label: 'SMS', value: 'SMS' },
+        { label: 'System', value: 'System' },
+        { label: 'All Method reminders', value: 'All Method reminders' }
     ];
 
     const reminderTypeOptions = [
@@ -35,7 +37,7 @@ const ReminderItems = ({ item }) => {
     return (
         <View style={{ borderBottomWidth: 0.5, borderColor: COLORS?.BORDER_LIGHT_COLOR, paddingBottom: 15 }}>
             {/* Top Row: Delete + ReminderThrough */}
-            <View style={{ flexDirection: "row", gap: 10, alignItems: "center", backgroundColor: COLORS?.BORDER_LIGHT_COLOR, borderWidth: 0.5, padding: 8,    borderColor: '#ddd', borderRadius: 5, marginTop: 10 }}>
+            <View style={{ flexDirection: "row", gap: 10, alignItems: "center", backgroundColor: COLORS?.BORDER_LIGHT_COLOR, borderWidth: 0.5, padding: 8, borderColor: '#ddd', borderRadius: 5, marginTop: 10 }}>
                 <TouchableOpacity onPress={handleRemoveItem}>
                     <AntDesign name="delete" size={20} color="red" />
                 </TouchableOpacity>
@@ -48,7 +50,7 @@ const ReminderItems = ({ item }) => {
             </View>
 
             {/* Reminder Type Dropdown */}
-            <View style={{ flexDirection: "row", gap: 10, alignItems: "center", backgroundColor: COLORS?.BORDER_LIGHT_COLOR, borderWidth: 0.5, padding: 8,    borderColor: '#ddd', borderRadius: 5, marginTop: 10 }}>
+            <View style={{ flexDirection: "row", gap: 10, alignItems: "center", backgroundColor: COLORS?.BORDER_LIGHT_COLOR, borderWidth: 0.5, padding: 8, borderColor: '#ddd', borderRadius: 5, marginTop: 10 }}>
                 <TouchableOpacity onPress={() => setIsOpenReminderType(true)}>
                     <MyText style={{ color: item.reminderType ? COLORS?.PRIMARY_COLOR : COLORS?.LIGHT_COLOR }}>
                         {item?.reminderType || 'Reminder Type'}
@@ -67,7 +69,7 @@ const ReminderItems = ({ item }) => {
                         borderWidth: 1,
                         borderRadius: 5,
                         padding: 10,
-                         borderColor: '#ddd',
+                        borderColor: '#ddd',
                         fontSize: calculatefontSize(1.8),
                         color: COLORS.PRIMARY_COLOR
                     }}

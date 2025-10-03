@@ -62,6 +62,7 @@ import TaskDocumentOneDrive from '../screens/tabs/tasks/screens/taskDocuments/Ta
 import Award from '../screens/more/award/Award';
 import CreateAward from '../screens/more/award/screen/CreateAward';
 import EditAward from '../screens/more/award/screen/EditAward';
+import AddRepeat from '../screens/events/screens/AddRepeat';
 
 
 
@@ -152,6 +153,7 @@ const RootNavigation = () => {
         <Stack.Screen name="Award" component={Award} />
         <Stack.Screen name="CreateAward" component={CreateAward} />
         <Stack.Screen name="EditAward" component={EditAward} />
+        <Stack.Screen name="AddRepeat" component={AddRepeat} />
 
 
 

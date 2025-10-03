@@ -64,24 +64,29 @@ const Calender = ({ navigation }) => {
   const getCalenderData = async () => {
     let fromDate = selectedDate;
     let toDate = getToDate(fromDate);
+    console.log(toDate, "toDate================>");
+
     const currentStartOfWeek = getStartOfWeek(new Date());
 
     if (selectedDate >= currentStartOfWeek && selectedDate <= getToDate(currentStartOfWeek)) {
       fromDate = currentStartOfWeek;
     }
 
+
     const selectedDateStr = moment(selectedDate).format('MM/DD/YYYY');
+    const nextDateStr = moment(selectedDateStr, 'MM/DD/YYYY')
+      .add(1, 'day')
+      .format('MM/DD/YYYY');
+
     setLoader(true);
     const { res, err } = await httpRequest({
       method: 'get',
       // navigation: navigation,
-      path: `/ic/event/date-range?fromDate=${selectedDateStr}&toDate=${selectedDateStr}`,
+      path: `/ic/event/date-range?fromDate=${selectedDateStr}&toDate=${nextDateStr}`,
+      // path: `/ic/event/date-range?fromDate=09/28/2025&toDate=11/09/2025`,
     });
 
     if (res) {
-
-      console.log(res, "res=======CALENDER==d=======>", `/ic/event/date-range?fromDate=${selectedDateStr}&toDate=${selectedDateStr}`);
-
       setCalenderData(res?.data);
     } else {
       console.log(err, "err");
@@ -274,7 +279,7 @@ const Calender = ({ navigation }) => {
           />
         ) : (
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 10 }}>
-            <Image source={IconUri?.Calender} style={{ height: 30, width: 30, resizeMode: 'contain' }} />
+            <Image source={IconUri?.Calender} tintColor={COLORS.PRIMARY_COLOR} style={{ height: 30, width: 30, resizeMode: 'contain' }} />
             <MyText style={{ fontSize: calculatefontSize(1.5), color: COLORS.PRIMARY_COLOR }}>No Data Found</MyText>
           </View>
         )}

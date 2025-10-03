@@ -1,4 +1,4 @@
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, Text, TextInputComponent, TouchableOpacity, View } from 'react-native'
+import { Alert, Animated, Dimensions, FlatList, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Switch, Text, TextInput, TextInputComponent, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
@@ -29,11 +29,33 @@ const Event = ({ navigation }) => {
   const toast = useToast();
   const [firmUserData, setFirmUserData] = useState([])
   const items = useSelector(state => state.createItemforReminder.items);
+  const repeatItem = useSelector(state => state.createItemForAddRepeat.repeatObj);
 
   const [matterData, setmatterData] = React.useState([]);
   const [eventTypeData, seteventTypeData] = React.useState([]);
   const [billingData, setBillingData] = React.useState([]);
   const [partyData, setPartyData] = React.useState([]);
+  // inside Event component
+  const [searchQuery, setSearchQuery] = useState("");
+  const userDetails = useSelector(state => state?.userDetails?.userDetails);
+
+  // Filtered Lists
+  const filteredBilling = billingData?.filter((item) => {
+    const text = searchQuery.toLowerCase();
+    return (
+      item?.companyName?.toLowerCase().includes(text) ||
+      item?.userProfileDTO?.fullName?.toLowerCase().includes(text) ||
+      item?.email?.toLowerCase().includes(text)
+    );
+  });
+
+  const filteredParties = partyData?.filter((item) => {
+    const text = searchQuery.toLowerCase();
+    return (
+      item?.companyName?.toLowerCase().includes(text) ||
+      (item?.firstName + " " + item?.lastName)?.toLowerCase().includes(text)
+    );
+  });
 
 
   const getMatterData = async () => {
@@ -79,17 +101,15 @@ const Event = ({ navigation }) => {
         }),
         httpRequest({
           method: 'get',
-          path: '/ic/another-api/?status=Pending', // yeh second API ka actual path daalna hoga
+          path: '/ic/party/?status=Active', // yeh second API ka actual path daalna hoga
           navigation: navigation
         })
       ]);
-
       if (customerResponse?.res) {
         setBillingData(customerResponse.res.data);
       } else {
-        console.log(customerResponse?.err, 'GET CUSTOMER RESPONSE===>err');
+        console.log(customerResponse?.err, 'GET CUSTOMER dRESPONSE===>err');
       }
-
       if (anotherResponse?.res) {
         setPartyData(anotherResponse.res.data); // is function ko aapko useState se define karna hoga
       } else {
@@ -100,17 +120,6 @@ const Event = ({ navigation }) => {
       console.log('Unexpected error in Promise.all =>', error);
     }
 
-    // const { res, err } = await httpRequest({
-    //   method: `get`,
-    //   path: `/ic/user/?status=Active`,
-    //   navigation: navigation
-    // })
-    // if (res) {
-    //   setBillingData(res?.data);
-    // }
-    // else {
-    //   console.log(err, "GET CUSTOMER RESPONSE===>err");
-    // }
   }
 
   //get users 
@@ -158,14 +167,24 @@ const Event = ({ navigation }) => {
             firmUserObj: {},
             isOpenFirmUser: false,
 
+            // Billing Users
+            billingUsers: [],
+            isOpenBillingUser: false,
+
+            // Party Users
+            partyUsers: [],
+            isOpenPartyUser: false,
+
             //start data/time
             isOpenStartDate: false,
             startDate: '',
+            startDateSelected: new Date(),
             selectedStartDate: new Date(), // 👈 must be a Date object
 
             //end date/time
             isOpenEndDate: false,
             endDate: '',
+            endDateSelected: new Date(),
             selectedEndDate: new Date(),
 
             location: "",
@@ -196,10 +215,247 @@ const Event = ({ navigation }) => {
             loader: false
           }
         }
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={async (values, { setFieldValue }) => {
-          console.log(values, "EVENT CREATE ====>");
-          const payload = {}
+          console.log(values, "values?.billingUsers");
+
+          const mappedEventReminder = items?.map((d, i) => {
+            return {
+              createdBy: null,
+              createdOn: null,
+              duration: d?.counts || 0,
+              durationType: d?.reminderType || "",
+              eventReminderId: null,
+              revision: null,
+              type: d?.reminderThrough || "",
+              updatedBy: null,
+              updatedOn: null
+            }
+          })
+
+
+          let updatedPayload = { attendeeUserIds: "", attendeePartyIds: "", };
+          if (!values?.isRepeated) {
+            updatedPayload = {
+              attendeeUserIds: values?.firmItems
+                ?.filter(v => v?.type === "billing")   // sirf billing wale
+                ?.map(v => v?.userId)                  // unka userId nikal lo
+                ?.filter(Boolean)                      // null/undefined hatao
+                ?.join(",") || "",
+
+              attendeePartyIds: values?.firmItems
+                ?.filter(v => v?.type === "party")     // sirf party wale
+                ?.map(v => v?.partyId)                 // unka partyId nikal lo
+                ?.filter(Boolean)                      // null/undefined hatao
+                ?.join(",") || "",
+              calenderUserIds: values?.clientItems    // sirf party wale
+                ?.map(v => v?.userId)                 // unka partyId nikal lo
+                ?.filter(Boolean)                      // null/undefined hatao
+                ?.join(",") || "",
+              eventId: null,
+              code: null,
+              createdBy: userDetails?.userId || 0,
+              createdOn: null,
+              description: values?.description || "",
+              endType: "",
+              eventEndDate: "",
+              every: 0,
+              matterId: values?.matterSelectedObj?.matterId || 0,
+              includeFcSc: values?.isInclude || false,
+              location: values?.location || "",
+              occurrences: 0,
+              repeatType: "",
+              revision: null,
+              title: values?.title || "",
+              typeId: values?.eventTypeSelectedObj?.eventTypeId || 0,
+              updatedBy: null,
+              updatedOn: null,
+
+              eventReminderDTOList: mappedEventReminder || [],
+              eventScheduleDTOList: [{
+                createdOn: null,
+                updatedOn: null,
+                createdBy: userDetails?.userId || 0,
+                updatedBy: null,
+                revision: null,
+                eventScheduleId: null,
+                startOnDate: values?.startDateSelected,
+                startOnTime: moment(values?.startDateSelected)
+                  .set({
+                    hour: moment(values?.startDateSelected, "HH:mm").hours(),
+                    minute: moment(values?.startDateSelected, "HH:mm").minutes(),
+                  }).toISOString(),
+                endOnDate: values?.endDateSelected,
+                endOnTime: moment(values?.endDateSelected)
+                  .set({
+                    hour: moment(values?.endDateSelected, "HH:mm").hours(),
+                    minute: moment(values?.endDateSelected, "HH:mm").minutes(),
+                  }).toISOString(),
+                code: null,
+
+                title: values?.title || "",
+                location: values?.location || "",
+                matterId: values?.matterSelectedObj?.matterId || 0,
+                typeId: values?.eventTypeSelectedObj?.eventTypeId || 0,
+                description: values?.description || "",
+
+                attendeeUserIds: values?.firmItems
+                  ?.filter(v => v?.type === "billing")   // sirf billing wale
+                  ?.map(v => v?.userId)                  // unka userId nikal lo
+                  ?.filter(Boolean)                      // null/undefined hatao
+                  ?.join(",") || "",
+                attendeePartyIds: values?.firmItems
+                  ?.filter(v => v?.type === "party")     // sirf party wale
+                  ?.map(v => v?.partyId)                 // unka partyId nikal lo
+                  ?.filter(Boolean)                      // null/undefined hatao
+                  ?.join(",") || "",
+                calenderUserIds: values?.clientItems    // sirf party wale
+                  ?.map(v => v?.userId)                 // unka partyId nikal lo
+                  ?.filter(Boolean)                      // null/undefined hatao
+                  ?.join(",") || "",
+                includeFcSc: values?.isInclude || false,
+              }],
+            };
+          } else {
+            console.log(repeatItem, "REDUX REPEAT ITEM");
+
+            updatedPayload = {
+              attendeeUserIds: values?.firmItems
+                ?.filter(v => v?.type === "billing")   // sirf billing wale
+                ?.map(v => v?.userId)                  // unka userId nikal lo
+                ?.filter(Boolean)                      // null/undefined hatao
+                ?.join(",") || "",
+
+              attendeePartyIds: values?.firmItems
+                ?.filter(v => v?.type === "party")     // sirf party wale
+                ?.map(v => v?.partyId)                 // unka partyId nikal lo
+                ?.filter(Boolean)                      // null/undefined hatao
+                ?.join(",") || "",
+              calenderUserIds: values?.clientItems    // sirf party wale
+                ?.map(v => v?.userId)                 // unka partyId nikal lo
+                ?.filter(Boolean)                      // null/undefined hatao
+                ?.join(",") || "",
+              eventId: null,
+              code: null,
+              createdBy: userDetails?.userId || 0,
+              createdOn: null,
+              description: values?.description || "",
+              endType: repeatItem?.endType?.toLocaleLowerCase() || "",
+              eventEndDate: "",
+              every: Number(repeatItem?.every || 0),
+              matterId: values?.matterSelectedObj?.matterId || 0,
+              includeFcSc: values?.isInclude || false,
+              location: values?.location || "",
+              occurrences: Number(repeatItem?.endOccurrences || 0),
+              repeatType: repeatItem?.isRepeatObj?.value.endsWith("s") ? repeatItem?.isRepeatObj?.value.slice(0, -1) : repeatItem?.isRepeatObj?.value || "",
+              revision: null,
+              title: values?.title || "",
+              typeId: values?.eventTypeSelectedObj?.eventTypeId || 0,
+              updatedBy: null,
+              updatedOn: null,
+
+              eventReminderDTOList: mappedEventReminder || [],
+              eventScheduleDTOList: [],
+            };
+
+            const frequency = Number(repeatItem?.every || 1); // every like a 1,2,3 and so on,
+            let maxOccurrences = 0;
+            // Determine max occurrences based on endType
+            if (repeatItem?.endType === "Never") {
+              if (repeatItem?.isRepeatObj?.value === "days") {
+                maxOccurrences = Math.floor((3 * 365) / frequency); // 3 years of days
+              } else if (repeatItem?.isRepeatObj?.value === "weeks") {
+                maxOccurrences = Math.floor((3 * 52) / frequency); // 3 years of weeks
+              } else if (repeatItem?.isRepeatObj?.value === "month") {
+                maxOccurrences = Math.floor((3 * 12) / frequency); // 3 years of months
+              }
+            } else if (repeatItem?.endType === "After") {
+              maxOccurrences = Number(repeatItem?.endOccurrences || 0);
+            } else if (repeatItem?.endType === "On") {
+              const endDate = moment(repeatItem?.endDate);
+              maxOccurrences = Math.floor((endDate.diff(values?.startDateSelected, "days") + 2) / frequency); // Add 1 to include both start and end dates
+            }
+            for (let i = 0; i < maxOccurrences; i++) {
+              let nextDate = null;
+
+              if (repeatItem?.isRepeatObj?.value === "days") {
+                console.log(values?.startDateSelected, "values?.startDateSelected", frequency, "frequency");
+
+                nextDate = moment(values?.startDateSelected).clone().add(i * frequency, "day");
+              } else if (repeatItem?.isRepeatObj?.value === "weeks") {
+                nextDate = moment(values?.startDateSelected).clone().add(i * frequency, "week");
+              } else if (repeatItem?.isRepeatObj?.value === "month") {
+                nextDate = moment(values?.startDateSelected).clone().add(i * frequency, "month");
+              }
+              console.log(nextDate, "nextDate");
+
+              if (nextDate) {
+                updatedPayload.eventScheduleDTOList.push({
+                  createdOn: null,
+                  updatedOn: null,
+                  createdBy: userDetails?.userId || 0,
+                  updatedBy: null,
+                  revision: null,
+                  eventScheduleId: null,
+                  startOnDate: nextDate.toISOString(),
+                  startOnTime: moment(nextDate.toISOString())
+                    .set({
+                      hour: moment(values?.startDateSelected, "HH:mm").hours(),
+                      minute: moment(values?.startDateSelected, "HH:mm").minutes(),
+                    }).toISOString(),
+                  endOnDate: nextDate.toISOString(),
+                  endOnTime: moment(nextDate.toISOString())
+                    .set({
+                      hour: moment(values?.startDateSelected, "HH:mm").hours(),
+                      minute: moment(values?.startDateSelected, "HH:mm").minutes(),
+                    }).toISOString(),
+                  code: null,
+                  title: values.title,
+                  location: values.location,
+                  matterId: values?.matterSelectedObj?.matterId || 0,
+                  typeId: values?.eventTypeSelectedObj?.eventTypeId || 0,
+                  description: values?.description || "",
+
+                  attendeeUserIds: values?.firmItems
+                    ?.filter(v => v?.type === "billing")   // sirf billing wale
+                    ?.map(v => v?.userId)                  // unka userId nikal lo
+                    ?.filter(Boolean)                      // null/undefined hatao
+                    ?.join(",") || "",
+                  attendeePartyIds: values?.firmItems
+                    ?.filter(v => v?.type === "party")     // sirf party wale
+                    ?.map(v => v?.partyId)                 // unka partyId nikal lo
+                    ?.filter(Boolean)                      // null/undefined hatao
+                    ?.join(",") || "",
+                  calenderUserIds: values?.clientItems    // sirf party wale
+                    ?.map(v => v?.userId)                 // unka partyId nikal lo
+                    ?.filter(Boolean)                      // null/undefined hatao
+                    ?.join(",") || "",
+                  includeFcSc: values?.isInclude || false,
+                });
+              }
+            }
+
+            console.log(updatedPayload, "updatedPayload REPEATATION==========>");
+
+          }
+
+          // console.log(values?.isRepeated, "updatedPayload", updatedPayload);
+
+          const { res, err } = await httpRequest({
+            method: `post`,
+            path: `/ic/event/`,
+            params: updatedPayload,
+            navigation: navigation,
+
+          });
+          if (res) {
+            console.log(res, "practive arae");
+            toast.show('Event created successfully', { type: 'success' })
+            navigation.goBack();
+          }
+          else {
+            console.log(err, "GET CUSTOMER RESPONSE===>err");
+          }
 
         }}
       >
@@ -230,11 +486,68 @@ const Event = ({ navigation }) => {
                     )
                   }
                   <TextInputWithTitle
-                    title="Find firm users or contacts to invite"
-                    isButton={true}
-                    isRequired={true}
-                    buttonText={values.firmUser || 'Select FirmUser'}
+                    setFieldValue={setFieldValue}
+                    arrayValue={values?.firmItems}
                     onPressButton={() => setFieldValue('isOpenFirmUser', true)}
+                    isRequired={true}
+                    title="Invite attendees"
+                    isButton={true}
+                    buttonText={'Find firm users or contacts to invite'}
+                    customView={({ arrayValue, setFieldValue, onPressButton, buttonText }) => (
+                      <View style={{ marginTop: 10 }}>
+
+                        {/* Billing Users Section */}
+                        {arrayValue?.filter(item => item.type === 'billing').length > 0 && (
+                          <>
+                            <MyText style={{ fontWeight: 'bold', marginVertical: 5 }}>Billing Users</MyText>
+                            {arrayValue?.filter(item => item.type === 'billing').map((item) => (
+                              <View key={item.userId} style={styles.itemContainer}>
+                                <MyText>{item?.userProfileDTO?.fullName || item?.companyName}</MyText>
+                                <TouchableOpacity
+                                  onPress={() => {
+                                    const updatedList = arrayValue?.filter((c) => c.userId !== item.userId);
+                                    setFieldValue('firmItems', updatedList);
+                                  }}
+                                >
+                                  <AntDesign name="delete" size={20} color="red" />
+                                </TouchableOpacity>
+                              </View>
+                            ))}
+                          </>
+                        )}
+
+                        {/* Parties Section */}
+                        {arrayValue?.filter(item => item.type === 'party').length > 0 && (
+                          <>
+                            <MyText style={{ fontWeight: 'bold', marginVertical: 5 }}>Parties</MyText>
+                            {arrayValue?.filter(item => item.type === 'party').map((item) => (
+                              console.log(item, 'party item======================================================>'),
+
+                              <View key={item.userId} style={styles.itemContainer}>
+                                <MyText>
+                                  {item?.companyName || `${item?.firstName} ${item?.lastName}`}
+                                </MyText>
+                                <TouchableOpacity
+                                  onPress={() => {
+                                    const updatedList = arrayValue?.filter(
+                                      (c) => !(c.uniqueKey === item.uniqueKey && c.type === 'party')
+                                    );
+                                    setFieldValue('firmItems', updatedList);
+                                  }}
+                                >
+                                  <AntDesign name="delete" size={20} color="red" />
+                                </TouchableOpacity>
+                              </View>
+                            ))}
+                          </>
+                        )}
+
+                        {/* Add button */}
+                        <TouchableOpacity onPress={onPressButton} style={{ paddingVertical: 10 }}>
+                          <MyText style={styles.btnTextStyle}>{buttonText}</MyText>
+                        </TouchableOpacity>
+                      </View>
+                    )}
                   />
                   <TextInputWithTitle
                     title="Start Date/Time "
@@ -252,12 +565,19 @@ const Event = ({ navigation }) => {
                   />
                   <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderBottomWidth: 1, paddingVertical: 10, borderColor: '#ddd', }}>
                     <MyText style={styles.title}>Is Repeate ?</MyText>
-                    <Switch
+                    <TouchableOpacity onPress={() => {
+                      setFieldValue('isRepeated', !values.isRepeated), navigation?.navigate(
+                        'AddRepeat'
+                      )
+                    }}>
+                      <AntDesign name="plus" size={20} color={values.isRepeated ? COLORS?.PRIMARY_COLOR_LIGHT : 'gray'} />
+                    </TouchableOpacity>
+                    {/* <Switch
                       value={values.isRepeated}
                       onValueChange={(val) => setFieldValue('isRepeated', val)}
                       thumbColor={values.isRepeated ? "#ffffff" : "#ffffff"}
                       trackColor={{ false: "gray", true: COLORS?.PRIMARY_COLOR_LIGHT }}
-                    />
+                    /> */}
                   </View>
 
                   {/* //Remider  */}
@@ -407,39 +727,102 @@ const Event = ({ navigation }) => {
                 searchKey={"email"}
               />
 
-              {/* ====>//FIrm user list */}
-              <BottomModalListWithSearch
-                onClose={() => setFieldValue('isOpenFirmUser', false)}
-                renderItem={({ item }) => (
-                  console.log(item, "ITEMS====>"),
 
-                  <TouchableOpacity
-                    onPress={() => {
-                      const alreadyExists = values.firmItems.find(
-                        (i) => i.userId === item.userId
-                      );
-                      if (!alreadyExists) {
-                        setFieldValue('firmItems', [...values.firmItems, item]);
-                      }
-                      else {
-                        Alert.alert('Client already added');
-                      }
-                      setFieldValue('firmUserObj', item);
-                      setFieldValue('firmUser', item?.userProfileDTO?.fullName || '');
-                      setFieldValue('isOpenFirmUser', false);
-                    }}
-                    style={styles.itemStyle}
-                  >
+              <Modal statusBarTranslucent transparent visible={values?.isOpenFirmUser} animationType="none">
+                <View style={styles.overlay}>
+                  <View style={[styles.modalContainer]}>
+                    <View style={styles.header}>
+                      <Text style={styles.title1}>Search</Text>
+                      <TouchableOpacity onPress={() => setFieldValue('isOpenFirmUser', false)}>
+                        <AntDesign name="closecircle" size={20} color="red" />
+                      </TouchableOpacity>
+                    </View>
 
-                    <MyText style={{ fontSize: calculatefontSize(1.9) }}>
-                      {item?.companyName || item?.userProfileDTO?.fullName}
-                    </MyText>
-                  </TouchableOpacity>
-                )}
-                visible={values?.isOpenFirmUser}
-                data={[...billingData, ...partyData]}
-                searchKey={"email"}
-              />
+                    {/* Search Input */}
+                    <TextInput
+                      placeholderTextColor={COLORS?.LIGHT_COLOR}
+                      style={styles.searchInput}
+                      placeholder="Search..."
+                      value={searchQuery}
+                      onChangeText={(txt) => setSearchQuery(txt)}
+                    />
+
+                    <ScrollView showsVerticalScrollIndicator={false}>
+                      {/* Firm Users Section */}
+                      <Text style={styles.title1}>Firm USERS</Text>
+                      {filteredBilling.length > 0 ? (
+                        filteredBilling.map((item, i) => (
+                          <TouchableOpacity
+                            key={i}
+                            onPress={() => {
+                              const alreadyExists = values.firmItems.find(
+                                (i) => i.userId === item.userId && i.type === 'billing'
+                              );
+                              if (!alreadyExists) {
+                                setFieldValue('firmItems', [
+                                  ...values.firmItems,
+                                  { ...item, type: 'billing' }
+                                ]);
+                              } else {
+                                toast.show('Billing User already added', { type: 'danger' });
+                                // Alert.alert('Billing User already added');
+                              }
+                              setFieldValue('isOpenFirmUser', false);
+                              setSearchQuery("");
+                            }}
+                            style={styles.itemStyle}
+                          >
+                            <MyText style={{ fontSize: calculatefontSize(1.9) }}>
+                              {item?.companyName || item?.userProfileDTO?.fullName}
+                            </MyText>
+                          </TouchableOpacity>
+                        ))
+                      ) : (
+                        <MyText style={{ color: 'gray', padding: 10 }}>No Firm User found</MyText>
+                      )}
+
+                      {/* Parties Section */}
+                      <Text style={styles.title1}>PARTIES</Text>
+                      {filteredParties.length > 0 ? (
+                        filteredParties.map((item, i) => (
+                          <TouchableOpacity
+                            key={i}
+                            onPress={() => {
+                              const id = item.userId || item.partyId;
+                              const alreadyExists = values.firmItems.find(
+                                (i) => i.uniqueKey === id && i.type === 'party'
+                              );
+
+                              if (!alreadyExists) {
+                                setFieldValue('firmItems', [
+                                  ...values.firmItems,
+                                  { ...item, type: 'party', uniqueKey: id }
+                                ]);
+                              } else {
+                                toast.show('Party already added', { type: 'danger' });
+                                // Alert.alert('Party already added');
+                              }
+                              setFieldValue('isOpenFirmUser', false);
+                              setSearchQuery("");
+                            }}
+                            style={styles.itemStyle}
+                          >
+                            <MyText style={{ fontSize: calculatefontSize(1.9) }}>
+                              {item?.companyName ||
+                                item?.userProfileDTO?.fullName ||
+                                `${item?.firstName} ${item?.lastName}`}
+                            </MyText>
+                          </TouchableOpacity>
+                        ))
+                      ) : (
+                        <MyText style={{ color: 'gray', padding: 10 }}>No Party found</MyText>
+                      )}
+                    </ScrollView>
+                  </View>
+                </View>
+              </Modal>
+
+
 
               <BottomModalListWithSearch
                 onClose={() => setFieldValue('isOpenEventType', false)}
@@ -464,12 +847,13 @@ const Event = ({ navigation }) => {
               {/* //PICKER ============================> */}
 
               {/* //select start date and time  */}
-              <DatePicker
+              {/* <DatePicker
                 modal
                 mode='datetime'
                 open={values.isOpenStartDate}
                 date={values.selectedStartDate || new Date()}
                 onConfirm={date => {
+
                   setFieldValue('startDate', `${moment(date).format('MM/DD/YYYY')} : ${moment(date).format('hh:mm A')}`);
                   setFieldValue('selectedStartDate', date); // ✅ keep as Date object
                   setFieldValue('isOpenStartDate', false);
@@ -477,8 +861,25 @@ const Event = ({ navigation }) => {
                 onCancel={() => {
                   setFieldValue('isOpenStartDate', false);
                 }}
+              /> */}
+              <DatePicker
+                modal
+                mode="datetime"
+                open={values.isOpenStartDate}
+                date={values.selectedStartDate ? new Date(values.selectedStartDate) : new Date()}
+                onConfirm={(date) => {
+                  setFieldValue(
+                    "startDate",
+                    `${moment(date).format("MM/DD/YYYY")} : ${moment(date).format("hh:mm A")}`
+                  );
+                  setFieldValue("selectedStartDate", new Date(date)); // ✅ Date object rakho
+                  setFieldValue('startDateSelected', moment(date).toISOString()); // ✅ Date object rakho
+                  setFieldValue("isOpenStartDate", false);
+                }}
+                onCancel={() => {
+                  setFieldValue("isOpenStartDate", false);
+                }}
               />
-
               <DatePicker
                 modal
                 mode='datetime'
@@ -487,6 +888,8 @@ const Event = ({ navigation }) => {
                 onConfirm={date => {
                   setFieldValue('endDate', `${moment(date).format('MM/DD/YYYY')} : ${moment(date).format('hh:mm A')}`);
                   setFieldValue('selectedEndDate', date); // ✅ keep as Date object
+                  setFieldValue('endDateSelected', moment(date).toISOString()); // ✅ Date object rakho
+
                   setFieldValue('isOpenEndDate', false);
                 }}
                 onCancel={() => {
@@ -538,5 +941,39 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     bottom: 10,
     color: COLORS?.PRIMARY_COLOR_LIGHT
+  },
+
+
+  //Modal list
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 16,
+    maxHeight: Dimensions.get('window').height * 0.6,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  title1: {
+    fontSize: calculatefontSize(2),
+    fontWeight: 'bold',
+  },
+  searchInput: {
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+  },
+  listContainer: {
+    paddingBottom: 20,
   },
 })
