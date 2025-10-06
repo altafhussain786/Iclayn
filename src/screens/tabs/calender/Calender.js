@@ -27,6 +27,7 @@ import moment from 'moment';
 import Loader from '../../../components/Loader';
 import TimekeeperModal from '../../../components/TimekeeperModal';
 import LinearGradient from 'react-native-linear-gradient';
+import { Swipeable } from 'react-native-gesture-handler';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -82,7 +83,7 @@ const Calender = ({ navigation }) => {
     const { res, err } = await httpRequest({
       method: 'get',
       // navigation: navigation,
-      path: `/ic/event/date-range?fromDate=${selectedDateStr}&toDate=${nextDateStr}`,
+      path: `/ic/event/date-range?fromDate=09/28/2025&toDate=11/09/2025`,
       // path: `/ic/event/date-range?fromDate=09/28/2025&toDate=11/09/2025`,
     });
 
@@ -167,6 +168,54 @@ const Calender = ({ navigation }) => {
     year: 'numeric',
   });
 
+  const renderLeftActions = (item) => (
+    <TouchableOpacity
+      onPress={() => navigation.navigate('EditEvent', { item })}
+      style={styles.leftSwipe}
+    >
+      <AntDesign name="edit" size={20} color={COLORS.BLACK_COLOR} />
+    </TouchableOpacity>
+  );
+
+  const renderRightActions = (item) => (
+    <TouchableOpacity
+      onPress={() => handleDeleteEvent(item)}
+      style={[styles.leftSwipe, { backgroundColor: COLORS.RED_COLOR }]}
+    >
+      <AntDesign name="delete" size={20} color={COLORS.whiteColors} />
+    </TouchableOpacity>
+  );
+
+
+  const renderEventItem = ({ item }) => (
+    <Swipeable
+      renderLeftActions={() => renderLeftActions(item)}
+      renderRightActions={() => renderRightActions(item)}
+      overshootLeft={false}
+      overshootRight={false}
+    >
+      <TouchableOpacity
+        onPress={() => navigation.navigate('CalenderDetails', { item })}
+        style={styles.card}
+      >
+        <View style={styles.headerRow}>
+          <MyText style={styles.codeText}>{item?.title || 'No Title'}</MyText>
+          <View style={[styles.statusBadge]}>
+            <MyText style={styles.statusText}>
+              {moment(item.eventScheduleDTOList[0]?.startOnTime).format('hh:mm A')}
+            </MyText>
+          </View>
+        </View>
+        {item?.description ? (
+          <MyText style={styles.descText1}>{item?.description}</MyText>
+        ) : null}
+        {item?.location ? (
+          <MyText style={styles.dateText1}>{item?.location}</MyText>
+        ) : null}
+      </TouchableOpacity>
+    </Swipeable>
+  );
+
   return (
     <>
       <ScreenHeader onPress={() => { navigation.navigate("Settings") }} isShowTitle={true} title="Calendar" />
@@ -244,37 +293,38 @@ const Calender = ({ navigation }) => {
             showsVerticalScrollIndicator={false}
             data={calenderData}
             keyExtractor={(item) => item.matterId}
-            renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => navigation.navigate('CalenderDetails', { item })} style={{ flexDirection: 'row', gap: 10 }}>
-                <View>
-                  <Image
-                    source={IconUri?.CalenderColor}
-                    style={{ height: 20, width: 20, resizeMode: 'contain', top: getResponsiveHeight(3) }}
-                  />
-                </View>
-                <View style={{ width: '100%' }}>
-                  <View style={[styles.eventItem]}>
-                    <View style={{ width: '65%' }}>
-                      <MyText style={styles.timeColor}>
-                        {moment(item.eventScheduleDTOList[0]?.startOnTime).format('hh:mm A')} -{' '}
-                        {moment(item.eventScheduleDTOList[0]?.endOnTime).format('hh:mm A')}
-                      </MyText>
-                      <MyText style={[styles.txtStyle, { fontWeight: '300' }]}>
-                        {item.title}
-                      </MyText>
-                      {item?.description && (
-                        <MyText style={[styles.timeColor, { width: '70%' }]}>{item?.description}</MyText>
-                      )}
-                    </View>
-                    <View style={{ width: '35%' }}>
-                      {item?.location && (
-                        <MyText style={[styles.timeColor, { fontWeight: '300' }]}>{item?.location}</MyText>
-                      )}
-                    </View>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            )}
+            renderItem={renderEventItem}
+            // renderItem={({ item }) => (
+            //   <TouchableOpacity onPress={() => navigation.navigate('CalenderDetails', { item })} style={{ flexDirection: 'row', gap: 10 }}>
+            //     <View>
+            //       <Image
+            //         source={IconUri?.CalenderColor}
+            //         style={{ height: 20, width: 20, resizeMode: 'contain', top: getResponsiveHeight(3) }}
+            //       />
+            //     </View>
+            //     <View style={{ width: '100%' }}>
+            //       <View style={[styles.eventItem]}>
+            //         <View style={{ width: '65%' }}>
+            //           <MyText style={styles.timeColor}>
+            //             {moment(item.eventScheduleDTOList[0]?.startOnTime).format('hh:mm A')} -{' '}
+            //             {moment(item.eventScheduleDTOList[0]?.endOnTime).format('hh:mm A')}
+            //           </MyText>
+            //           <MyText style={[styles.txtStyle, { fontWeight: '300' }]}>
+            //             {item.title}
+            //           </MyText>
+            //           {item?.description && (
+            //             <MyText style={[styles.timeColor, { width: '70%' }]}>{item?.description}</MyText>
+            //           )}
+            //         </View>
+            //         <View style={{ width: '35%' }}>
+            //           {item?.location && (
+            //             <MyText style={[styles.timeColor, { fontWeight: '300' }]}>{item?.location}</MyText>
+            //           )}
+            //         </View>
+            //       </View>
+            //     </View>
+            //   </TouchableOpacity>
+            // )}
             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={getCalenderData} />}
           />
         ) : (
@@ -315,6 +365,33 @@ const Calender = ({ navigation }) => {
 export default Calender;
 
 const styles = StyleSheet.create({
+  leftSwipe: {
+    backgroundColor: COLORS.BORDER_LIGHT_COLOR,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    paddingHorizontal: 20,
+    marginHorizontal: 10,
+    marginVertical: 6,
+  },
+  noData: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
+  },
+  card: {
+    backgroundColor: COLORS.BORDER_LIGHT_COLOR,
+    padding: 15,
+    marginVertical: 6,
+    borderRadius: 8,
+    elevation: 1,
+    shadowColor: '#ccc',
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   header: {
     padding: 20,
     flexDirection: 'row',
@@ -355,6 +432,10 @@ const styles = StyleSheet.create({
     height: 20,
     width: 20,
     textAlign: 'center',
+    borderRadius: 10,
+  },
+  dateText1: {
+    fontSize: calculatefontSize(1.5),
     borderRadius: 10,
   },
   eventItem: {
