@@ -16,10 +16,12 @@ import AddButton from '../../components/AddButton'
 import httpRequest from '../../api/apiHandler'
 import BottomModalListWithSearch from '../../components/BottomModalListWithSearch'
 import ReminderItems from '../tabs/tasks/components/ReminderItems'
-import { addReminderItem } from '../../store/slices/taskSlice/createItemforReminder'
+import { addReminderItem, resetReminderItems } from '../../store/slices/taskSlice/createItemforReminder'
 
 //icons 
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { resetRepeat } from '../../store/slices/eventSlice/createItemForAddRepeat'
 
 
 
@@ -235,22 +237,22 @@ const Event = ({ navigation }) => {
 
 
           let updatedPayload = { attendeeUserIds: "", attendeePartyIds: "", };
-          if (!values?.isRepeated) {
+          if (!Object.keys(repeatItem).length > 0) {
             updatedPayload = {
               attendeeUserIds: values?.firmItems
-                ?.filter(v => v?.type === "billing")   // sirf billing wale
-                ?.map(v => v?.userId)                  // unka userId nikal lo
-                ?.filter(Boolean)                      // null/undefined hatao
+                ?.filter(v => v?.type === "billing")
+                ?.map(v => v?.userId)
+                ?.filter(Boolean)
                 ?.join(",") || "",
 
               attendeePartyIds: values?.firmItems
-                ?.filter(v => v?.type === "party")     // sirf party wale
-                ?.map(v => v?.partyId)                 // unka partyId nikal lo
-                ?.filter(Boolean)                      // null/undefined hatao
+                ?.filter(v => v?.type === "party")
+                ?.map(v => v?.partyId)
+                ?.filter(Boolean)
                 ?.join(",") || "",
-              calenderUserIds: values?.clientItems    // sirf party wale
-                ?.map(v => v?.userId)                 // unka partyId nikal lo
-                ?.filter(Boolean)                      // null/undefined hatao
+              calenderUserIds: values?.clientItems
+                ?.map(v => v?.userId)
+                ?.filter(Boolean)
                 ?.join(",") || "",
               eventId: null,
               code: null,
@@ -300,18 +302,18 @@ const Event = ({ navigation }) => {
                 description: values?.description || "",
 
                 attendeeUserIds: values?.firmItems
-                  ?.filter(v => v?.type === "billing")   // sirf billing wale
-                  ?.map(v => v?.userId)                  // unka userId nikal lo
-                  ?.filter(Boolean)                      // null/undefined hatao
+                  ?.filter(v => v?.type === "billing")
+                  ?.map(v => v?.userId)
+                  ?.filter(Boolean)
                   ?.join(",") || "",
                 attendeePartyIds: values?.firmItems
-                  ?.filter(v => v?.type === "party")     // sirf party wale
-                  ?.map(v => v?.partyId)                 // unka partyId nikal lo
-                  ?.filter(Boolean)                      // null/undefined hatao
+                  ?.filter(v => v?.type === "party")
+                  ?.map(v => v?.partyId)
+                  ?.filter(Boolean)
                   ?.join(",") || "",
-                calenderUserIds: values?.clientItems    // sirf party wale
-                  ?.map(v => v?.userId)                 // unka partyId nikal lo
-                  ?.filter(Boolean)                      // null/undefined hatao
+                calenderUserIds: values?.clientItems
+                  ?.map(v => v?.userId)
+                  ?.filter(Boolean)
                   ?.join(",") || "",
                 includeFcSc: values?.isInclude || false,
               }],
@@ -321,19 +323,19 @@ const Event = ({ navigation }) => {
 
             updatedPayload = {
               attendeeUserIds: values?.firmItems
-                ?.filter(v => v?.type === "billing")   // sirf billing wale
-                ?.map(v => v?.userId)                  // unka userId nikal lo
-                ?.filter(Boolean)                      // null/undefined hatao
+                ?.filter(v => v?.type === "billing")
+                ?.map(v => v?.userId)
+                ?.filter(Boolean)
                 ?.join(",") || "",
 
               attendeePartyIds: values?.firmItems
-                ?.filter(v => v?.type === "party")     // sirf party wale
-                ?.map(v => v?.partyId)                 // unka partyId nikal lo
-                ?.filter(Boolean)                      // null/undefined hatao
+                ?.filter(v => v?.type === "party")
+                ?.map(v => v?.partyId)
+                ?.filter(Boolean)
                 ?.join(",") || "",
-              calenderUserIds: values?.clientItems    // sirf party wale
-                ?.map(v => v?.userId)                 // unka partyId nikal lo
-                ?.filter(Boolean)                      // null/undefined hatao
+              calenderUserIds: values?.clientItems
+                ?.map(v => v?.userId)
+                ?.filter(Boolean)
                 ?.join(",") || "",
               eventId: null,
               code: null,
@@ -417,18 +419,18 @@ const Event = ({ navigation }) => {
                   description: values?.description || "",
 
                   attendeeUserIds: values?.firmItems
-                    ?.filter(v => v?.type === "billing")   // sirf billing wale
-                    ?.map(v => v?.userId)                  // unka userId nikal lo
-                    ?.filter(Boolean)                      // null/undefined hatao
+                    ?.filter(v => v?.type === "billing")
+                    ?.map(v => v?.userId)
+                    ?.filter(Boolean)
                     ?.join(",") || "",
                   attendeePartyIds: values?.firmItems
-                    ?.filter(v => v?.type === "party")     // sirf party wale
-                    ?.map(v => v?.partyId)                 // unka partyId nikal lo
-                    ?.filter(Boolean)                      // null/undefined hatao
+                    ?.filter(v => v?.type === "party")
+                    ?.map(v => v?.partyId)
+                    ?.filter(Boolean)
                     ?.join(",") || "",
-                  calenderUserIds: values?.clientItems    // sirf party wale
-                    ?.map(v => v?.userId)                 // unka partyId nikal lo
-                    ?.filter(Boolean)                      // null/undefined hatao
+                  calenderUserIds: values?.clientItems
+                    ?.map(v => v?.userId)
+                    ?.filter(Boolean)
                     ?.join(",") || "",
                   includeFcSc: values?.isInclude || false,
                 });
@@ -566,19 +568,35 @@ const Event = ({ navigation }) => {
                   <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderBottomWidth: 1, paddingVertical: 10, borderColor: '#ddd', }}>
                     <MyText style={styles.title}>Is Repeate ?</MyText>
                     <TouchableOpacity onPress={() => {
-                      setFieldValue('isRepeated', !values.isRepeated), navigation?.navigate(
+                      setFieldValue('isRepeated', true), navigation?.navigate(
                         'AddRepeat'
                       )
                     }}>
-                      <AntDesign name="plus" size={20} color={values.isRepeated ? COLORS?.PRIMARY_COLOR_LIGHT : 'gray'} />
+                      <AntDesign name="plus" size={20} color={Object.keys(repeatItem).length > 0 ? COLORS?.PRIMARY_COLOR_LIGHT : 'gray'} />
                     </TouchableOpacity>
-                    {/* <Switch
-                      value={values.isRepeated}
-                      onValueChange={(val) => setFieldValue('isRepeated', val)}
-                      thumbColor={values.isRepeated ? "#ffffff" : "#ffffff"}
-                      trackColor={{ false: "gray", true: COLORS?.PRIMARY_COLOR_LIGHT }}
-                    /> */}
                   </View>
+                  {
+                    Object.keys(repeatItem).length > 0 &&
+                    <RepeatCard
+                      item={repeatItem}
+                      onEdit={() => navigation.navigate('AddRepeat', {
+                        paramData: {
+                          repeat: repeatItem?.repeat || "",
+                          every: repeatItem?.every || "",
+                          endType: repeatItem?.endType || "Never",   // Default
+                          endOccurrences: repeatItem?.endOccurrences || "", // only for "After"
+                          endDate: repeatItem?.endDate || "",
+                          isRepeatObj: repeatItem?.isRepeatObj || {},
+
+                        }
+                      })}
+                      onDelete={() => {
+                        setFieldValue('isRepeated', false),
+                          dispatch(resetRepeat())
+                      }
+                      }
+                    />
+                  }
 
                   {/* //Remider  */}
                   <View style={{ borderBottomWidth: 1, borderColor: COLORS?.LIGHT_COLOR, marginVertical: 10, }}>
@@ -847,21 +865,6 @@ const Event = ({ navigation }) => {
               {/* //PICKER ============================> */}
 
               {/* //select start date and time  */}
-              {/* <DatePicker
-                modal
-                mode='datetime'
-                open={values.isOpenStartDate}
-                date={values.selectedStartDate || new Date()}
-                onConfirm={date => {
-
-                  setFieldValue('startDate', `${moment(date).format('MM/DD/YYYY')} : ${moment(date).format('hh:mm A')}`);
-                  setFieldValue('selectedStartDate', date); // ✅ keep as Date object
-                  setFieldValue('isOpenStartDate', false);
-                }}
-                onCancel={() => {
-                  setFieldValue('isOpenStartDate', false);
-                }}
-              /> */}
               <DatePicker
                 modal
                 mode="datetime"
@@ -905,6 +908,50 @@ const Event = ({ navigation }) => {
     </>
   )
 }
+
+const RepeatCard = ({ item, onEdit, onDelete }) => {
+  return (
+    <View style={styles.card1}>
+      <View style={styles.header1}>
+        <MyText style={styles.title1}>{item?.repeat || "No Repeat"}</MyText>
+
+        <View style={styles.actions1}>
+          <TouchableOpacity onPress={onEdit} style={styles.iconBtn1}>
+            <AntDesign name="edit" size={18} color={COLORS.PRIMARY_COLOR_LIGHT} />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => onDelete()} style={[styles.iconBtn1, { marginLeft: 10 }]}>
+            <MaterialIcons name="delete-outline" size={20} color="red" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.row1}>
+        <MyText style={styles.label1}>Every:</MyText>
+        <MyText style={styles.value1}>{item?.every || "—"} {item?.isRepeatObj?.value}</MyText>
+      </View>
+
+      <View style={styles.row1}>
+        <MyText style={styles.label1}>End Type:</MyText>
+        <MyText style={styles.value1}>{item?.endType || "—"}</MyText>
+      </View>
+
+      {item?.endType === "After" && (
+        <View style={styles.row1}>
+          <MyText style={styles.label1}>End After:</MyText>
+          <MyText style={styles.value1}>{item?.endOccurrences || "—"} occurrences</MyText>
+        </View>
+      )}
+
+      {item?.endType === "On" && (
+        <View style={styles.row1}>
+          <MyText style={styles.label1}>End Date:</MyText>
+          <MyText style={styles.value1}>{moment(item?.endDate).format("MM/DD/YYYY") || "—"}</MyText>
+        </View>
+      )}
+    </View>
+  );
+};
 
 
 export default Event
@@ -975,5 +1022,50 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingBottom: 20,
+  },
+
+
+
+  // =====================>
+  card1: {
+    backgroundColor: '#f3f3f3ff',
+    borderRadius: 12,
+    padding: 15,
+    borderWidth: 1,
+    borderColor: COLORS?.BORDER_LIGHT_COLOR,
+    marginVertical: 10,
+
+  },
+  header1: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  title1: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS?.PRIMARY_TEXT || '#1A1A1A',
+  },
+  actions1: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconBtn1: {
+    padding: 4,
+  },
+  row1: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 2,
+  },
+  label1: {
+    fontSize: calculatefontSize(1.5),
+    color: '#000000ff',
+  },
+  value1: {
+    fontSize: calculatefontSize(1.5),
+    color: '#000',
+    // fontWeight: '500',
   },
 })
