@@ -157,10 +157,13 @@ const EditEvents = ({ navigation, route }) => {
 
         const { res, err } = await httpRequest({
             method: `get`,
-            path: `/ic/event/${eventData?.eventId}`,
+            path: editType === "single" ? `/ic/event/schedule/${eventData?.eventScheduleDTOList[0]?.eventScheduleId}` : `/ic/event/${eventData?.eventId}`,
+
+            // path: `/ic/event/${eventData?.eventId}`,
             navigation: navigation
         })
         if (res) {
+            setDefaultData(res?.data);
             const repeatType = res?.data?.repeatType;
 
             const matchedRepeatObj = repeadData?.find(opt =>
@@ -214,12 +217,12 @@ const EditEvents = ({ navigation, route }) => {
             eventData
         ) {
 
-            const userIds = eventData?.attendeeUserIds
-                ? eventData.attendeeUserIds.split(',').filter(Boolean)
+            const userIds = defaultData?.attendeeUserIds
+                ? defaultData.attendeeUserIds.split(',').filter(Boolean)
                 : [];
 
-            const partyIds = eventData?.attendeePartyIds
-                ? eventData.attendeePartyIds.split(',').filter(Boolean)
+            const partyIds = defaultData?.attendeePartyIds
+                ? defaultData.attendeePartyIds.split(',').filter(Boolean)
                 : [];
 
             // 🔹 Filter users and parties from API data using IDs
@@ -238,8 +241,8 @@ const EditEvents = ({ navigation, route }) => {
                 }));
 
 
-            const clientIds = eventData?.calenderUserIds
-                ? eventData.calenderUserIds.split(',').filter(Boolean)
+            const clientIds = defaultData?.calenderUserIds
+                ? defaultData.calenderUserIds.split(',').filter(Boolean)
                 : [];
 
             const matchedClients = billingData
@@ -266,15 +269,15 @@ const EditEvents = ({ navigation, route }) => {
             // 🔹 Set the Formik initial values dynamically
             setInitialValues(prev => ({
                 ...prev,
-                title: eventData.title || '',
+                title: defaultData.title || '',
                 firmItems: [...matchedBillingUsers, ...matchedParties],
-                startDate: moment(eventData?.eventScheduleDTOList[0]?.startOnDate)?.format('YYYY-MM-DD') || '',
-                startDateSelected: eventData?.eventScheduleDTOList[0]?.startOnDate || '',
-                endDate: moment(eventData?.eventScheduleDTOList[0]?.endOnDate)?.format('YYYY-MM-DD') || '',
-                endDateSelected: eventData?.eventScheduleDTOList[0]?.endOnDate || '',
-                location: eventData.location || '',
-                matterSelected: matterData?.find(item => item?.matterId === eventData?.matterId)?.name || '',
-                matterSelectedObj: matterData?.find(item => item?.matterId === eventData?.matterId) || {},
+                startDate: moment(defaultData?.startOnDate)?.format('YYYY-MM-DD') || '',
+                startDateSelected: defaultData?.startOnDate || '',
+                endDate: moment(defaultData?.endOnDate)?.format('YYYY-MM-DD') || '',
+                endDateSelected: defaultData?.endOnDate || '',
+                location: defaultData.location || '',
+                matterSelected: matterData?.find(item => item?.matterId === defaultData?.matterId)?.name || '',
+                matterSelectedObj: matterData?.find(item => item?.matterId === defaultData?.matterId) || {},
 
                 //Asign to
                 client: matchedClients?.map(c => c?.userProfileDTO?.fullName)?.join(', ') || '',
@@ -282,11 +285,11 @@ const EditEvents = ({ navigation, route }) => {
                 clientObj: {},
 
                 //isInclude
-                isInclude: eventData?.includeFcSc || false,
+                isInclude: defaultData?.includeFcSc || false,
 
                 //Event type 
-                eventTypeSelected: eventTypeData?.find(item => item?.eventTypeId === eventData?.typeId)?.name || '',
-                eventTypeSelectedObj: eventTypeData?.find(item => item?.eventTypeId === eventData?.typeId) || {},
+                eventTypeSelected: eventTypeData?.find(item => item?.eventTypeId === defaultData?.typeId)?.name || '',
+                eventTypeSelectedObj: eventTypeData?.find(item => item?.eventTypeId === defaultData?.typeId) || {},
                 //description
                 description: defaultData?.description || '',
             }));
