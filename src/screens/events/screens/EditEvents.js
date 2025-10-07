@@ -26,6 +26,7 @@ import { resetRepeat, setRepeat } from '../../../store/slices/eventSlice/createI
 //icons 
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import LoaderModal from '../../../components/LoaderModal'
 
 
 
@@ -38,6 +39,7 @@ const EditEvents = ({ navigation, route }) => {
     const [firmUserData, setFirmUserData] = useState([])
     const items = useSelector(state => state.createItemforReminder.items);
     const repeatItem = useSelector(state => state.createItemForAddRepeat.repeatObj);
+    const [loader, setLoader] = useState(false)
 
     const [matterData, setmatterData] = React.useState([]);
     const [eventTypeData, seteventTypeData] = React.useState([]);
@@ -127,6 +129,7 @@ const EditEvents = ({ navigation, route }) => {
         );
     });
     const getRepeatData = async () => {
+
         const { res, err } = await httpRequest({
             method: `get`,
             path: `/ic/event/${eventData?.eventId}`,
@@ -179,11 +182,13 @@ const EditEvents = ({ navigation, route }) => {
 
 
     useEffect(() => {
+        setLoader(true)
         if (
             billingData.length > 0 &&
             partyData.length > 0 &&
             eventData
         ) {
+
             const userIds = eventData?.attendeeUserIds
                 ? eventData.attendeeUserIds.split(',').filter(Boolean)
                 : [];
@@ -260,7 +265,11 @@ const EditEvents = ({ navigation, route }) => {
                 //description
                 description: eventData?.description || '',
             }));
+            setLoader(false)
+
         }
+        setLoader(false)
+
     }, [billingData, partyData, eventData]);
 
 
@@ -349,12 +358,37 @@ const EditEvents = ({ navigation, route }) => {
         }
     }
 
+    const getAllData = async () => {
+        try {
+            setLoader(true);
+
+            await Promise.all([
+                getEventTypeData(),
+                getBillingData(),
+                getMatterData(),
+                getFirmUserData(),
+                editType !== "single" ? getRepeatData() : Promise.resolve()
+            ]);
+
+        } catch (error) {
+            console.log("Error loading data:", error);
+        } finally {
+            setLoader(false);
+        }
+    };
+
     useEffect(() => {
-        getEventTypeData()
-        getBillingData()
-        getMatterData()
-        getFirmUserData()
-    }, [])
+        getAllData();
+    }, []);
+    // useEffect(() => {
+    //     setLoader(true)
+    //     getEventTypeData()
+    //     getBillingData()
+    //     getMatterData()
+    //     getFirmUserData()
+    //     setLoader(false)
+
+    // }, [])
 
 
     console.log(billingData);
@@ -643,11 +677,23 @@ const EditEvents = ({ navigation, route }) => {
 
                     }
 
+                    console.log(updatedPayload, "updatedPayload ===============================>#########################################################################>", editType == "single" ? `/ic/event/schedule` : `/ic/event/`);
+                    // const { res, err } = await httpRequest({
+                    //     method: `posputt`,
+                    //     path: editType == "single" ? `/ic/event/schedule` : `/ic/event/`,
+                    //     params: updatedPayload,
+                    //     navigation: navigation,
 
+                    // });
+                    // if (res) {
+                    //     console.log(res, "practive arae");
+                    //     toast.show('Event created successfully', { type: 'success' })
+                    //     navigation.goBack();
+                    // }
+                    // else {
+                    //     console.log(err, "GET CUSTOMER RESPONSE===>err");
+                    // }
 
-
-
-                    console.log(updatedPayload, "updatedPayload ===============================>#########################################################################>");
 
 
 
@@ -661,6 +707,7 @@ const EditEvents = ({ navigation, route }) => {
                     <>
                         <ScreenHeader isLoading={values?.loader} onPressSave={handleSubmit} isShowSave={true} extraStyle={{ backgroundColor: '#F5F6F8' }} isGoBack={true} onPress={() => { navigation.goBack() }} isShowTitle={true} title={`Edit Event${editType}`} />
                         <Wrapper>
+                            <LoaderModal visible={loader} />
                             <KeyboardAvoidingView
                                 style={{ flex: 1 }}
                                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
