@@ -1,5 +1,5 @@
 import { Alert, Animated, Dimensions, FlatList, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Switch, Text, TextInput, TextInputComponent, TouchableOpacity, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import moment from 'moment'
@@ -48,6 +48,31 @@ const EditEvents = ({ navigation, route }) => {
     // inside Event component
     const [searchQuery, setSearchQuery] = useState("");
     const userDetails = useSelector(state => state?.userDetails?.userDetails);
+
+
+    //Default data
+    const [defaultData, setDefaultData] = useState({});
+
+    const getDefaultData = async () => {
+        console.log(eventData, "EVENT DATA===============================>");
+
+        const { res, err } = await httpRequest({
+            method: `get`,
+            path: editType === "single" ? `/ic/event/schedule/${eventData?.eventScheduleDTOList[0]?.eventScheduleId}` : `/ic/event/${eventData?.eventId}`,
+            navigation: navigation
+        })
+        if (res) {
+            console.log(res, "practive arae",);
+            setDefaultData(res?.data);
+        }
+        else {
+            console.log(err, "getDefaultData===>err", editType === "single" ? `/ic/event/schedule/${eventData?.eventScheduleDTOList[0]?.eventScheduleId}` : `/ic/event/${eventData?.eventId}`);
+        }
+    }
+
+    useEffect(() => {
+        getDefaultData()
+    }, [])
 
 
     const repeadData = [
@@ -263,7 +288,7 @@ const EditEvents = ({ navigation, route }) => {
                 eventTypeSelected: eventTypeData?.find(item => item?.eventTypeId === eventData?.typeId)?.name || '',
                 eventTypeSelectedObj: eventTypeData?.find(item => item?.eventTypeId === eventData?.typeId) || {},
                 //description
-                description: eventData?.description || '',
+                description: defaultData?.description || '',
             }));
             setLoader(false)
 
@@ -678,27 +703,26 @@ const EditEvents = ({ navigation, route }) => {
                     }
 
                     console.log(updatedPayload, "updatedPayload ===============================>#########################################################################>", editType == "single" ? `/ic/event/schedule` : `/ic/event/`);
-                    // const { res, err } = await httpRequest({
-                    //     method: `posputt`,
-                    //     path: editType == "single" ? `/ic/event/schedule` : `/ic/event/`,
-                    //     params: updatedPayload,
-                    //     navigation: navigation,
+                    setFieldValue('loader', true)
+                    const { res, err } = await httpRequest({
+                        method: `put`,
+                        path: editType == "single" ? `/ic/event/schedule` : `/ic/event/`,
+                        params: updatedPayload,
+                        navigation: navigation,
 
-                    // });
-                    // if (res) {
-                    //     console.log(res, "practive arae");
-                    //     toast.show('Event created successfully', { type: 'success' })
-                    //     navigation.goBack();
-                    // }
-                    // else {
-                    //     console.log(err, "GET CUSTOMER RESPONSE===>err");
-                    // }
+                    });
+                    if (res) {
+                        console.log(res, "practive arae");
+                        setFieldValue('loader', false)
 
+                        toast.show('Event updated successfully', { type: 'success' })
+                        navigation.goBack();
+                    }
+                    else {
+                        setFieldValue('loader', false)
 
-
-
-
-
+                        console.log(err, "GET CUSTOMER RESPONSE===>err");
+                    }
                 }}
             >
 
