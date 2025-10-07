@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    repeatObj: {}, // yahan poora AddRepeat ka object aayega
+    repeatObj: {}, // yahan poora AddRepeat ka object aayega 
 };
 
 const repeatSlice = createSlice({

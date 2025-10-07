@@ -8,7 +8,8 @@ const createReminderItem = (payload) => ({
     rId: payload.rId, // unique ID
     reminderThrough: payload.reminderThrough || '',  // e.g. 'email', 'sms'
     counts: payload.counts || 0,
-    reminderType: payload.reminderType || '',        // e.g. 'daily', 'weekly'
+    reminderType: payload.reminderType || '',
+    reminderObj: payload.reminderObj || {},      // e.g. 'daily', 'weekly'
 });
 
 const reminderSlice = createSlice({

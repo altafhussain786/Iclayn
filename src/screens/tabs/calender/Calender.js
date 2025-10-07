@@ -12,6 +12,7 @@ import {
   PanResponder,
   Animated,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { COLORS, IconUri } from '../../../constants';
@@ -28,6 +29,7 @@ import Loader from '../../../components/Loader';
 import TimekeeperModal from '../../../components/TimekeeperModal';
 import LinearGradient from 'react-native-linear-gradient';
 import { Swipeable } from 'react-native-gesture-handler';
+import EditRecurringModal from './screens/EditRecurringModal';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -39,9 +41,11 @@ const Calender = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loader, setLoader] = useState(false);
   const [calenderData, setCalenderData] = useState([]);
+  const [editModalVisible, setEditModalVisible] = useState(false);
 
   //modal
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
 
   const translateX = useRef(new Animated.Value(0)).current;
@@ -83,7 +87,7 @@ const Calender = ({ navigation }) => {
     const { res, err } = await httpRequest({
       method: 'get',
       // navigation: navigation,
-      path: `/ic/event/date-range?fromDate=09/28/2025&toDate=11/09/2025`,
+      path: `/ic/event/date-range?fromDate=10/05/2025&toDate=10/12/2025`,
       // path: `/ic/event/date-range?fromDate=09/28/2025&toDate=11/09/2025`,
     });
 
@@ -170,7 +174,11 @@ const Calender = ({ navigation }) => {
 
   const renderLeftActions = (item) => (
     <TouchableOpacity
-      onPress={() => navigation.navigate('EditEvent', { item })}
+      // onPress={() => navigation.navigate('EditEvent', { item })}
+      onPress={() => {
+        setSelectedEvent(item); // store current event
+        setEditModalVisible(true);
+      }}
       style={styles.leftSwipe}
     >
       <AntDesign name="edit" size={20} color={COLORS.BLACK_COLOR} />
@@ -189,6 +197,7 @@ const Calender = ({ navigation }) => {
 
   const renderEventItem = ({ item }) => (
     <Swipeable
+      key={item?.id}
       renderLeftActions={() => renderLeftActions(item)}
       renderRightActions={() => renderRightActions(item)}
       overshootLeft={false}
@@ -294,37 +303,7 @@ const Calender = ({ navigation }) => {
             data={calenderData}
             keyExtractor={(item) => item.matterId}
             renderItem={renderEventItem}
-            // renderItem={({ item }) => (
-            //   <TouchableOpacity onPress={() => navigation.navigate('CalenderDetails', { item })} style={{ flexDirection: 'row', gap: 10 }}>
-            //     <View>
-            //       <Image
-            //         source={IconUri?.CalenderColor}
-            //         style={{ height: 20, width: 20, resizeMode: 'contain', top: getResponsiveHeight(3) }}
-            //       />
-            //     </View>
-            //     <View style={{ width: '100%' }}>
-            //       <View style={[styles.eventItem]}>
-            //         <View style={{ width: '65%' }}>
-            //           <MyText style={styles.timeColor}>
-            //             {moment(item.eventScheduleDTOList[0]?.startOnTime).format('hh:mm A')} -{' '}
-            //             {moment(item.eventScheduleDTOList[0]?.endOnTime).format('hh:mm A')}
-            //           </MyText>
-            //           <MyText style={[styles.txtStyle, { fontWeight: '300' }]}>
-            //             {item.title}
-            //           </MyText>
-            //           {item?.description && (
-            //             <MyText style={[styles.timeColor, { width: '70%' }]}>{item?.description}</MyText>
-            //           )}
-            //         </View>
-            //         <View style={{ width: '35%' }}>
-            //           {item?.location && (
-            //             <MyText style={[styles.timeColor, { fontWeight: '300' }]}>{item?.location}</MyText>
-            //           )}
-            //         </View>
-            //       </View>
-            //     </View>
-            //   </TouchableOpacity>
-            // )}
+
             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={getCalenderData} />}
           />
         ) : (
@@ -342,6 +321,35 @@ const Calender = ({ navigation }) => {
           iconSize={25}
         />
         <TimekeeperModal navigation={navigation} visible={modalVisible} onClose={() => setModalVisible(false)} />
+        <EditRecurringModal
+          key={Math.random() * 1000}
+          visible={editModalVisible}
+          onClose={() => setEditModalVisible(false)}
+          onSelect={(type) => {
+            setEditModalVisible(false);
+            if (type === 'single') {
+              // Alert.alert('single');
+              setEditModalVisible(false);
+
+              navigation.navigate('EditEvent', {
+                eventData: selectedEvent,
+                editType: type, // 'single' or 'all'
+              });
+
+              // handle "this event only"
+            } else {
+              // Alert.alert('double');
+
+              setEditModalVisible(false);
+
+              navigation.navigate('EditEvent', {
+                eventData: selectedEvent,
+                editType: type, // 'single' or 'all'
+              });
+              // handle "all events"
+            }
+          }}
+        />
       </Wrapper>
 
       {showMonthPicker && (
