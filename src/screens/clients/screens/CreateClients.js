@@ -218,7 +218,7 @@ const CreateClients = ({ navigation }) => {
                         firstName: values.firstName,
                         middleName: values.middleName,
                         lastName: values.lastName,
-                        company: 'company Name',
+                        company: values?.companyName,
                         title: values.title,
                         dob: values.selectedDateOfBirth,
                         status: "Active",

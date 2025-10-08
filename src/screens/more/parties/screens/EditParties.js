@@ -164,7 +164,7 @@ const EditParties = ({ navigation, route }) => {
                         middleName: partiesDetails?.middleName || "",
                         lastName: partiesDetails?.lastName || "",
 
-                        companyName: partiesDetails?.company || "",
+                        company: partiesDetails?.company || "",
                         title: partiesDetails?.title || "",
 
                         //Date of birth
@@ -257,14 +257,14 @@ const EditParties = ({ navigation, route }) => {
                         updatedBy: userDetails.userId,
                         revision: null,
                         partyId: partiesDetails?.partyId || 0,
-                        partyTypeId: String(values?.partyObj?.partyTypeId),
+                        partyTypeId: values?.partyObj?.partyTypeId,
                         prefix: values?.prefix,
                         companyName: values?.companyName,
                         companyNumber: values?.companyNumber,
                         firstName: values.firstName,
                         middleName: values.middleName,
                         lastName: values.lastName,
-                        company: null,
+                        company: values?.company || "",
                         title: values.title,
                         dob: values.selectedDateOfBirth,
                         status: "Active",
@@ -283,24 +283,29 @@ const EditParties = ({ navigation, route }) => {
                         updatedBy: userDetails.userId,
                         revision: null,
                         partyId: partiesDetails?.partyId || 0,
-                        partyTypeId: String(values?.partyObj?.partyTypeId),
+                        partyTypeId: values?.partyObj?.partyTypeId,
                         prefix: values?.prefix,
-                        companyName: null,
-                        companyNumber: null,
+                        companyName: values?.companyName || null,
+                        companyNumber: values?.companyNumber || null,
                         firstName: values.firstName,
                         middleName: values.middleName,
                         lastName: values.lastName,
-                        company: values?.companyName,
+                        company: values?.company,
                         title: values.title,
                         dob: values.selectedDateOfBirth,
                         status: "Active",
                         type: values?.isYourType || "Individual",
                         photo: null,
+                        addressAs: null,
+                        fullName: values?.companyName || "",
+                        fullAddress: null,
                         partyEmailAddressDTOList: mappedItemForEmailAdd || [],
                         partyPhoneNumberDTOList: mappedItemForClientPhone || [],
                         partyWebAddresseDTOList: mappedItemForWebAddress || [],
                         partyAddresseDTOList: mappedItemForAddress || [],
                     }
+                    console.log(values?.isYourType === "Supplier" ? payloadForSupplier : payload);
+
                     formData.append('data', JSON.stringify(values?.isYourType === "Supplier" ? payloadForSupplier : payload));
                     console.log(payload, "payload", formData);
 
@@ -467,7 +472,9 @@ const EditParties = ({ navigation, route }) => {
                                                 const isSelected = values.isYourType === item;
                                                 return (
                                                     <>
-                                                        <TouchableOpacity disabled={partyTypeData?.type !== item} style={{ width: "45%", }} onPress={() => setFieldValue('isYourType', item)}>
+                                                        <TouchableOpacity
+                                                            //  disabled={partyTypeData?.type !== item} 
+                                                            style={{ width: "45%", }} onPress={() => setFieldValue('isYourType', item)}>
                                                             <LinearGradient
                                                                 colors={isSelected ? [COLORS?.PRIMARY_COLOR_LIGHT, COLORS?.PRIMARY_COLOR,] : [COLORS?.LIGHT_COLOR, COLORS?.BORDER_LIGHT_COLOR,]}
                                                                 start={{ x: 0, y: 0 }}
@@ -538,6 +545,14 @@ const EditParties = ({ navigation, route }) => {
                                         value={values.lastName}
                                         onChangeText={(txt) => setFieldValue('lastName', txt)}
                                         title="Last Name"
+
+                                    />
+                                    <TextInputWithTitle
+                                        placeholder={"What's the company name?"}
+                                        isRequired={true}
+                                        value={values.company}
+                                        onChangeText={(txt) => setFieldValue('company', txt)}
+                                        title="Company"
 
                                     />
                                     <TextInputWithTitle
