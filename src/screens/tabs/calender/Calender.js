@@ -68,8 +68,8 @@ const Calender = ({ navigation }) => {
 
   const getCalenderData = async () => {
     let fromDate = selectedDate;
-    let toDate = getToDate(fromDate);
-    console.log(toDate, "toDate================>");
+
+
 
     const currentStartOfWeek = getStartOfWeek(new Date());
 
@@ -79,16 +79,26 @@ const Calender = ({ navigation }) => {
 
 
     const selectedDateStr = moment(selectedDate).format('MM/DD/YYYY');
-    const nextDateStr = moment(selectedDateStr, 'MM/DD/YYYY')
-      .add(1, 'day')
+
+    // previous Sunday nikalne ke liye
+    const fromDate1 = moment(selectedDateStr, 'MM/DD/YYYY')
+      .startOf('week') // by default Sunday se week start hota hai
       .format('MM/DD/YYYY');
 
+    // next Sunday nikalne ke liye
+    const toDate = moment(selectedDateStr, 'MM/DD/YYYY')
+      .endOf('week') // ye Saturday deta hai
+      .add(1, 'day') // Saturday + 1 day = Sunday
+      .format('MM/DD/YYYY');
+
+    console.log('fromDate:', fromDate1);
+    console.log('toDate:', toDate);
     setLoader(true);
     const { res, err } = await httpRequest({
       method: 'get',
       // navigation: navigation,
-      path: `/ic/event/date-range?fromDate=10/05/2025&toDate=10/12/2025`,
-      // path: `/ic/event/date-range?fromDate=09/28/2025&toDate=11/09/2025`,
+      path: `/ic/event/date-range?fromDate=${fromDate1}&toDate=${toDate}`,
+      // path: `/ic/event/date-range?fromDate=10/05/2025&toDate=10/12/2025`,
     });
 
     if (res) {

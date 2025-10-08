@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ScreenHeader from '../../../components/ScreenHeader';
 import { COLORS, IconUri } from '../../../constants';
 import { calculatefontSize } from '../../../helper/responsiveHelper';
@@ -23,6 +23,7 @@ import TimekeeperModal from '../../../components/TimekeeperModal';
 import LinearGradient from 'react-native-linear-gradient';
 import Loader from '../../../components/Loader';
 import { useToast } from 'react-native-toast-notifications';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Tasks = ({ navigation, route }) => {
   const matterDetails = route?.params?.matterDetails
@@ -60,9 +61,15 @@ const Tasks = ({ navigation, route }) => {
     }
   };
 
-  useEffect(() => {
-    getTasks();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getTasks();
+    }, [tabs]) // tabs bhi dependency me rakho
+  );
+
+  // useEffect(() => {
+  //   getTasks();
+  // }, []);
 
   const checkBGStatusColor = (status) => {
     if (status.toLowerCase() === 'pending') return COLORS?.PENDING_BG;
@@ -114,7 +121,25 @@ const Tasks = ({ navigation, route }) => {
     // setFilteredData(filtered);
   }, [searchText, data, tabs]);
 
+  // const handleDeleteItem = async (item) => {
+
+  //   const { res, err } = await httpRequest({
+  //     method: 'delete',
+  //     path: `/ic/matter/task/`,
+  //     params: [item?.taskId],
+  //     navigation,
+  //   });
+  //   if (res) {
+  //     toast.show('Task deleted successfully', { type: 'success' })
+  //     getTasks();
+  //   } else {
+  //     console.log('err', err);
+  //   }
+  // };
   const handleDeleteItem = async (item) => {
+    // optimistically remove from UI
+    setData(prev => prev.filter(task => task.taskId !== item.taskId));
+    setFilteredData(prev => prev.filter(task => task.taskId !== item.taskId));
 
     const { res, err } = await httpRequest({
       method: 'delete',
@@ -122,11 +147,16 @@ const Tasks = ({ navigation, route }) => {
       params: [item?.taskId],
       navigation,
     });
+
     if (res) {
-      toast.show('Task deleted successfully', { type: 'success' })
+      toast.show('Task deleted successfully', { type: 'success' });
+      // optional: re-fetch to ensure sync with server
       getTasks();
     } else {
+      toast.show('Failed to delete task', { type: 'danger' });
       console.log('err', err);
+      // rollback UI if failed
+      getTasks();
     }
   };
 
