@@ -80,6 +80,9 @@ const CreateClients = ({ navigation }) => {
                         selectedDateOfBirth: moment(new Date()).toISOString(),
                         isdateOfBirthOpen: false,
 
+                        //Insurance
+                        nationalInsurance: "",
+
                         // ========================>COMPANY ===>
                         companyName: "",
                         companyNumber: "",
@@ -107,6 +110,25 @@ const CreateClients = ({ navigation }) => {
                         type: i?.emailType,
                         primary: i?.isEmailPrimary,
                         clientId: null
+                    }))
+                    const mappedItemForcontact = itemsForContactPerson.map((i, index) => ({
+
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: null,
+                        updatedBy: null,
+                        revision: null,
+                        clientContactPersonId: i?.contactPersonObj?.clientContactPersonId,
+                        prefix: i?.prefixName || "",
+                        firstName: i?.firstName || "",
+                        middleName: i?.middleName || "",
+                        lastName: i?.lastName || "",
+                        email: i?.email || "",
+                        phoneNo: i?.phoneNumber || "",
+                        type: i?.type || "",
+                        primary: i?.isContactPersonPrimary || false,
+                        clientId: i?.contactPersonObj?.clientId
+
                     }))
 
                     const mappedItemForClientPhone = itemsForPhoneNumber.map((i, index) => ({
@@ -152,6 +174,36 @@ const CreateClients = ({ navigation }) => {
                         clientId: null
                     }))
 
+
+                    const payloadForcompany = {
+                        createdOn: "",
+                        updatedOn: null,
+                        createdBy: userDetails.userId,
+                        updatedBy: null,
+                        revision: null,
+                        clientId: 0,
+                        companyName: values?.companyName,
+                        companyNumber: values?.companyNumber,
+                        prefix: values?.prefix,
+                        code: null,
+                        company: '',
+                        firstName: values.firstName,
+                        middleName: values.middleName,
+                        lastName: values.lastName,
+                        title: values.title,
+                        dob: "",
+                        nationalInsurance: null,
+                        status: "Active",
+                        // type: values?.isYourType "Individual",
+                        type: values?.isYourType,
+                        photo: values?.defaultFiles || null,
+                        clientEmailAddressDTOList: mappedItemForEmailAdd || null,
+                        clientPhoneNumberDTOList: mappedItemForClientPhone || null,
+                        clientWebAddresseDTOList: mappedItemForWebAddress || null,
+                        clientAddresseDTOList: mappedItemForAddress || null,
+                        clientContactPersonDTOList: mappedItemForcontact || null
+                    }
+
                     const payload = {
                         createdOn: "",
                         updatedOn: null,
@@ -176,14 +228,12 @@ const CreateClients = ({ navigation }) => {
                         clientPhoneNumberDTOList: mappedItemForClientPhone || [],
                         clientWebAddresseDTOList: mappedItemForWebAddress || [],
                         clientAddresseDTOList: mappedItemForAddress || [],
-                        clientContactPersonDTOList: []
+                        clientContactPersonDTOList: mappedItemForcontact || []
                     }
-                    formData.append('data', JSON.stringify(payload));
-                    // formData.append('data', {
-                    //     string: JSON.stringify(payload), // RN ke kuch builds 'string' key chahte
-                    //     type: 'application/json',
-                    //     name: 'data.json',
-                    // });
+                    // formData.append('data', JSON.stringify(payload));
+                    formData.append('data', JSON.stringify(values?.isYourType === "Company" ? payloadForcompany : payload));
+
+
                     if (values?.documentFile[0]?.uri) {
                         formData.append('photo', {
                             uri: values?.documentFile[0].uri, // local file uri
@@ -350,6 +400,13 @@ const CreateClients = ({ navigation }) => {
                                                             title="Date of Birth"
                                                             isButton={true}
                                                             buttonText={values.dateOfBirth ? values.dateOfBirth : 'DD/MM/YYYY'}
+                                                        />
+                                                        <TextInputWithTitle
+                                                            placeholder={"National Insurance"}
+                                                            value={values.nationalInsurance}
+                                                            onChangeText={(txt) => setFieldValue('nationalInsurance', txt)}
+                                                            title="National Insurance"
+
                                                         />
                                                     </>
                                                     :

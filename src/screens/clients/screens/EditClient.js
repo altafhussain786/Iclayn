@@ -214,6 +214,8 @@ const EditClient = ({ navigation, route }) => {
                         //common file
                         commonDocumentFile: defaultData?.photo,
 
+                        nationalInsuranceNumber: defaultData?.nationalInsurance || "",
+
                         //loader
                         loader: false,
 
@@ -345,7 +347,8 @@ const EditClient = ({ navigation, route }) => {
                         firstName: values.firstName,
                         middleName: values.middleName,
                         lastName: values.lastName,
-                        company: 'company Name',
+                        nationalInsurance: values.nationalInsuranceNumber,
+                        company: values?.company,
                         title: values.title,
                         dob: values.selectedDateOfBirth,
                         status: "Active",
@@ -527,7 +530,10 @@ const EditClient = ({ navigation, route }) => {
                                                 const isSelected = values.isYourType === item;
                                                 return (
                                                     <>
-                                                        <TouchableOpacity key={index} disabled={defaultData?.defaultData?.type !== item} style={{ width: "45%", }} onPress={() => setFieldValue('isYourType', item)}>
+                                                        <TouchableOpacity key={index}
+                                                            //  disabled={defaultData?.defaultData?.type !== item} 
+                                                            style={{ width: "45%", }}
+                                                            onPress={() => setFieldValue('isYourType', item)}>
                                                             <LinearGradient
                                                                 colors={isSelected ? [COLORS?.PRIMARY_COLOR_LIGHT, COLORS?.PRIMARY_COLOR,] : [COLORS?.LIGHT_COLOR, COLORS?.BORDER_LIGHT_COLOR,]}
                                                                 start={{ x: 0, y: 0 }}
@@ -600,6 +606,13 @@ const EditClient = ({ navigation, route }) => {
                                                             title="Date of Birth"
                                                             isButton={true}
                                                             buttonText={values.dateOfBirth ? values.dateOfBirth : 'DD/MM/YYYY'}
+                                                        />
+                                                        <TextInputWithTitle
+                                                            placeholder={"National Insurance"}
+                                                            value={values.nationalInsuranceNumber}
+                                                            onChangeText={(txt) => setFieldValue('nationalInsuranceNumber', txt)}
+                                                            title="National Insurance"
+
                                                         />
                                                     </>
                                                     :
