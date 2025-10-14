@@ -119,6 +119,15 @@ const TimekeeperModal = ({ visible, onClose, navigation }) => {
         await saveTimerState({ isRunning: false, duration });
     };
 
+    const resetTimer = async () => {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        setIsRunning(false);
+        setDuration(0);
+        setStartTime(null);
+        console.log('🔄 Timer reset');
+        await saveTimerState({ duration: 0, isRunning: false, startTime: null });
+    };
+
     const toggleTimer = () => {
         isRunning ? stopTimer() : startTimer();
     };
@@ -156,18 +165,25 @@ const TimekeeperModal = ({ visible, onClose, navigation }) => {
                             </TouchableOpacity>
                         </View>
                     </View>
-                    <TouchableOpacity onPress={toggleTimer} >
-                        <LinearGradient
-                            start={{ x: 1, y: 0 }}
-                            end={{ x: 0, y: 1 }}
-                            colors={[COLORS?.PRIMARY_COLOR_LIGHT, COLORS?.PRIMARY_COLOR]}
-                            style={styles.timerBar}
-                        >
+                    <View>
+                        <TouchableOpacity onPress={toggleTimer} >
+                            <LinearGradient
+                                start={{ x: 1, y: 0 }}
+                                end={{ x: 0, y: 1 }}
+                                colors={[COLORS?.PRIMARY_COLOR_LIGHT, COLORS?.PRIMARY_COLOR]}
+                                style={styles.timerBar}
+                            >
 
-                            <FontAwesome name={isRunning ? 'pause' : 'play'} size={16} color="white" />
-                            <Text style={styles.timerText}>{formatTime(duration)}</Text>
-                        </LinearGradient>
-                    </TouchableOpacity>
+                                <FontAwesome name={isRunning ? 'pause' : 'play'} size={16} color="white" />
+                                <Text style={styles.timerText}>{formatTime(duration)}</Text>
+                                <TouchableOpacity onPress={resetTimer} style={{ left: 50 }}>
+                                    <FontAwesome name={'refresh'} size={16} color="white" />
+                                </TouchableOpacity>
+                            </LinearGradient>
+
+                        </TouchableOpacity>
+
+                    </View>
 
                     <Text style={styles.sectionTitle}>Create new</Text>
                     <Text style={styles.swipeHint}>Swipe left to see all options</Text>

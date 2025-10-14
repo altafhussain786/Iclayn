@@ -16,7 +16,7 @@ import Wrapper from '../../../../components/Wrapper'
 import MyText from '../../../../components/MyText'
 import TextInputWithTitle from '../../../../components/TextInputWithTitle'
 import BottomModalListWithSearch from '../../../../components/BottomModalListWithSearch'
-import { COLORS } from '../../../../constants'
+import { API_URL, COLORS } from '../../../../constants'
 import { calculatefontSize } from '../../../../helper/responsiveHelper'
 import httpRequest from '../../../../api/apiHandler'
 import { pick } from '@react-native-documents/picker'
@@ -184,6 +184,8 @@ const CreateExpense = ({ navigation, route }) => {
                 }
                 // validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
+
+                    const token = await AsyncStorage.getItem('access_token')
                     console.log(values, "values==>");
                     const payload = {
                         createdOn: "",
@@ -211,32 +213,47 @@ const CreateExpense = ({ navigation, route }) => {
                     console.log(payload, "payload=======");
 
                     const formdata = new FormData();
-                    let jsonString = JSON.stringify(payload);
-                    formdata.append('data', new Blob([jsonString], { type: 'application/json' }));
+                    formdata.append('data', JSON.stringify(payload));
+
                     if (values?.documentFile.length) {
                         values?.documentFile?.map(v => (
                             // formdata.append("attachment", v)
                             formdata.append('attachment', {
-                                // uri: v.uri,
-                                // type: v.type, // You may want to determine this dynamically
+                                uri: v.uri,
+                                type: v.type, // You may want to determine this dynamically
                                 filename: v.name, // You can also use original file name
                             })
                         ));
                     }
-                    const { res, err } = await httpRequest({
-                        method: "put",
-                        path: "/ic/matter/exp-entry/",
-                        params: formdata,
-                        header: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    });
-                    if (res) {
-                        toast.show('Expense added successfully', { type: 'success' })
+
+                    console.log(formdata, "=====>");
+                    try {
+                        const response = await fetch(`${API_URL}/ic/matter/exp-entry/`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                            },
+                            body: formdata,
+                        });
+
+                        const result = await response.json();
+                        if (result?.data) {
+                            toast.show('Expense added successfully', { type: 'success' })
+                            navigation.goBack()
+                        }
+                        else {
+                            setFieldValue('loader', false);
+                            toast.show('Something went wrong', { type: 'danger' })
+
+                        }
+
+                        console.log('Log:', result);
+                    } catch (error) {
+                        setFieldValue('loader', false);
+
+                        console.error('Upload Error:', error);
                     }
-                    else {
-                        toast.show(err?.message, { type: 'danger' })
-                    }
+
 
 
 

@@ -17,11 +17,12 @@ import FloatingButton from '../../../components/FloatingButton';
 import httpRequest from '../../../api/apiHandler';
 import Loader from '../../../components/Loader';
 import ScreenHeader from '../../../components/ScreenHeader';
-import { COLORS, fontFamily, IconUri } from '../../../constants';
+import { API_URL, COLORS, fontFamily, IconUri } from '../../../constants';
 import { calculatefontSize } from '../../../helper/responsiveHelper';
 import MyText from '../../../components/MyText';
 import { addDocument } from '../../../store/slices/taskSlice/createItemforDocuments';
 import { checkTypeForIcon } from '../../../helper/Helpers';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Documents = ({ navigation, route }) => {
     const matterDetails = route?.params?.matterDetails;
@@ -52,6 +53,8 @@ const Documents = ({ navigation, route }) => {
             navigation: navigation
         });
         if (res) {
+            console.log('get organization data', res?.data);
+
             setOrganizationData(res?.data);
             getOffice365Data(res?.data?.accessToken); // fetch Office365 data with token
         } else {
@@ -73,16 +76,83 @@ const Documents = ({ navigation, route }) => {
                 }
             );
 
+            console.log("📡 Office365 Status Code:", response.status);
+
+            // 🛑 Check if token expired or invalid
+            if (response.status === 401) {
+                console.log("🔑 Token expired — refreshing...");
+
+                // ✅ Call your API to get new access token
+                const newToken = await getNewAccessToken(token);
+
+                if (newToken) {
+                    // 🔁 Retry fetching data with new token
+                    return await getOffice365Data(newToken);
+                } else {
+                    console.log("❌ Failed to refresh token");
+                    setLoader(false);
+                    return;
+                }
+            }
+
+            // ✅ If not 401, continue normally
             const data = await response.json();
-            console.log("API Response to get OFFICE 365 DATA:==>", data?.value);
+            console.log("API Response to get OFFICE 365 DATA:==>", data);
             setDocumentData(data?.value || []);
             setFilteredData(data?.value || []);
+
         } catch (error) {
-            console.error("Error fetching data:", error);
+            console.error("❌ Error fetching Office 365 data:", error);
         } finally {
             setLoader(false);
         }
     };
+    const getNewAccessToken = async () => {
+        try {
+            const { res, err } = await httpRequest({
+                method: 'get',
+                path: `/ic/one-drive/refresh-token?tenantId=${organizationData?.tenantId}`,
+                navigation: navigation
+            });
+
+            if (res?.data?.accessToken) {
+                console.log("✅ Got new token");
+                setOrganizationData(prev => ({ ...prev, accessToken: res.data.accessToken }));
+                return res.data.accessToken;
+            } else {
+                console.log("⚠️ No token in refresh response", err);
+                return null;
+            }
+        } catch (error) {
+            console.log("❌ Error refreshing token", error);
+            return null;
+        }
+    };
+
+
+    // const getOffice365Data = async (token) => {
+    //     try {
+    //         const response = await fetch(
+    //             "https://graph.microsoft.com/v1.0/users/info@iclayn.com/drive/root/children?$orderby=lastModifiedDateTime%20desc",
+    //             {
+    //                 method: "GET",
+    //                 headers: {
+    //                     "Content-Type": "application/json",
+    //                     "Authorization": `Bearer ${token}`,
+    //                 },
+    //             }
+    //         );
+
+    //         const data = await response.json();
+    //         console.log("API Response to get OFFICE 365 dDATA:==>", data);
+    //         setDocumentData(data?.value || []);
+    //         setFilteredData(data?.value || []);
+    //     } catch (error) {
+    //         console.error("Error fetching data:", error);
+    //     } finally {
+    //         setLoader(false);
+    //     }
+    // };
 
     const getDocuments = async () => {
         setLoader(true);

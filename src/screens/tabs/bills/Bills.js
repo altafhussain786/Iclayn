@@ -93,7 +93,23 @@ const Bills = ({ navigation, route }) => {
     }
   }
 
+  const renderDueStatus = (dueDate) => {
+    const today = moment();
+    const due = moment(dueDate);
+    const diff = due.diff(today, 'days');
+
+    if (diff > 0) {
+      return `Due in ${diff} days`;
+    } else if (diff === 0) {
+      return 'Due today';
+    } else {
+      return `Overdue ${Math.abs(diff)} days ago`;
+    }
+  };
+
   const renderBillItem = ({ item }) => {
+    console.log(item, "ITE<=======================>");
+
     return (
       <Swipeable
         renderLeftActions={() => renderLeftActions(item)}
@@ -138,8 +154,13 @@ const Bills = ({ navigation, route }) => {
 
           {/* Row 3: Date */}
           <View style={styles.dateRow}>
-            <MyText style={styles.dateText}>
-              {moment(item?.openDate).format('DD-MM-YYYY')}
+            <MyText
+              style={{
+                ...styles.dateText,
+                color: renderDueStatus(item?.dueDate).includes('Overdue') ? 'red' : '#444'
+              }}
+            >
+              {renderDueStatus(item?.dueDate)}
             </MyText>
           </View>
         </TouchableOpacity>

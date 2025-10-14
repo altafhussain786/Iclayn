@@ -18,6 +18,7 @@ import { Swipeable } from 'react-native-gesture-handler';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FloatingButton from '../../../components/FloatingButton';
 import TimekeeperModal from '../../../components/TimekeeperModal';
+import { formatNumber } from '../../../helper/Helpers';
 
 const TOP_TABS = ['Funds', 'Receive Advance', 'Transfer Advance'];
 // const SUB_TABS = ['All', 'Pending', 'Partial Received', 'Received', 'Cancelled'];
@@ -34,7 +35,7 @@ const TransactionsScreen = ({ navigation, route }) => {
     const matterDetails = route?.params?.matterDetails
 
     const [topTab, setTopTab] = useState('Funds');
-    const [subTab, setSubTab] = useState('All');
+    const [subTab, setSubTab] = useState('ALL');
     const [data, setData] = useState([]);
     const [search, setSearch] = useState('');
     const [loader, setLoader] = useState(false);
@@ -68,7 +69,7 @@ const TransactionsScreen = ({ navigation, route }) => {
     }, [topTab]);
 
     const filteredData = data.filter(item => {
-        const matchStatus = subTab === 'All' || item?.status === subTab?.toLocaleUpperCase();
+        const matchStatus = subTab === 'ALL' || item?.status === subTab?.toLocaleUpperCase();
         const matchSearch = item?.code?.toLowerCase()?.includes(search?.toLowerCase());
         return matchStatus && matchSearch;
     });
@@ -113,7 +114,7 @@ const TransactionsScreen = ({ navigation, route }) => {
                     <TouchableOpacity>
                         <Text style={styles.codeText}>{item.code}</Text>
                     </TouchableOpacity>
-                    <Text style={styles.balance}>{item.amount}</Text>
+                    <Text style={styles.balance}>£{formatNumber(item.amount)}</Text>
                 </View>
                 <MyText style={styles.mainText}>{item.matterName}</MyText>
                 <MyText style={styles.subText}>{item.clientIds}</MyText>
@@ -138,7 +139,7 @@ const TransactionsScreen = ({ navigation, route }) => {
                         <TouchableOpacity>
                             <Text style={styles.codeText}>{item.entityType}</Text>
                         </TouchableOpacity>
-                        <Text style={styles.balance}>{item.amount?.toFixed(2)}</Text>
+                        <Text style={styles.balance}>£ {formatNumber(item.amount)}</Text>
                     </View>
                     {item?.notes && <MyText style={styles.mainText}>{item.notes}</MyText>}
                     <MyText style={styles.subText}>{item.matterId}</MyText>
@@ -159,7 +160,7 @@ const TransactionsScreen = ({ navigation, route }) => {
                     <TouchableOpacity>
                         <Text style={styles.codeText}>{item.entityType}</Text>
                     </TouchableOpacity>
-                    <Text style={styles.balance}>{item.amount?.toFixed(2)}</Text>
+                    <Text style={styles.balance}>£ {formatNumber(item.amount)}</Text>
                 </View>
                 <MyText style={styles.mainText}>{item.notes}</MyText>
                 <MyText style={styles.subText}>{item.matterId}</MyText>
@@ -190,7 +191,7 @@ const TransactionsScreen = ({ navigation, route }) => {
                         key={tab}
                         onPress={() => {
                             setTopTab(tab);
-                            setSubTab('All');
+                            setSubTab('ALL');
                         }}
                         style={[
                             styles.topTab,
@@ -226,9 +227,11 @@ const TransactionsScreen = ({ navigation, route }) => {
                                         paddingVertical: 5,
                                         borderRadius: 5,
                                         paddingHorizontal: 30,
-                                        borderColor: subTab === item?.value ? COLORS.PRIMARY_COLOR_LIGHT : "transparent",
-                                        backgroundColor:
-                                            subTab === item?.value ? COLORS.yellow : COLORS.whiteColors,
+                                        // borderColor: subTab === item?.value ? COLORS.PRIMARY_COLOR_LIGHT : "transparent",
+                                        // backgroundColor:
+                                        //     subTab === item?.value ? COLORS.yellow : COLORS.whiteColors,
+                                        borderColor: subTab === item.value ? COLORS.PRIMARY_COLOR_LIGHT : "transparent",
+                                        backgroundColor: subTab === item.value ? COLORS.yellow : COLORS.whiteColors,
                                     },
                                 ]}
                                 onPress={() => setSubTab(item?.value)}
@@ -268,53 +271,61 @@ const TransactionsScreen = ({ navigation, route }) => {
             {/* )} */}
             <LoaderModal visible={loader} />
             {/* 📋 Content */}
-            {topTab === 'Funds' && (
+            <View style={{ backgroundColor: COLORS?.whiteColors, flex: 1 }}>
+                {topTab === 'Funds' && (
+                    filteredData?.length > 0 ?
+                        <>
+                            <FlatList
+                                data={filteredData}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={renderItem}
+                                contentContainerStyle={{ paddingBottom: 100, backgroundColor: COLORS?.whiteColors, }}
+                            />
+                        </>
+                        :
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS?.whiteColors }}>
+                            <Text style={{ textAlign: 'center', marginTop: 50, color: COLORS?.GREY_COLOR }}>No Funds found.</Text>
+                        </View>
+                )
+                }
+                {topTab === 'Receive Advance' && (
+                    data?.length > 0 ?
+                        <>
+                            <FlatList
+                                data={data}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={renderItem1}
+                                contentContainerStyle={{ paddingBottom: 100, backgroundColor: COLORS?.whiteColors, }}
 
-                <>
-                    <FlatList
-                        data={filteredData}
-                        keyExtractor={(item, index) => index.toString()}
-                        renderItem={renderItem}
-                        contentContainerStyle={{ paddingBottom: 100, backgroundColor: COLORS?.whiteColors, flex: 1 }}
-                        ListEmptyComponent={
-                            <Text style={{ textAlign: 'center', marginTop: 50 }}>No Funds found.</Text>
-                        }
-                    />
-                </>
-            )
-            }
-            {topTab === 'Receive Advance' && (
+                            />
+                        </>
+                        :
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS?.whiteColors }}>
+                            <Text style={{ textAlign: 'center', marginTop: 50, color: COLORS?.GREY_COLOR }}>No Receive Advance found.</Text>
+                        </View>
+                )
+                }
+                {topTab === 'Transfer Advance' && (
 
-                <>
-                    <FlatList
-                        data={data}
-                        keyExtractor={(item, index) => index.toString()}
-                        renderItem={renderItem1}
-                        contentContainerStyle={{ paddingBottom: 100, backgroundColor: COLORS?.whiteColors, flex: 1 }}
-                        ListEmptyComponent={
-                            <Text style={{ textAlign: 'center', marginTop: 50 }}>No Receive Advance found.</Text>
-                        }
-                    />
-                </>
-            )
-            }
-            {topTab === 'Transfer Advance' && (
+                    data?.length > 0 ?
+                        <>
 
+                            <FlatList
+                                data={data}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={renderItem2}
+                                contentContainerStyle={{ paddingBottom: 100, backgroundColor: COLORS?.whiteColors, }}
 
-                <>
+                            />
+                        </>
+                        :
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS?.whiteColors }}>
+                            <Text style={{ textAlign: 'center', marginTop: 50, color: COLORS?.GREY_COLOR }}>No Transfer Advance found.</Text>
+                        </View>
+                )
+                }
 
-                    <FlatList
-                        data={data}
-                        keyExtractor={(item, index) => index.toString()}
-                        renderItem={renderItem2}
-                        contentContainerStyle={{ paddingBottom: 100, backgroundColor: COLORS?.whiteColors, flex: 1 }}
-                        ListEmptyComponent={
-                            <Text style={{ textAlign: 'center', marginTop: 50 }}>No Transfer Advance found.</Text>
-                        }
-                    />
-                </>
-            )
-            }
+            </View>
 
             <FloatingButton
                 style={{ marginBottom: 40 }}
@@ -385,6 +396,7 @@ const styles = StyleSheet.create({
         color: '#fff'
     },
     card: {
+
         backgroundColor: COLORS?.BORDER_LIGHT_COLOR,
         padding: 15,
         marginVertical: 6,
