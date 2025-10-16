@@ -1,9 +1,9 @@
-import { Alert, AppState, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, AppState, Image, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import Entypo from 'react-native-vector-icons/Entypo'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { Formik } from 'formik'
+import { Field, Formik } from 'formik'
 import * as Yup from 'yup'
 import moment from 'moment'
 import DatePicker from 'react-native-date-picker';
@@ -16,7 +16,7 @@ import Wrapper from '../../../../components/Wrapper'
 import MyText from '../../../../components/MyText'
 import TextInputWithTitle from '../../../../components/TextInputWithTitle'
 import BottomModalListWithSearch from '../../../../components/BottomModalListWithSearch'
-import { COLORS } from '../../../../constants'
+import { API_URL, COLORS } from '../../../../constants'
 import { calculatefontSize } from '../../../../helper/responsiveHelper'
 import httpRequest from '../../../../api/apiHandler'
 import { pick } from '@react-native-documents/picker'
@@ -37,7 +37,7 @@ const EditExpense = ({ navigation, route }) => {
     const [defaultData, setDefaultData] = useState({});
     const toast = useToast()
 
-    console.log(communicationDetails, "=========");
+
 
 
     const getDefaultData = async () => {
@@ -148,6 +148,8 @@ const EditExpense = ({ navigation, route }) => {
 
     })
 
+    console.log(defaultData, "=====d====d", taxData);
+
     return (
         <>
             <Formik
@@ -157,7 +159,7 @@ const EditExpense = ({ navigation, route }) => {
                         //matter details
                         matter: matterData?.find(user => user?.matterId === defaultData?.matterId)?.name || '',
                         matterObj: matterData?.find(user => user?.matterId === defaultData?.matterId) || {},
-                        matterObj: {},
+                        // matterObj: {},
                         isOpenmatter: false,
 
                         // expense Type ==>
@@ -165,15 +167,15 @@ const EditExpense = ({ navigation, route }) => {
 
 
                         //Party Data
-                        party: '',
-                        partyObj: {},
+                        party: partyData?.find(user => user?.partyId === defaultData?.partyId)?.companyName || '',
+                        partyObj: partyData?.find(user => user?.partyId === defaultData?.partyId) || {},
                         isOpenParty: false,
                         // partyItems: [],
 
                         //expense Data
-                        expense: '',
-                        expenseItems: [],
-                        expenseObj: {},
+                        expense: expenseData?.find(user => user?.expCategoryId === defaultData?.categoryId)?.name || '',
+                        expenseItems: expenseData?.find(user => user?.expCategoryId === defaultData?.categoryId) || [],
+                        expenseObj: expenseData?.find(user => user?.expCategoryId === defaultData?.categoryId) || {},
                         isOpenexpense: false,
 
                         //Tax Data
@@ -202,7 +204,14 @@ const EditExpense = ({ navigation, route }) => {
 
 
                         //Document
-                        documentFile: [],
+
+                        defaultFiles: defaultData?.matterExpenseEntryAttachmentDTOList || [], // API se aayi files
+                        // defultFileUpdates:defaultData?.matterExpenseEntryAttachmentDTOList || [],
+                        documentFile: [], // new upload hone wali files
+                        documentsForShown: [
+                            ...(defaultData?.matterExpenseEntryAttachmentDTOList || []),
+                        ], // UI me dikhane ke liye dono mil kar
+
                         //loader
                         loader: false
                     }
@@ -210,13 +219,14 @@ const EditExpense = ({ navigation, route }) => {
                 // validationSchema={validationSchema}
                 onSubmit={async (values, { setFieldValue }) => {
                     console.log(values, "values==>");
+                    const token = await AsyncStorage.getItem('access_token')
                     const payload = {
-                        createdOn: "",
-                        updatedOn: null,
+                        createdOn: defaultData?.createdOn || "",
+                        updatedOn: defaultData?.updatedOn || null,
                         createdBy: userDetails?.userId,
                         updatedBy: null,
                         revision: null,
-                        matterExpenseEntryId: 0,
+                        matterExpenseEntryId: defaultData?.matterExpenseEntryId,
                         matterId: values?.matterObj?.matterId || null,
                         matterName: values?.matterObj?.name || null,
                         expDate: values?.selectedDate,
@@ -232,39 +242,55 @@ const EditExpense = ({ navigation, route }) => {
                         description: values?.description || "",
                         billed: false,
                         type: values?.expenseType == "Disbursment" ? "DISBURSEMENT" : "RECOVERIES",
-                        matterExpenseEntryAttachmentDTOList: null,
+                        matterExpenseEntryAttachmentDTOList: [], // sirf default
                     }
-                    console.log(payload, "payload=======");
+                    console.log(values?.matterObj, payload, "payload=======", defaultData, token);
 
                     const formdata = new FormData();
-                    let jsonString = JSON.stringify(payload);
-                    formdata.append('data', new Blob([jsonString], { type: 'application/json' }));
+                    formdata.append('data', JSON.stringify(payload));
                     if (values?.documentFile.length) {
 
-                        values?.documentFile?.map(v => (
-                            // formdata.append("attachment", v)
+                        values.documentFile.forEach(file => {
                             formdata.append('attachment', {
-                                // uri: v.uri,
-                                // type: v.type, // You may want to determine this dynamically
-                                filename: v.name, // You can also use original file name
-                            })
-                        ));
+                                uri: file.uri,
+                                type: file.type,
+                                name: file.name,
+                            });
+                        });
                     }
-                    const { res, err } = await httpRequest({
-                        method: "put",
-                        path: "/ic/matter/exp-entry/",
-                        params: formdata,
-                        header: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    });
-                    if (res) {
-                        toast.show('Expense added successfully', { type: 'success' })
-                    }
-                    else {
-                        console.log(err, "====================EERRRO");
 
-                        toast.show(err?.message, { type: 'danger' })
+                    console.log(formdata, "=====================>");
+
+                    try {
+                        setFieldValue('loader', true);
+                        const response = await fetch(`${API_URL}/ic/matter/exp-entry/v1`, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                            },
+                            body: formdata,
+                        });
+
+                        const result = await response.json();
+                        console.log(result?.data, "======================>result?.data");
+
+                        if (result?.data) {
+                            toast.show('Expense Updated successfully', { type: 'success' })
+                            setFieldValue('loader', true);
+
+                            navigation.goBack();
+                        }
+                        else {
+                            setFieldValue('loader', false);
+                            toast.show('Something went wrong', { type: 'danger' })
+
+                        }
+
+                        console.log('Log:', result);
+                    } catch (error) {
+                        setFieldValue('loader', false);
+
+                        console.error('Upload Error:', error);
                     }
 
 
@@ -382,6 +408,7 @@ const EditExpense = ({ navigation, route }) => {
 
                                     placeholder={'Amount'}
                                     title="Amount"
+                                    keyboardType='numeric'
                                     isRequired={true}
                                     onChangeText={(txt) => setFieldValue('rate', txt)}
                                     value={values.rate?.toString()}
@@ -434,9 +461,9 @@ const EditExpense = ({ navigation, route }) => {
                                             onPress={async () => {
                                                 try {
                                                     const [pickResult] = await pick();
-
                                                     if (pickResult) {
-                                                        setFieldValue('documentFile', [...(values?.documentFile || []), pickResult]);
+                                                        setFieldValue('documentFile', [...values.documentFile, pickResult]);
+                                                        setFieldValue('documentsForShown', [...values.documentsForShown, pickResult]);
                                                     }
                                                 } catch (err) {
                                                     console.log(err);
@@ -463,9 +490,11 @@ const EditExpense = ({ navigation, route }) => {
                                     </View>
 
                                     {/* Uploaded Files List */}
-                                    {values?.documentFile?.length > 0 && (
+                                    {values?.documentsForShown?.length > 0 && (
                                         <View style={{ gap: 10, }}>
-                                            {values?.documentFile?.map((d, i) => (
+                                            {values?.documentsForShown?.map((d, i) => (
+                                                console.log(d, "dddddddddddddddd"),
+
                                                 <View
                                                     key={i}
                                                     style={{
@@ -477,14 +506,58 @@ const EditExpense = ({ navigation, route }) => {
                                                         borderRadius: 5,
                                                     }}
                                                 >
-                                                    <MyText style={{ width: "70%" }}>{d?.name || 'Unnamed File'}</MyText>
+                                                    {/* <MyText style={{ width: "70%" }}>{d?.name || 'Unnamed File'} {d?.uri}</MyText> */}
+                                                    <Image source={{ uri: d?.uri || `data:image/jpeg;base64,${d?.attachment}` }} style={{ height: 100, width: 100 }} />
                                                     <TouchableOpacity
-                                                        onPress={() =>
-                                                            setFieldValue(
-                                                                'documentFile',
-                                                                values?.documentFile?.filter((_, index) => index !== i)
-                                                            )
-                                                        }
+
+                                                        onPress={() => {
+                                                            const fileToRemove = values.documentsForShown[i];
+
+                                                            if (fileToRemove.attachmentId) {
+                                                                // Default file
+                                                                const updatedDefault = values.defaultFiles.filter(
+                                                                    f => f.attachmentId !== fileToRemove.attachmentId
+                                                                );
+                                                                setFieldValue('defaultFiles', updatedDefault);
+                                                            } else {
+                                                                // New uploaded file
+                                                                const updatedDocs = values.documentFile.filter(
+                                                                    f => f.uri !== fileToRemove.uri
+                                                                );
+                                                                setFieldValue('documentFile', updatedDocs);
+                                                            }
+
+                                                            // Always remove from UI
+                                                            const updatedShown = values.documentsForShown.filter(
+                                                                (_, idx) => idx !== i
+                                                            );
+                                                            setFieldValue('documentsForShown', updatedShown);
+                                                            // const fileToRemove = values.documentsForShown[i] || values.defaultFiles[i];
+                                                            // if (fileToRemove.attachmentId) {
+                                                            //     // 👇 Default file hai
+                                                            //     const updatedDefault = values.defaultFiles.filter(
+                                                            //         f => f.attachmentId !== fileToRemove.attachmentId
+                                                            //     );
+                                                            //     console.log(values.defaultFiles, "IF", updatedDefault);
+
+                                                            //     setFieldValue('defaultFiles', updatedDefault);
+                                                            // } else {
+                                                            //     // 👇 New file hai
+                                                            //     const updatedDocs = values.documentFile.filter(
+                                                            //         f => f.uri !== fileToRemove.uri
+                                                            //     );
+
+                                                            //     console.log(values.defaultFiles, "ELSE", updatedDocs);
+
+                                                            //     setFieldValue('documentFile', updatedDocs);
+                                                            // }
+
+                                                            // // 👇 UI se remove karna
+                                                            // const updatedShown = values.documentsForShown.filter((_, idx) => idx !== i);
+                                                            // console.log(values.defaultFiles, "Bahir", updatedShown);
+
+                                                            // setFieldValue('documentsForShown', updatedShown);
+                                                        }}
                                                     >
                                                         <Entypo name="circle-with-cross" size={20} color="red" />
                                                     </TouchableOpacity>
@@ -619,7 +692,7 @@ const EditExpense = ({ navigation, route }) => {
                     </>
 
                 )}
-            </Formik>
+            </Formik >
 
         </>
     )

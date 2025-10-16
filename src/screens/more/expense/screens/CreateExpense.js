@@ -221,14 +221,14 @@ const CreateExpense = ({ navigation, route }) => {
                             formdata.append('attachment', {
                                 uri: v.uri,
                                 type: v.type, // You may want to determine this dynamically
-                                filename: v.name, // You can also use original file name
+                                name: v.name, // You can also use original file name
                             })
                         ));
                     }
 
                     console.log(formdata, "=====>");
                     try {
-                        const response = await fetch(`${API_URL}/ic/matter/exp-entry/`, {
+                        const response = await fetch(`${API_URL}/ic/matter/exp-entry/v1`, {
                             method: 'POST',
                             headers: {
                                 'Authorization': `Bearer ${token}`,
@@ -239,7 +239,7 @@ const CreateExpense = ({ navigation, route }) => {
                         const result = await response.json();
                         if (result?.data) {
                             toast.show('Expense added successfully', { type: 'success' })
-                            navigation.goBack()
+                            navigation.navigate("Activities");
                         }
                         else {
                             setFieldValue('loader', false);
